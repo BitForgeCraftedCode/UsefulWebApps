@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "List Buddy";
+}
+
+<div class="text-center list-buddy-index-container mx-auto">
+    <h1 class="display-4">List Buddy</h1>
+    <p>Choose a list template to use</p>
+    
+    <div class="list-group list-links-container mx-auto">   
+        <a asp-controller="ListBuddy" asp-action="ToDoList" class="list-group-item list-group-item-action list-group-item-primary">To Do List</a>
+        <a asp-controller="ListBuddy" asp-action="GroceryList" class="list-group-item list-group-item-action list-group-item-primary">Grocery List</a>
+    </div>
+</div>
+

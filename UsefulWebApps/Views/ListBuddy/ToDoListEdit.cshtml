@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "List Buddy";
+}
+
+@model UsefulWebApps.Models.ListBuddy.ToDoList
+
+<div class="text-center to-do-list-container mx-auto">
+    <h1 class="display-4">Edit</h1>
+    <form method="post">
+        <div class="input-group mb-3 mt-3">
+            <input asp-for="Id" hidden />
+            <input asp-for="Complete" hidden />
+            <input asp-for="ToDoItem" type="text" class="form-control" placeholder="new item" />
+            <button class="btn btn-primary" type="submit">Edit Item</button>
+        </div>
+        <div class="mb-2">
+            <span asp-validation-for="ToDoItem" class="text-danger"></span>
+        </div>
+        <div>
+            <a asp-controller="ListBuddy" asp-action="ToDoList" class="btn btn-primary">Back to List</a>
+        </div>
+    </form>
+</div>
+
+<!--Partial View scripts-->
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

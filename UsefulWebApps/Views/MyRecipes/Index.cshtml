@@ -1,0 +1,67 @@
+﻿@using UsefulWebApps.Models.MyRecipes
+@{
+    ViewData["Title"] = "My Recipes";
+}
+
+@model UsefulWebApps.Models.ViewModels.MyRecipes.RecipeIndexVM
+
+<div class="text-center list-buddy-index-container mx-auto">
+    <h1 class="display-4">Recipes</h1>
+    <p>To make a new recipe click <a asp-controller="MyRecipes" asp-action="CreateRecipe">here</a></p>
+    
+    <form asp-controller="MyRecipes" asp-action="Index" id="search-form">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" id="search-input" name="SearchString" asp-for="@Model.SearchString" />
+            <input class="btn btn-outline-secondary" type="submit" value="Search" />
+            <input class="btn btn-outline-secondary" type="button" value="Clear" onclick="clearSearch()" />
+        </div>
+    </form>
+    <div class="list-group">
+        @foreach (Recipe recipe in Model.Recipes)
+        {
+            <a asp-controller="MyRecipes" asp-action="Recipe" asp-route-id="@recipe.RecipeId" class="list-group-item list-group-item-action">@recipe.RecipeTitle</a>
+        }
+    </div>
+    <div class="mt-4">
+        <total-recipes total-recipes="@Model.TotalRecipes"></total-recipes>
+    </div>
+    <div class="mt-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage - 1 == 0 ? 1 : Model.CurrentPage - 1)">Previous</a></li>
+                <!--display 1st 3 and last 3 pages if more than 8 pages total-->
+                @if(Model.TotalPages >= 8)
+                {
+                    @for (int i = 1; i <= @Model.TotalPages; i++)
+                    {
+                        if (i <= 3)
+                        {
+                            <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-searchString="@Model.SearchString" asp-route-page="@i">@i</a></li>
+                        }
+                        else if (i == 4)
+                        {
+                            <li class="page-item disabled"><a class="page-link">...</a></li>
+                        }
+                        else if (i > Model.TotalPages - 3)
+                        {
+                            <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-searchString="@Model.SearchString" asp-route-page="@i">@i</a></li>
+                        }
+                    }
+                }
+                
+                <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage + 1 < Model.TotalPages ? Model.CurrentPage + 1 : Model.TotalPages)">Next</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!--scripts-->
+@section Scripts {
+    <script type="text/javascript">
+        function clearSearch() {
+            $("#search-input").val("");
+            $("#search-form").submit();
+        }
+    </script>
+}
+

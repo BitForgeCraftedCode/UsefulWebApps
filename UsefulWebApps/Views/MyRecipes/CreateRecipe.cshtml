@@ -1,0 +1,207 @@
+﻿@{
+    ViewData["Title"] = "My Recipes";
+}
+
+@model UsefulWebApps.Models.ViewModels.MyRecipes.RecipeVM
+
+<div class="list-buddy-index-container mx-auto">
+    <h1 class="mt-3 mb-3 text-center">Create Recipe</h1>
+    <form asp-controller="MyRecipes" asp-action="CreateRecipe" method="post" id="createRecipeForm">
+        <h2 class="display-6 mt-3 text-center">Title</h2>
+        <div class="form-floating mb-3">
+            <input asp-for="Recipe.RecipeTitle" type="text" class="form-control" minlength="3" required />
+            <label asp-for="Recipe.RecipeTitle">Recipe Title</label>
+            <span asp-validation-for="Recipe.RecipeTitle" class="text-danger"></span>
+        </div>
+        <h2 class="display-6 mt-3 text-center">Description</h2>
+        <div class="form-floating">
+            <textarea asp-for="Recipe.RecipeDescription" class="form-control ignore"></textarea>
+            <label asp-for="Recipe.RecipeDescription">Recipe Description</label>
+        </div>
+        <h2 class="display-6 mt-3 text-center">Course</h2>
+        <p style="font-size: 10px;">Check one.</p>
+        <!--hidden input just for jquery validate-->
+        <input type="hidden" name="courseError" id="courseError" />
+        <ul class="list-group list-group-flush mt-3 choice-list">
+            @for (int i = 0; i < Model.RecipeCourses.Count; i++)
+            {
+                <li class="list-group-item">
+                    <input class="form-check-input me-1 course-radio-btn" type="radio" asp-for="Recipe.CourseId" value="@Model.RecipeCourses[i].CourseId" checked="@(Model.RecipeCourses[i].IsChecked == true ? "checked" : null )" />
+                    @Model.RecipeCourses[i].Course
+                    <input type="hidden" asp-for="@Model.RecipeCourses[i].Course" />
+                    <input type="hidden" asp-for="@Model.RecipeCourses[i].CourseId" />
+                </li>
+            }
+        </ul>
+        <h2 class="display-6 mt-3 text-center">Cuisine</h2>
+        <p style="font-size: 10px;">Check one.</p>
+        <!--hidden input just for jquery validate-->
+        <input type="hidden" name="cuisineError" id="cuisineError" />
+        <ul class="list-group list-group-flush mt-3 choice-list">
+            @for (int i = 0; i < Model.RecipeCuisines.Count; i++)
+            {
+                <li class="list-group-item">
+                    <input class="form-check-input me-1 cuisine-radio-btn" type="radio" asp-for="Recipe.CuisineId" value="@Model.RecipeCuisines[i].CuisineId" checked="@(Model.RecipeCuisines[i].IsChecked == true ? "checked" : null)" />
+                    @Model.RecipeCuisines[i].Cuisine
+                    <input type="hidden" asp-for="@Model.RecipeCuisines[i].Cuisine" />
+                    <input type="hidden" asp-for="@Model.RecipeCuisines[i].CuisineId" />
+                </li>
+            }
+        </ul>
+        <h2 class="display-6 mt-3 text-center">Difficulty</h2>
+        <p style="font-size: 10px;">Check one.</p>
+        <!--hidden input just for jquery validate-->
+        <input type="hidden" name="difficultyError" id="difficultyError" />
+        <ul class="list-group mt-3">
+            @for (int i = 0; i < Model.RecipeDifficulties.Count; i++)
+            {
+                <li class="list-group-item">
+                    <input class="form-check-input me-1 difficulty-radio-btn" type="radio" asp-for="Recipe.DifficultyId" value="@Model.RecipeDifficulties[i].DifficultyId" checked="@(Model.RecipeDifficulties[i].IsChecked == true ? "checked" : null)" />
+                    @Model.RecipeDifficulties[i].Difficulty
+                    <input type="hidden" asp-for="@Model.RecipeDifficulties[i].Difficulty" />
+                    <input type="hidden" asp-for="@Model.RecipeDifficulties[i].DifficultyId" />
+                </li>
+            }
+        </ul>
+        <!-- https://stackoverflow.com/questions/40555543/how-do-i-implement-a-checkbox-list-in-asp-net-core -->
+        <h2 class="display-6 mt-3 text-center">Tags</h2>
+        <p style="font-size: 10px;">Check at least one tag.</p>
+        <!--hidden input just for jquery validate-->
+        <input type="hidden" name="tags" id="tags" />
+        <span asp-validation-for="Recipe.Categories" class="text-danger"></span>
+        <ul class="list-group list-group-flush mt-3 choice-list">
+            @for (int i = 0; i < Model.RecipeCategories.Count; i++)
+            {
+                <li class="list-group-item">
+                    <input class="form-check-input me-1 tags-ck-box" type="checkbox" asp-for="@Model.RecipeCategories[i].IsChecked" />
+                    <label class="form-check-label stretched-link" asp-for="@Model.RecipeCategories[i].IsChecked">@Model.RecipeCategories[i].Category</label>
+                    <input type="hidden" asp-for="@Model.RecipeCategories[i].CategoryId" />
+                    <input type="hidden" asp-for="@Model.RecipeCategories[i].Category" />
+                </li>
+            }
+        </ul>
+        <h2 class="display-6 mt-3 text-center">Prep Time</h2>
+        <div class="form-floating mb-3">
+            <input asp-for="Recipe.PrepTime" type="number" step="1" max="65535" min="0" class="form-control" required />
+            <label asp-for="Recipe.PrepTime">Prep Time - Minutes</label>
+            <span asp-validation-for="Recipe.PrepTime" class="text-danger"></span>
+        </div>
+        <h2 class="display-6 mt-3 text-center">Cook Time</h2>
+        <div class="form-floating mb-3">
+            <input asp-for="Recipe.CookTime" type="number" step="1" max="65535" min="0" class="form-control" required />
+            <label asp-for="Recipe.CookTime">Cook Time - Minutes</label>
+            <span asp-validation-for="Recipe.CookTime" class="text-danger"></span>
+        </div>
+        <h2 class="display-6 mt-3 text-center">Rating</h2>
+        <div class="form-floating mb-3">
+            <input asp-for="Recipe.Rating" type="number" step="1" max="10" min="1" class="form-control" required />
+            <label asp-for="Recipe.Rating">Rating 1-10</label>
+            <span asp-validation-for="Recipe.Rating" class="text-danger"></span>
+        </div>
+        <h2 class="display-6 mt-3 text-center">Servings</h2>
+        <div class="form-floating mb-3">
+            <input asp-for="Recipe.Servings" type="number" step="1" max="20" min="1" class="form-control" required />
+            <label asp-for="Recipe.Servings">Servings 1-20</label>
+            <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
+        </div>
+        <h2 class="display-6 mt-3 text-center">Ingredients</h2>
+        <div class="form-floating">
+            <textarea asp-for="Recipe.Ingredients" class="form-control textarea-input" minlength="3" required></textarea>
+            <label asp-for="Recipe.Ingredients">Recipe Ingredients</label>
+            <span asp-validation-for="Recipe.Ingredients" class="text-danger"></span>
+        </div>
+        <h2 class="display-6 mt-3 text-center">Instructions</h2>
+        <div class="form-floating">
+            <textarea asp-for="Recipe.Instructions" class="form-control textarea-input" minlength="3" required></textarea>
+            <label asp-for="Recipe.Instructions">Recipe Instructions</label>
+            <span asp-validation-for="Recipe.Instructions" class="text-danger"></span>
+        </div>
+        <h2 class="display-6 mt-3 text-center">Notes</h2>
+        <div class="form-floating">
+            <textarea asp-for="Recipe.Notes" class="form-control textarea-input ignore"></textarea>
+            <label asp-for="Recipe.Notes">Recipe Notes</label>
+        </div>
+        <h2 class="display-6 mt-3 text-center">Nutrition</h2>
+        <div class="form-floating">
+            <textarea asp-for="Recipe.Nutrition" class="form-control textarea-input ignore"></textarea>
+            <label asp-for="Recipe.Nutrition">Recipe Nutrition</label>
+        </div>
+        <div class="text-center">
+            <div class="mt-2">
+                <button class="btn btn-primary" type="submit">Create Recipe</button>
+            </div>
+            <div class="mt-2">
+                <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-primary">Back to Recipe List</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!--Partial View scripts-->
+@section Scripts {
+    @{
+            <partial name="_ValidationScriptsPartial" />
+    }
+    <script type="text/javascript">
+        $("#createRecipeForm").validate({
+            invalidHandler: function (event, validator) {
+                var errors = validator.numberOfInvalids();
+                if (errors) {
+                    toastError();
+                }
+            },
+            ignore: ".ignore",
+            rules: {
+                tags: {
+                    required: function (element) {
+                        var boxes = $('.tags-ck-box');
+                        if (boxes.filter(':checked').length == 0) {
+                            return true;
+                        }
+                        return false;
+                    },
+                    minlength: 1
+                },
+                courseError: {
+                    required: function (element) {
+                        var boxes = $('.course-radio-btn');
+                        if (boxes.filter(':checked').length == 0) {
+                            return true;
+                        }
+                        return false;
+                    },
+                    minlength: 1
+                },
+                cuisineError: {
+                    required: function (element) {
+                        var boxes = $('.cuisine-radio-btn');
+                        if (boxes.filter(':checked').length == 0) {
+                            return true;
+                        }
+                        return false;
+                    },
+                    minlength: 1
+                },
+                difficultyError: {
+                    required: function (element) {
+                        var boxes = $('.difficulty-radio-btn');
+                        if (boxes.filter(':checked').length == 0) {
+                            return true;
+                        }
+                        return false;
+                    },
+                    minlength: 1
+                }
+            },
+            messages: {
+                tags: "Please check at least one recipe tag.",
+                courseError: "Please pick a recipe course.",
+                cuisineError: "Please pick a recipe cuisine.",
+                difficultyError: "Please pick a recipe difficulty."
+            }
+        });
+        function toastError() {
+            toastr.error("Please check the form for errors.");
+        }
+    </script>
+}
