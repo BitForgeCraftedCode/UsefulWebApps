@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using UsefulWebApps.IdentityModels;
 
@@ -17,6 +18,11 @@ namespace UsefulWebApps.Controllers
         }
 
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult AccessDenied()
         {
             return View();
         }
@@ -59,11 +65,13 @@ namespace UsefulWebApps.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult RegisterAdmin()
         {
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> RegisterAdmin(Register userRegInfo)
         {
