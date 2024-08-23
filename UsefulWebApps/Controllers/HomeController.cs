@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using UsefulWebApps.Models;
 
 namespace UsefulWebApps.Controllers
 {
+    [Authorize(Roles = "StandardUser, Admin")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
