@@ -78,7 +78,7 @@ namespace UsefulWebApps.Repository
             return rowsEffected > 0 ? true : false;
         }
 
-        public async Task<bool> Delete(T entity)
+        public async Task<bool> Delete(int? id)
         {
             int rowsEffected = 0;
 
@@ -87,7 +87,7 @@ namespace UsefulWebApps.Repository
             string keyProperty = GetKeyPropertyName();
             string query = $"DELETE FROM {tableName} WHERE {keyColumn} = @{keyProperty}";
 
-            rowsEffected = await _connection.ExecuteAsync(query, entity);
+            rowsEffected = await _connection.ExecuteAsync(query, new { id });
 
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
