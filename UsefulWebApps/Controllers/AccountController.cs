@@ -59,6 +59,43 @@ namespace UsefulWebApps.Controllers
             }
         }
 
+        public IActionResult RegisterAdmin()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterAdmin(Register userRegInfo)
+        {
+            if (!ModelState.IsValid) { return View(); }
+
+            IdentityUser user = new IdentityUser
+            {
+                Email = userRegInfo.Email,
+                UserName = userRegInfo.UserName
+            };
+            IdentityResult result = await _userManager.CreateAsync(user, userRegInfo.Password);
+            if (result.Succeeded)
+            {
+
+                if (!await _roleManager.RoleExistsAsync("Admin"))
+                {
+                    IdentityRole adminUserRole = new IdentityRole("Admin");
+                    await _roleManager.CreateAsync(adminUserRole);
+                }
+                await _userManager.AddToRoleAsync(user, "Admin");
+                return RedirectToAction("Login");
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("Register", error.Description);
+                }
+                return View();
+            }
+        }
+
         public IActionResult Login()
         {
             return View();
