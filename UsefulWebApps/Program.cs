@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using UsefulWebApps.Data;
+using UsefulWebApps.Repository.IRepository;
+using UsefulWebApps.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,8 @@ builder.Services.AddMySqlDataSource(builder.Configuration.GetConnectionString("D
 builder.Services.AddDbContext<EFCoreDbContext>(options => {
     options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
