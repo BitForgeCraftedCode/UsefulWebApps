@@ -58,10 +58,15 @@ namespace UsefulWebApps.Controllers
         {
             if (ModelState.IsValid)
             {
-                string sql = "INSERT INTO to_do_list (ToDoItem, Complete) VALUES (@newToDoItem, @isComplete)";
-                await _connection.ExecuteAsync(sql, new { newToDoItem = toDoList.ToDoItem, isComplete = toDoList.Complete });
-                TempData["success"] = "To do item created successfully";
-                await _connection.CloseAsync();
+                bool success = await _unitOfWork.ToDoList.Add(toDoList);
+                if (success)
+                {
+                    TempData["success"] = "To do item created successfully";
+                }   
+                else
+                {
+                    TempData["error"] = "Add To do item error. Please try again.";
+                }
                 return RedirectToAction("ToDoList");
             }
             TempData["error"] = "Add To do item error. Please try again.";
