@@ -5,16 +5,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.ViewModels.ListBuddy;
 using static Dapper.SqlMapper;
+using UsefulWebApps.Repository.IRepository;
 
 
 namespace UsefulWebApps.Controllers
 {
     public class ListBuddyController : Controller
     {
+        private readonly IUnitOfWork _unitOfWork;
+
         private readonly MySqlConnection _connection;
-        public ListBuddyController(MySqlConnection db)
+        public ListBuddyController(MySqlConnection db, IUnitOfWork unitOfWork)
         {
             _connection = db;
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
@@ -22,11 +26,11 @@ namespace UsefulWebApps.Controllers
         }
 
         #region To Do List
+
         public async Task<IActionResult> ToDoList()
         {
-            string sql = "SELECT * FROM to_do_list";
-           
-            List<ToDoList> listItems = (List<ToDoList>)await _connection.QueryAsync<ToDoList>(sql);
+            
+            List<ToDoList> listItems = (List<ToDoList>)await _unitOfWork.ToDoList.GetAll();
             ToDoListVM toDoListVM = new()
             {
                 ToDoListItems = listItems,
