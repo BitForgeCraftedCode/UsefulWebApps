@@ -186,24 +186,19 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
-            string sqlMult = @"
-                SELECT * FROM grocery_list WHERE Id = @id;
-                SELECT * FROM grocery_categories;
-            ";
-            GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult, new { id });
-            GroceryList groceryList = await gridReader.ReadFirstAsync<GroceryList>();
-            IEnumerable<GroceryCategories> groceryListCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
-            await _connection.CloseAsync();
-            IEnumerable<SelectListItem> groceryListCategories = groceryListCategoriesEnum.Select(u => new SelectListItem
+            (GroceryList groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GetGroceryListItemAndCategoriesAtId(id);
+            GroceryList groceryListItem = result.groceryListItem;
+            IEnumerable<GroceryCategories> groceryCategoriesEnum = result.groceryCategoriesEnum;
+            IEnumerable<SelectListItem> groceryListCategories = groceryCategoriesEnum.Select(u => new SelectListItem
             {
-                Text= u.Category,
-                Value= u.Category
+                Text = u.Category,
+                Value = u.Category
             });
 
             GroceryListEditVM groceryListEditVM = new()
             {
-                Category = groceryList.Category,    
-                GroceryList = groceryList,
+                Category = groceryListItem.Category,
+                GroceryList = groceryListItem,
                 GroceryCategoriesList = groceryListCategories
             };
             return View(groceryListEditVM);

@@ -7,6 +7,7 @@ namespace UsefulWebApps.Repository.IRepository
     {
         //any GroceryList model specific database methods here
         Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemsAndCategories();
+        Task<(GroceryList groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemAndCategoriesAtId(int? id);
         Task GroceryListToggleComplete(int? id);
     }
 }

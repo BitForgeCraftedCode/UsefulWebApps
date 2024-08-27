@@ -26,7 +26,21 @@ namespace UsefulWebApps.Repository
             await _connection.CloseAsync();
             return (groceryListItems, groceryCategoriesEnum);
         }
-       
+
+        public async Task<(GroceryList groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemAndCategoriesAtId(int? id)
+        {
+            string query = @"
+                SELECT * FROM grocery_list WHERE Id = @id;
+                SELECT * FROM grocery_categories;
+            ";
+            GridReader gridReader = await _connection.QueryMultipleAsync(query, new { id });
+            GroceryList groceryListItem = await gridReader.ReadFirstAsync<GroceryList>();
+            IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
+            await _connection.CloseAsync();
+            return (groceryListItem, groceryCategoriesEnum);
+        }
+
+
         public async Task GroceryListToggleComplete(int? id)
         {
             await _connection.OpenAsync();
