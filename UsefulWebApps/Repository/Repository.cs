@@ -93,6 +93,23 @@ namespace UsefulWebApps.Repository
             return rowsEffected > 0 ? true : false;
         }
 
+        public async Task<bool> DeleteAll()
+        {
+            int rowsEffected = 0;
+            string tableName = GetTableName();
+            string keyColumn = GetKeyColumnName();
+
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string query1 = $"DELETE FROM {tableName} WHERE {keyColumn} >= 1";
+            string query2 = $"ALTER TABLE {tableName} AUTO_INCREMENT = 1";
+            rowsEffected = await _connection.ExecuteAsync(query1, transaction: txn);
+            await _connection.ExecuteAsync(query2, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
+
         private static string GetTableName()
         {
             string tableName = "";

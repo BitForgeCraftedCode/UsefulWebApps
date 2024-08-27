@@ -85,32 +85,11 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("ToDoList");
         }
 
-        //[HttpPost]
-        //[Route("/ListBuddy/ToDoListDeleteItem", Name = "deleteToDoItem")]
-        //public async Task<IActionResult> ToDoListDeleteItem(int? id)
-        //{
-        //    if (id == null || id == 0)
-        //    {
-        //        return NotFound();
-        //    }
-        //    string sql = "DELETE FROM to_do_list WHERE Id = @id";
-        //    await _connection.ExecuteAsync(sql, new { id });
-        //    await _connection.CloseAsync();
-        //    return RedirectToAction("ToDoList");
-        //}
-
         [HttpPost]
         [Route("/ListBuddy/ToDoListDeleteAll", Name = "deleteAllToDoList")]
         public async Task<IActionResult> ToDoListDeleteAll()
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
-            string sql = "DELETE FROM to_do_list WHERE Id >= 1";
-            string sql2 = "ALTER TABLE to_do_list AUTO_INCREMENT = 1";
-            await _connection.ExecuteAsync(sql, transaction: txn);
-            await _connection.ExecuteAsync(sql2, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            await _unitOfWork.ToDoList.DeleteAll();
             return RedirectToAction("ToDoList");
         }
 
