@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MySqlConnector;
-using Dapper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.ViewModels.ListBuddy;
-using static Dapper.SqlMapper;
 using UsefulWebApps.Repository.IRepository;
 
 
@@ -14,10 +11,8 @@ namespace UsefulWebApps.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        private readonly MySqlConnection _connection;
-        public ListBuddyController(MySqlConnection db, IUnitOfWork unitOfWork)
+        public ListBuddyController(IUnitOfWork unitOfWork)
         {
-            _connection = db;
             _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
