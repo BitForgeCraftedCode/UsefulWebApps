@@ -256,10 +256,15 @@ namespace UsefulWebApps.Controllers
             TryValidateModel(groceryListVM.GroceryList);
             if (ModelState.IsValid)
             {
-                string sql = "INSERT INTO grocery_list (GroceryItem, Category, Complete) VALUES (@newGroceryItem, @itemCategory, @isComplete)";
-                await _connection.ExecuteAsync(sql, new { newGroceryItem = groceryListVM.GroceryList.GroceryItem, itemCategory = groceryListVM.GroceryList.Category, isComplete = groceryListVM.GroceryList.Complete });
-                TempData["success"] = "Grocery item created successfully";
-                await _connection.CloseAsync();
+                bool success = await _unitOfWork.GroceryList.Add(groceryListVM.GroceryList);
+                if (success)
+                {
+                    TempData["success"] = "Grocery item created successfully";
+                }
+                else
+                {
+                    TempData["error"] = "Add grocery item error. Please try again.";
+                }
                 return RedirectToAction("GroceryList");
             }
             TempData["error"] = "Add grocery item error. Please try again.";
