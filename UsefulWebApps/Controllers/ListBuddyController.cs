@@ -36,7 +36,6 @@ namespace UsefulWebApps.Controllers
                 ToDoListItems = listItems,
                 ToDoList = new ToDoList()
             };
-            await _connection.CloseAsync();
             return View(toDoListVM);
         }
 
