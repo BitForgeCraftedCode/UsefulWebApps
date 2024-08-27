@@ -13,5 +13,11 @@ namespace UsefulWebApps.Repository
         }
 
         //any GroceryList model specific database methods here
+        public async Task GroceryListToggleComplete(int? id)
+        {
+            await _connection.OpenAsync();
+            //logic here
+            await _connection.CloseAsync();
+        }
     }
 }
