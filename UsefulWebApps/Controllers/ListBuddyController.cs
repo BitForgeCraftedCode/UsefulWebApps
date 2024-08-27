@@ -275,16 +275,10 @@ namespace UsefulWebApps.Controllers
         [Route("/ListBuddy/GroceryListDeleteAll", Name = "deleteAllGroceryList")]
         public async Task<IActionResult> GroceryListDeleteAll()
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
-            string sql = "DELETE FROM grocery_list WHERE Id >= 1";
-            string sql2 = "ALTER TABLE grocery_list AUTO_INCREMENT = 1";
-            await _connection.ExecuteAsync(sql, transaction: txn);
-            await _connection.ExecuteAsync(sql2, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            await _unitOfWork.GroceryList.DeleteAll();
             return RedirectToAction("GroceryList");
         }
+
         #endregion
     }
 }
