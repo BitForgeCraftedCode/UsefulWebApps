@@ -24,11 +24,12 @@ namespace UsefulWebApps.Repository
             await _connection.CloseAsync();
             return allDbRows;
         }
-        public async Task<T> GetById(int id)
+        public async Task<T> GetById(int? id)
         {
             string tableName = GetTableName();
             string keyColumn = GetKeyColumnName();
-            string sql = $"SELECT * FROM {tableName} WHERE {keyColumn} = @id";
+            string keyProperty = GetKeyPropertyName();
+            string sql = $"SELECT * FROM {tableName} WHERE {keyColumn} = @{keyProperty}";
             T singleDbRow = await _connection.QuerySingleAsync<T>(sql, new { id });
             await _connection.CloseAsync();
             return singleDbRow;

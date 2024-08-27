@@ -8,7 +8,7 @@
 
         //https://stackoverflow.com/questions/14458566/making-interface-implementations-async
         Task<IEnumerable<T>> GetAll();
-        Task<T> GetById(int id);
+        Task<T> GetById(int? id);
         Task<bool> Add(T entity);
         Task<bool> Update(T entity);
         Task<bool> Delete(int? id);

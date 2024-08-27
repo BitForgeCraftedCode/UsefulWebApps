@@ -98,10 +98,8 @@ namespace UsefulWebApps.Controllers
             if (id == null || id == 0)
             {
                 return NotFound();
-            }
-            string sql = "SELECT * FROM to_do_list WHERE Id = @id";
-            ToDoList toDoList = await _connection.QuerySingleAsync<ToDoList>(sql, new { id });
-            await _connection.CloseAsync();
+            } 
+            ToDoList toDoList = await _unitOfWork.ToDoList.GetById(id);
             return View(toDoList);
         }
 
@@ -110,15 +108,21 @@ namespace UsefulWebApps.Controllers
         {
             if (ModelState.IsValid)
             {
-                string sql = "UPDATE to_do_list SET ToDoItem = @toDoItem WHERE Id = @id";
-                await _connection.ExecuteAsync(sql, new { toDoItem = obj.ToDoItem, id = obj.Id });
-                TempData["success"] = "To do item updated successfully";
-                await _connection.CloseAsync();
+                bool success = await _unitOfWork.ToDoList.Update(obj);
+                if (success)
+                {
+                    TempData["success"] = "To do item updated successfully";
+                }
+                else
+                {
+                    TempData["error"] = "Update to do item error. Try again.";
+                }
                 return RedirectToAction("ToDoList");
             }
-            TempData["error"] = "Update to do item error. Go back to list and try again.";
-            return View();
+            TempData["error"] = "Update to do item error. Try again.";
+            return RedirectToAction("ToDoList");
         }
+
         #endregion
 
         #region Grocery List
