@@ -213,10 +213,15 @@ namespace UsefulWebApps.Controllers
 
             if (ModelState.IsValid)
             {
-                string sql = "UPDATE grocery_list SET GroceryItem = @groceryItem, Category = @category WHERE Id = @id";
-                await _connection.ExecuteAsync(sql, new { groceryItem = groceryList.GroceryItem, category = groceryList.Category, id = groceryList.Id });
-                TempData["success"] = "Grocery item updated successfully";
-                await _connection.CloseAsync();
+                bool success = await _unitOfWork.GroceryList.Update(groceryList);
+                if (success) 
+                {
+                    TempData["success"] = "Grocery item updated successfully";
+                }
+                else
+                {
+                    TempData["error"] = "Update grocery item error. Please try again.";
+                }
                 return RedirectToAction("GroceryList");
             }
             TempData["error"] = "Update grocery item error. Please try again.";
