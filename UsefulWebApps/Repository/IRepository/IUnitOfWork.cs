@@ -3,6 +3,7 @@
     public interface IUnitOfWork
     {
         IToDoListRepository ToDoList {  get; }
+        IGroceryListRepository GroceryList { get; }
         //other repos here
     }
 }

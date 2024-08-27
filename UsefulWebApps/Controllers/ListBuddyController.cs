@@ -125,18 +125,13 @@ namespace UsefulWebApps.Controllers
         #endregion
 
         #region Grocery List
+
         public async Task<IActionResult> GroceryList()
         {
-
-            string sqlMult = @"
-                SELECT * FROM grocery_list;
-                SELECT * FROM grocery_categories;
-            ";
-            GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult);
-            List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
-            IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
-            await _connection.CloseAsync();
-
+            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories();
+            List<GroceryList> groceryListItems = result.groceryListItems;
+            IEnumerable<GroceryCategories> groceryCategoriesEnum = result.groceryCategoriesEnum;
+            
             //for UI display we need a list of grocery items for each category
             //A list of lists where each individual list will contain the all items in a specific category
             List<List<GroceryList>> filteredGroceryListItems = new List<List<GroceryList>>();
@@ -148,7 +143,7 @@ namespace UsefulWebApps.Controllers
                 Text = u.Category,
                 Value = u.Category
             });
-            
+
             //filter out the List of lists
             //for each category filter out the grocery list items in that category to their own list 
             //add each new list to the filteredGroceryList variable
@@ -162,14 +157,14 @@ namespace UsefulWebApps.Controllers
                     filteredGroceryListItems.Add(filter);
                 }
             }
-            
+
             GroceryListVM groceryListVM = new()
             {
                 GroceryList = new GroceryList(),
                 GroceryCategoriesList = groceryListCategories,
                 FilteredGroceryListItems = filteredGroceryListItems
             };
-           
+
             return View(groceryListVM);
         }
 

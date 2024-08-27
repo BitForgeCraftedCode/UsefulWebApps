@@ -10,12 +10,14 @@ namespace UsefulWebApps.Repository
         private readonly MySqlConnection _connection;
 
         public IToDoListRepository ToDoList {  get; private set; }
+        public IGroceryListRepository GroceryList { get; private set; }
         //other repos here
 
         public UnitOfWork(MySqlConnection db)
         {
             _connection = db;
             ToDoList = new  ToDoListRepository(_connection);
+            GroceryList = new GroceryListRepository(_connection);
             //other repos here
         }
     }
