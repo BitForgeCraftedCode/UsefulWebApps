@@ -236,9 +236,7 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
-            string sql = "DELETE FROM grocery_list WHERE Id = @id";
-            await _connection.ExecuteAsync(sql, new { id });
-            await _connection.CloseAsync();
+            await _unitOfWork.GroceryList.Delete(id);
             return RedirectToAction("GroceryList");
         }
 
