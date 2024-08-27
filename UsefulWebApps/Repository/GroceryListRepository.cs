@@ -30,7 +30,20 @@ namespace UsefulWebApps.Repository
         public async Task GroceryListToggleComplete(int? id)
         {
             await _connection.OpenAsync();
-            //logic here
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string sql = "SELECT Complete FROM grocery_list WHERE Id = @id";
+            bool isComplete = await _connection.QuerySingleAsync<bool>(sql, new { id }, transaction: txn);
+            string sql2 = String.Empty;
+            if (isComplete)
+            {
+                sql2 = "UPDATE grocery_list SET Complete = False WHERE Id = @id";
+            }
+            else
+            {
+                sql2 = "UPDATE grocery_list SET Complete = True WHERE Id = @id";
+            }
+            await _connection.ExecuteAsync(sql2, new { id }, transaction: txn);
+            await txn.CommitAsync();
             await _connection.CloseAsync();
         }
     }
