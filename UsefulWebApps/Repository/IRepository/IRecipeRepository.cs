@@ -23,5 +23,7 @@ namespace UsefulWebApps.Repository.IRepository
             List<RecipeDifficulties> recipeDifficulties
             )> GetCategoriesForCreateDisplay();
 
+        Task<bool> AddRecipe(RecipeVM recipeVM);
+
     }
 }

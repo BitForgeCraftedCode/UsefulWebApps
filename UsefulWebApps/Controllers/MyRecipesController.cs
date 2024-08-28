@@ -272,88 +272,22 @@ namespace UsefulWebApps.Controllers
                 }
             }
             recipeVM.Recipe.Categories = recipeVM.RecipeCategories;
-            //make a checked categories parameter list for sql INSERT
-            List<Object> checkedCategoriesParams = new List<Object>();
             
+
             ModelState.Clear();
             TryValidateModel(recipeVM);
             if (ModelState.IsValid)
             {
-                await _connection.OpenAsync();
-                MySqlTransaction txn = await _connection.BeginTransactionAsync();
-                string sql = @"INSERT INTO recipes 
-                    (
-                        RecipeTitle, 
-                        RecipeDescription, 
-                        CourseId, 
-                        CuisineId, 
-                        DifficultyId, 
-                        PrepTime, 
-                        CookTime, 
-                        Rating, 
-                        Servings, 
-                        Nutrition, 
-                        Ingredients,   
-                        Instructions,   
-                        Notes
-                    )
-                    VALUES 
-                    (
-                        @recipeTitle,   
-                        @recipeDescription, 
-                        @courseId, 
-                        @cuisineId, 
-                        @difficultyId, 
-                        @prepTime, 
-                        @cookTime, 
-                        @rating, 
-                        @servings, 
-                        @nutrition, 
-                        @ingredients, 
-                        @instructions, 
-                        @notes
-                    )";
-                await _connection.ExecuteAsync(sql, new
+                bool success = await _unitOfWork.Recipe.AddRecipe(recipeVM);
+                if (success)
                 {
-                    recipeTitle = recipeVM.Recipe.RecipeTitle,
-                    recipeDescription = recipeVM.Recipe.RecipeDescription,
-                    courseId = recipeVM.Recipe.Course.CourseId,
-                    cuisineId = recipeVM.Recipe.Cuisine.CuisineId,
-                    difficultyId = recipeVM.Recipe.Difficulty.DifficultyId,
-                    prepTime = recipeVM.Recipe.PrepTime,
-                    cookTime = recipeVM.Recipe.CookTime,
-                    rating = recipeVM.Recipe.Rating,
-                    servings = recipeVM.Recipe.Servings,
-                    nutrition = recipeVM.Recipe.Nutrition,
-                    ingredients = recipeVM.Recipe.Ingredients,
-                    instructions = recipeVM.Recipe.Instructions,
-                    notes = recipeVM.Recipe.Notes
-                }, transaction: txn);
-
-                //need the id before adding to recipe_categories_join
-                //not sure on the best way but for now using LAST_INSERT_ID() should get the job done. 
-                //https://stackoverflow.com/questions/56378699/insert-on-a-child-table-and-update-fk-on-parent
-                //https://stackoverflow.com/questions/3837990/last-insert-id-mysql
-                //https://stackoverflow.com/questions/19714308/mysql-how-to-insert-into-table-that-has-many-to-many-relationship
-                string sql2 = @"SELECT RecipeId FROM recipes WHERE RecipeId = LAST_INSERT_ID()";
-                //string sql2 = @"LAST_INSERT_ID()";
-                int idLastRecipeInsert = await _connection.QuerySingleAsync<int>(sql2, transaction: txn);
-         
-                foreach (RecipeCategories category in recipeVM.Recipe.Categories)
-                {
-                    if (category.IsChecked == true)
-                    {
-                        checkedCategoriesParams.Add(
-                            new { id = idLastRecipeInsert, categoryId = category.CategoryId }
-                        );
-                    }
+                    TempData["success"] = "Recipe created successfully";
                 }
-                string sql3 = @"INSERT INTO recipe_categories_join (RecipeId, CategoryId) VALUES (@id, @categoryId)";
-                
-                await _connection.ExecuteAsync(sql3, checkedCategoriesParams, transaction: txn);
-                await txn.CommitAsync();
-                TempData["success"] = "Recipe created successfully";
-                await _connection.CloseAsync();
+                else
+                {
+                    TempData["error"] = "Create recipe error. Please try again.";
+                }
+           
                 return View(recipeVM);
             }
             TempData["error"] = "Create recipe error. Please try again.";
