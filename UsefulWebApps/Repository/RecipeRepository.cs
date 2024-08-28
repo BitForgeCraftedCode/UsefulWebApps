@@ -131,11 +131,23 @@ namespace UsefulWebApps.Repository
             return (recipe, recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties);
         }
 
-        public async Task<bool> UpdateRecipe(RecipeVM recipeVM, List<Object> checkedCategoriesParams)
+        public async Task<bool> UpdateRecipe(RecipeVM recipeVM)
         {
             int rowsEffected1 = 0;
             int rowsEffected2 = 0;
             int rowsEffected3 = 0;
+            //make a checked categories parameter list for sql INSERT
+            List<Object> checkedCategoriesParams = new List<Object>();
+            foreach (RecipeCategories category in recipeVM.Recipe.Categories)
+            {
+                if (category.IsChecked == true)
+                {
+                    checkedCategoriesParams.Add(
+                        new { id = recipeVM.Recipe.RecipeId, categoryId = category.CategoryId }
+                    );
+                }
+            }
+
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
             string sql = @"UPDATE recipes

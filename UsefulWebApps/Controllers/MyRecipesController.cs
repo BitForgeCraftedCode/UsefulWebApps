@@ -187,24 +187,13 @@ namespace UsefulWebApps.Controllers
                 }
             }
             recipeVM.Recipe.Categories = recipeVM.RecipeCategories;
-            //make a checked categories parameter list for sql INSERT
-            List<Object> checkedCategoriesParams = new List<Object>();
-            foreach (RecipeCategories category in recipeVM.Recipe.Categories)
-            {
-                if (category.IsChecked == true)
-                {
-                    checkedCategoriesParams.Add(
-                        new { id = recipeVM.Recipe.RecipeId, categoryId = category.CategoryId }
-                    );
-                }
-            }
-
+            
             ModelState.Clear();
             TryValidateModel(recipeVM);
 
             if (ModelState.IsValid)
             {
-                bool success = await _unitOfWork.Recipe.UpdateRecipe(recipeVM, checkedCategoriesParams);
+                bool success = await _unitOfWork.Recipe.UpdateRecipe(recipeVM);
                 if (success)
                 {
                     TempData["success"] = "Recipe updated successfully";

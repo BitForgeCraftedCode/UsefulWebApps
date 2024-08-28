@@ -15,7 +15,7 @@ namespace UsefulWebApps.Repository.IRepository
             List<RecipeCuisines> recipeCuisines, 
             List<RecipeDifficulties> recipeDifficulties
             )> GetRecipeAndCategoriesForEditDisplay(int? id);
-        Task<bool> UpdateRecipe(RecipeVM recipeVM, List<Object> checkedCategoriesParams);
+        Task<bool> UpdateRecipe(RecipeVM recipeVM);
         Task<(
             List<RecipeCategories> recipeCategories,
             List<RecipeCourses> recipeCourses,
