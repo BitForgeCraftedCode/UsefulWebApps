@@ -60,22 +60,9 @@ namespace UsefulWebApps.Controllers
                 return NotFound();
             }
 
-            //https://www.learndapper.com/relationships -- map the JOIN to C# objects
-            //this is a list of 1 single recipe listed x times one for each category -- best to see this by running the above sql in workbench. 
-            List<Recipe> recipe = await _unitOfWork.Recipe.GetRecipeById(id);
+            Recipe recipe = await _unitOfWork.Recipe.GetRecipeById(id);
 
-            //since we sql SELECT on 1 id GroupBy returns 1 group with x num recipe rows
-            //foreach group get the First recipe and add the categories to it
-            //this returns a list with 1 recipe in it that now has List<RecipeCategories> filled
-            List<Recipe> filteredRecipe = recipe.GroupBy(r => r.RecipeId).Select(g =>
-            {
-                Recipe singleRecipe = g.First();
-                //select each recipe in the group and return the list of categories
-                singleRecipe.Categories = g.Select(r => r.Categories.Single()).ToList();
-                return singleRecipe;
-            }).ToList();
-
-            return View(filteredRecipe[0]);
+            return View(recipe);
         }
 
         public async Task<IActionResult> EditRecipe(int? id)
@@ -290,22 +277,9 @@ namespace UsefulWebApps.Controllers
                 return NotFound();
             }
 
-            //https://www.learndapper.com/relationships -- map the JOIN to C# objects
-            //this is a list of 1 single recipe listed x times one for each category -- best to see this by running the above sql in workbench. 
-            List<Recipe> recipe = await _unitOfWork.Recipe.GetRecipeById(id);
+            Recipe recipe = await _unitOfWork.Recipe.GetRecipeById(id);
 
-            //since we sql SELECT on 1 id GroupBy returns 1 group with x num recipe rows
-            //foreach group get the First recipe and add the categories to it
-            //this returns a list with 1 recipe in it that now has List<RecipeCategories> filled
-            List<Recipe> filteredRecipe = recipe.GroupBy(r => r.RecipeId).Select(g =>
-            {
-                Recipe singleRecipe = g.First();
-                //select each recipe in the group and return the list of categories
-                singleRecipe.Categories = g.Select(r => r.Categories.Single()).ToList();
-                return singleRecipe;
-            }).ToList();
-
-            return View(filteredRecipe[0]);
+            return View(recipe);
         }
 
         [HttpPost, ActionName("DeleteRecipe")]

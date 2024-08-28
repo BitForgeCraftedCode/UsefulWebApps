@@ -57,7 +57,7 @@ namespace UsefulWebApps.Repository
             return (count, recipes);
         }
 
-        public async Task<List<Recipe>> GetRecipeById(int? id)
+        public async Task<Recipe> GetRecipeById(int? id)
         {
             //returns x rows of a single recipe at RecipeId where x is the number of categories
             string sql = @"SELECT * FROM recipes
@@ -79,8 +79,19 @@ namespace UsefulWebApps.Repository
                     return recipe;
                 }, new { id }, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId");
 
+            //since we sql SELECT on 1 id GroupBy returns 1 group with x num recipe rows
+            //foreach group get the First recipe and add the categories to it
+            //this returns a list with 1 recipe in it that now has List<RecipeCategories> filled
+            List<Recipe> filteredRecipe = recipe.GroupBy(r => r.RecipeId).Select(g =>
+            {
+                Recipe singleRecipe = g.First();
+                //select each recipe in the group and return the list of categories
+                singleRecipe.Categories = g.Select(r => r.Categories.Single()).ToList();
+                return singleRecipe;
+            }).ToList();
+
             await _connection.CloseAsync();
-            return recipe;
+            return filteredRecipe[0];
         }
 
         public async Task<(
