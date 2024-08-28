@@ -6,6 +6,7 @@ namespace UsefulWebApps.Repository.IRepository
     public interface IRecipeRepository : IRepository<Recipe>
     {
         //any Recipe model specific database methods here
+        //Recipe is very specific no generic repo methods used
         Task<(int count, List<Recipe> recipes)> Pagination(int limit, int offset, string searchString);
         Task<Recipe> GetRecipeById(int? id);
         Task<(
@@ -24,6 +25,7 @@ namespace UsefulWebApps.Repository.IRepository
             )> GetCategoriesForCreateDisplay();
 
         Task<bool> AddRecipe(RecipeVM recipeVM);
+        Task<bool> DeleteRecipe(int? id);
 
     }
 }

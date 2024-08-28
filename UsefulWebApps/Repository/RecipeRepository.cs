@@ -15,6 +15,7 @@ namespace UsefulWebApps.Repository
             _connection = db;
         }
         //any Recipe model specific database methods here
+        //Recipe is very specific no generic repo methods used
         public async Task<(int count, List<Recipe> recipes)> Pagination(int limit, int offset, string searchString)
         {
             /* Basic limit offset pagination
@@ -297,6 +298,21 @@ namespace UsefulWebApps.Repository
             string sql3 = @"INSERT INTO recipe_categories_join (RecipeId, CategoryId) VALUES (@id, @categoryId)";
 
             rowsEffected2 = await _connection.ExecuteAsync(sql3, checkedCategoriesParams, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (rowsEffected1 > 0 && rowsEffected2 > 0) ? true : false;
+        }
+
+        public async Task<bool> DeleteRecipe(int? id)
+        {
+            int rowsEffected1 = 0;
+            int rowsEffected2 = 0;
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string sql = @"DELETE FROM recipe_categories_join WHERE RecipeId = @recipeId";
+            string sql2 = @"DELETE FROM recipes WHERE RecipeId = @recipeId";
+            rowsEffected1 = await _connection.ExecuteAsync(sql, new { recipeId = id }, transaction: txn);
+            rowsEffected2 = await _connection.ExecuteAsync(sql2, new { recipeId = id }, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return (rowsEffected1 > 0 && rowsEffected2 > 0) ? true : false;

@@ -217,7 +217,6 @@ namespace UsefulWebApps.Controllers
                 RecipeCuisines = recipeCuisines,
                 RecipeDifficulties = recipeDifficulties
             };
-            await _connection.CloseAsync();
             return View(recipeVM);
         }
 
@@ -289,15 +288,15 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
-            string sql = @"DELETE FROM recipe_categories_join WHERE RecipeId = @recipeId";
-            string sql2 = @"DELETE FROM recipes WHERE RecipeId = @recipeId";
-            await _connection.ExecuteAsync(sql, new { recipeId = id }, transaction: txn);
-            await _connection.ExecuteAsync(sql2, new { recipeId = id }, transaction: txn);
-            await txn.CommitAsync();
-            TempData["success"] = "Recipe deleted successfully";
-            await _connection.CloseAsync();
+            bool success = await _unitOfWork.Recipe.DeleteRecipe(id);
+            if (success) 
+            {
+                TempData["success"] = "Recipe deleted successfully";
+            }
+            else
+            {
+                TempData["error"] = "Delete recipe error. Please try again";
+            }
             return RedirectToAction("Index");
         }
     }
