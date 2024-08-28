@@ -11,7 +11,7 @@ namespace UsefulWebApps.Repository
 
         public IToDoListRepository ToDoList {  get; private set; }
         public IGroceryListRepository GroceryList { get; private set; }
-        public IRecipeRepository RecipeRepository { get; private set; }
+        public IRecipeRepository Recipe { get; private set; }
         //other repos here
 
         public UnitOfWork(MySqlConnection db)
@@ -19,7 +19,7 @@ namespace UsefulWebApps.Repository
             _connection = db;
             ToDoList = new  ToDoListRepository(_connection);
             GroceryList = new GroceryListRepository(_connection);
-            RecipeRepository = new RecipeRepository(_connection);
+            Recipe = new RecipeRepository(_connection);
             //other repos here
         }
     }

@@ -4,7 +4,7 @@
     {
         IToDoListRepository ToDoList {  get; }
         IGroceryListRepository GroceryList { get; }
-        IRecipeRepository RecipeRepository { get; }
+        IRecipeRepository Recipe { get; }
         //other repos here
     }
 }
