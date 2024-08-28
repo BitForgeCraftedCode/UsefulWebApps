@@ -1,4 +1,5 @@
 ﻿using UsefulWebApps.Models.MyRecipes;
+using UsefulWebApps.Models.ViewModels.MyRecipes;
 
 namespace UsefulWebApps.Repository.IRepository
 {
@@ -14,6 +15,7 @@ namespace UsefulWebApps.Repository.IRepository
             List<RecipeCuisines> recipeCuisines, 
             List<RecipeDifficulties> recipeDifficulties
             )> GetRecipeAndCategoriesForEditDisplay(int? id);
+        Task<bool> UpdateRecipe(RecipeVM recipeVM, List<Object> checkedCategoriesParams);
 
     }
 }

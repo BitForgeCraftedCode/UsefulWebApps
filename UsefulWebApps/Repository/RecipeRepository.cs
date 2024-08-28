@@ -3,6 +3,7 @@ using UsefulWebApps.Repository.IRepository;
 using MySqlConnector;
 using Dapper;
 using static Dapper.SqlMapper;
+using UsefulWebApps.Models.ViewModels.MyRecipes;
 
 namespace UsefulWebApps.Repository
 {
@@ -128,6 +129,48 @@ namespace UsefulWebApps.Repository
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return (recipe, recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties);
+        }
+
+        public async Task<bool> UpdateRecipe(RecipeVM recipeVM, List<Object> checkedCategoriesParams)
+        {
+            int rowsEffected1 = 0;
+            int rowsEffected2 = 0;
+            int rowsEffected3 = 0;
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string sql = @"UPDATE recipes
+                    SET RecipeTitle = @recipeTitle, RecipeDescription = @recipeDescription, CourseId = @courseId,
+                    CuisineId = @cuisineId, DifficultyId = @difficultyId, PrepTime = @prepTime, CookTime = @cookTime,
+                    Rating = @rating, Servings = @servings, Nutrition = @nutrition, Ingredients = @ingredients,
+                    Instructions = @instructions, Notes = @notes
+                    WHERE RecipeId = @id";
+
+            //to update the many to many -- delete all the records then insert the new categories
+            string sql2 = @"DELETE FROM recipe_categories_join WHERE RecipeId = @id";
+            string sql3 = @"INSERT INTO recipe_categories_join (RecipeId, CategoryId) VALUES (@id, @categoryId)";
+            rowsEffected1 = await _connection.ExecuteAsync(sql, new
+            {
+                recipeTitle = recipeVM.Recipe.RecipeTitle,
+                recipeDescription = recipeVM.Recipe.RecipeDescription,
+                courseId = recipeVM.Recipe.Course.CourseId,
+                cuisineId = recipeVM.Recipe.Cuisine.CuisineId,
+                difficultyId = recipeVM.Recipe.Difficulty.DifficultyId,
+                prepTime = recipeVM.Recipe.PrepTime,
+                cookTime = recipeVM.Recipe.CookTime,
+                rating = recipeVM.Recipe.Rating,
+                servings = recipeVM.Recipe.Servings,
+                nutrition = recipeVM.Recipe.Nutrition,
+                ingredients = recipeVM.Recipe.Ingredients,
+                instructions = recipeVM.Recipe.Instructions,
+                notes = recipeVM.Recipe.Notes,
+                id = recipeVM.Recipe.RecipeId
+            }, transaction: txn);
+            rowsEffected2 = await _connection.ExecuteAsync(sql2, new { id = recipeVM.Recipe.RecipeId }, transaction: txn);
+            rowsEffected3 = await _connection.ExecuteAsync(sql3, checkedCategoriesParams, transaction: txn);
+
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (rowsEffected1 > 0 && rowsEffected2 > 0 && rowsEffected3 > 0) ? true : false;
         }
     }
 }

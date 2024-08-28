@@ -167,77 +167,52 @@ namespace UsefulWebApps.Controllers
             //basically map the users choice to the Recipe model
             foreach (RecipeCourses course in recipeVM.RecipeCourses)
             {
-                if(recipeVM.Recipe.CourseId == course.CourseId)
+                if (recipeVM.Recipe.CourseId == course.CourseId)
                 {
                     recipeVM.Recipe.Course = course;
                 }
             }
-            foreach(RecipeCuisines cuisine in recipeVM.RecipeCuisines)
+            foreach (RecipeCuisines cuisine in recipeVM.RecipeCuisines)
             {
-                if(recipeVM.Recipe.CuisineId == cuisine.CuisineId)
+                if (recipeVM.Recipe.CuisineId == cuisine.CuisineId)
                 {
                     recipeVM.Recipe.Cuisine = cuisine;
                 }
             }
-            foreach(RecipeDifficulties difficulty in recipeVM.RecipeDifficulties)
+            foreach (RecipeDifficulties difficulty in recipeVM.RecipeDifficulties)
             {
-                if(recipeVM.Recipe.DifficultyId == difficulty.DifficultyId)
+                if (recipeVM.Recipe.DifficultyId == difficulty.DifficultyId)
                 {
                     recipeVM.Recipe.Difficulty = difficulty;
                 }
             }
             recipeVM.Recipe.Categories = recipeVM.RecipeCategories;
             //make a checked categories parameter list for sql INSERT
-            List<Object> checkedCategoriesParams = new List<Object>();    
+            List<Object> checkedCategoriesParams = new List<Object>();
             foreach (RecipeCategories category in recipeVM.Recipe.Categories)
             {
-                if(category.IsChecked == true)
+                if (category.IsChecked == true)
                 {
                     checkedCategoriesParams.Add(
-                        new {id = recipeVM.Recipe.RecipeId, categoryId = category.CategoryId }    
+                        new { id = recipeVM.Recipe.RecipeId, categoryId = category.CategoryId }
                     );
                 }
             }
-            
+
             ModelState.Clear();
             TryValidateModel(recipeVM);
-            
-            if(ModelState.IsValid)
+
+            if (ModelState.IsValid)
             {
-                await _connection.OpenAsync();
-                MySqlTransaction txn = await _connection.BeginTransactionAsync();
-                string sql = @"UPDATE recipes
-                    SET RecipeTitle = @recipeTitle, RecipeDescription = @recipeDescription, CourseId = @courseId,
-                    CuisineId = @cuisineId, DifficultyId = @difficultyId, PrepTime = @prepTime, CookTime = @cookTime,
-                    Rating = @rating, Servings = @servings, Nutrition = @nutrition, Ingredients = @ingredients,
-                    Instructions = @instructions, Notes = @notes
-                    WHERE RecipeId = @id";
-
-                //to update the many to many -- delete all the records then insert the new categories
-                string sql2 = @"DELETE FROM recipe_categories_join WHERE RecipeId = @id";
-                string sql3 = @"INSERT INTO recipe_categories_join (RecipeId, CategoryId) VALUES (@id, @categoryId)";
-                await _connection.ExecuteAsync(sql, new { 
-                    recipeTitle = recipeVM.Recipe.RecipeTitle,
-                    recipeDescription = recipeVM.Recipe.RecipeDescription,
-                    courseId = recipeVM.Recipe.Course.CourseId,
-                    cuisineId = recipeVM.Recipe.Cuisine.CuisineId,
-                    difficultyId = recipeVM.Recipe.Difficulty.DifficultyId,
-                    prepTime = recipeVM.Recipe.PrepTime,
-                    cookTime = recipeVM.Recipe.CookTime,
-                    rating = recipeVM.Recipe.Rating,
-                    servings = recipeVM.Recipe.Servings,
-                    nutrition = recipeVM.Recipe.Nutrition,
-                    ingredients = recipeVM.Recipe.Ingredients,
-                    instructions = recipeVM.Recipe.Instructions,
-                    notes = recipeVM.Recipe.Notes,
-                    id = recipeVM.Recipe.RecipeId
-                }, transaction: txn);
-                await _connection.ExecuteAsync(sql2, new { id = recipeVM.Recipe.RecipeId }, transaction: txn);
-                await _connection.ExecuteAsync(sql3, checkedCategoriesParams, transaction: txn);
-
-                await txn.CommitAsync();
-                TempData["success"] = "Recipe updated successfully";
-                await _connection.CloseAsync();
+                bool success = await _unitOfWork.Recipe.UpdateRecipe(recipeVM, checkedCategoriesParams);
+                if (success)
+                {
+                    TempData["success"] = "Recipe updated successfully";
+                }
+                else
+                {
+                    TempData["error"] = "Update recipe error. Please try again.";
+                }
                 return View(recipeVM);
             }
             TempData["error"] = "Update recipe error. Please try again.";
