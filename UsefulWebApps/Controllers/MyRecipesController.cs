@@ -1,24 +1,16 @@
-﻿using Dapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using MySqlConnector;
-using System.Net.WebSockets;
+﻿using Microsoft.AspNetCore.Mvc;
 using UsefulWebApps.Models.MyRecipes;
 using UsefulWebApps.Models.ViewModels.MyRecipes;
 using UsefulWebApps.Repository.IRepository;
-using static Dapper.SqlMapper;
-
 
 namespace UsefulWebApps.Controllers
 {
     public class MyRecipesController : Controller
     {
-        private readonly MySqlConnection _connection;
         private readonly IUnitOfWork _unitOfWork;
-        public MyRecipesController(MySqlConnection db, IUnitOfWork unitOfWork)
+        public MyRecipesController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _connection = db;
         }
 
         public async Task<IActionResult> Index(int page, string searchString)
