@@ -43,7 +43,7 @@ namespace UsefulWebApps.Repository
             string properties = GetPropertyNames(excludeKey: true);
             string query = $"INSERT INTO {tableName} ({columns}) VALUES ({properties})";
 
-            rowsEffected = _connection.Execute(query, entity);
+            rowsEffected = await _connection.ExecuteAsync(query, entity);
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
