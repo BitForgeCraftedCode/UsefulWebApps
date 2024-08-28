@@ -85,33 +85,17 @@ namespace UsefulWebApps.Controllers
                 return NotFound();
             }
 
-            //returns x rows of a single recipe at RecipeId where x is the number of categories
-            string sql = @"SELECT * FROM recipes
-                JOIN recipe_categories_join ON recipe_categories_join.RecipeId = recipes.RecipeId
-                JOIN recipe_categories ON recipe_categories_join.CategoryId = recipe_categories.CategoryId 
-                JOIN recipe_courses ON recipe_courses.CourseId = recipes.CourseId
-                JOIN recipe_cuisines ON recipe_cuisines.CuisineId = recipes.CuisineId
-                JOIN recipe_difficulties ON recipe_difficulties.DifficultyId = recipes.DifficultyId
-                WHERE recipes.RecipeId = @id;";
-            
-            string sqlMult = @"
-                SELECT * FROM recipe_categories;
-                SELECT * FROM recipe_courses;
-                SELECT * FROM recipe_cuisines;
-                SELECT * FROM recipe_difficulties;
-            ";
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            (
+                List<Recipe> recipe, 
+                List<RecipeCategories> recipeCategories,
+                List<RecipeCourses> recipeCourses, 
+                List<RecipeCuisines> recipeCuisines, 
+                List<RecipeDifficulties> recipeDifficulties
+            ) result = await _unitOfWork.Recipe.GetRecipeAndCategoriesForEditDisplay(id);
+
             //https://www.learndapper.com/relationships -- map the JOIN to C# objects
             //this is a list of 1 single recipe listed x times one for each category -- best to see this by running the above sql in workbench. 
-            List<Recipe> recipe = (List<Recipe>)await _connection.QueryAsync<Recipe, RecipeCategories, RecipeCourses, RecipeCuisines, RecipeDifficulties, Recipe>(sql,
-                (recipe, recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties) => {
-                    recipe.Categories.Add(recipeCategories);
-                    recipe.Course = recipeCourses;
-                    recipe.Cuisine = recipeCuisines;
-                    recipe.Difficulty = recipeDifficulties;
-                    return recipe;
-                }, new { id }, transaction: txn, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId");
+            List<Recipe> recipe = result.recipe;
 
             //since we sql SELECT on 1 id GroupBy returns 1 group with x num recipe rows
             //foreach group get the First recipe and add the categories to it
@@ -124,19 +108,15 @@ namespace UsefulWebApps.Controllers
                 return singleRecipe;
             }).ToList();
 
-            GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult, transaction: txn);
-            
-            List<RecipeCategories> recipeCategories = (List<RecipeCategories>)await gridReader.ReadAsync<RecipeCategories>();
-            List<RecipeCourses> recipeCourses = (List<RecipeCourses>)await gridReader.ReadAsync<RecipeCourses>();
-            List<RecipeCuisines> recipeCuisines = (List<RecipeCuisines>)await gridReader.ReadAsync<RecipeCuisines>();
-            List<RecipeDifficulties> recipeDifficulties = (List<RecipeDifficulties>)await gridReader.ReadAsync<RecipeDifficulties>();
+            List<RecipeCategories> recipeCategories = result.recipeCategories;
+            List<RecipeCourses> recipeCourses = result.recipeCourses;
+            List<RecipeCuisines> recipeCuisines = result.recipeCuisines;
+            List<RecipeDifficulties> recipeDifficulties = result.recipeDifficulties;
 
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
             //add IsChecked to recipeCategories
             for (int i = 0; i < recipeCategories.Count; i++)
             {
-                for(int j = 0; j < filteredRecipe[0].Categories.Count; j++)
+                for (int j = 0; j < filteredRecipe[0].Categories.Count; j++)
                 {
                     if (recipeCategories[i].CategoryId == filteredRecipe[0].Categories[j].CategoryId)
                     {
@@ -145,7 +125,7 @@ namespace UsefulWebApps.Controllers
                 }
             }
             //add IsChecked to recipeCourses
-            for(int i = 0; i < recipeCourses.Count; i++)
+            for (int i = 0; i < recipeCourses.Count; i++)
             {
                 if (recipeCourses[i].CourseId == filteredRecipe[0].Course.CourseId)
                 {
@@ -153,18 +133,18 @@ namespace UsefulWebApps.Controllers
                 }
             }
             //add IsChecked to recipeCuisines
-            for(int i = 0; i < recipeCuisines.Count; i++)
+            for (int i = 0; i < recipeCuisines.Count; i++)
             {
                 if (recipeCuisines[i].CuisineId == filteredRecipe[0].Cuisine.CuisineId)
                 {
-                    recipeCuisines[i].IsChecked = true; 
+                    recipeCuisines[i].IsChecked = true;
                 }
             }
-            for(int i = 0; i < recipeDifficulties.Count; i++)
+            for (int i = 0; i < recipeDifficulties.Count; i++)
             {
                 if (recipeDifficulties[i].DifficultyId == filteredRecipe[0].Difficulty.DifficultyId)
                 {
-                    recipeDifficulties[i].IsChecked = true; 
+                    recipeDifficulties[i].IsChecked = true;
                 }
             }
 
@@ -176,7 +156,7 @@ namespace UsefulWebApps.Controllers
                 RecipeCuisines = recipeCuisines,
                 RecipeDifficulties = recipeDifficulties
             };
-            
+
             return View(recipeVM);
         }
 
