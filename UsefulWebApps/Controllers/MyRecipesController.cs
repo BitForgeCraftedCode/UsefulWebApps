@@ -221,19 +221,18 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> CreateRecipe()
         {
-            //get the categories, courses, cuisines, and difficulties from the database for display on form
-            string sqlMult = @"
-                SELECT * FROM recipe_categories;
-                SELECT * FROM recipe_courses;
-                SELECT * FROM recipe_cuisines;
-                SELECT * FROM recipe_difficulties;
-            ";
-            GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult);
+            (
+                List<RecipeCategories> recipeCategories,
+                List<RecipeCourses> recipeCourses,
+                List<RecipeCuisines> recipeCuisines,
+                List<RecipeDifficulties> recipeDifficulties
+            ) result = await _unitOfWork.Recipe.GetCategoriesForCreateDisplay();
 
-            List<RecipeCategories> recipeCategories = (List<RecipeCategories>)await gridReader.ReadAsync<RecipeCategories>();
-            List<RecipeCourses> recipeCourses = (List<RecipeCourses>)await gridReader.ReadAsync<RecipeCourses>();
-            List<RecipeCuisines> recipeCuisines = (List<RecipeCuisines>)await gridReader.ReadAsync<RecipeCuisines>();
-            List<RecipeDifficulties> recipeDifficulties = (List<RecipeDifficulties>)await gridReader.ReadAsync<RecipeDifficulties>();
+            List<RecipeCategories> recipeCategories = result.recipeCategories;
+            List<RecipeCourses> recipeCourses = result.recipeCourses;
+            List<RecipeCuisines> recipeCuisines = result.recipeCuisines;
+            List<RecipeDifficulties> recipeDifficulties = result.recipeDifficulties;
+
             RecipeVM recipeVM = new()
             {
                 Recipe = new Recipe(),

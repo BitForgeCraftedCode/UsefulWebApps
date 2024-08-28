@@ -172,5 +172,28 @@ namespace UsefulWebApps.Repository
             await _connection.CloseAsync();
             return (rowsEffected1 > 0 && rowsEffected2 > 0 && rowsEffected3 > 0) ? true : false;
         }
+
+        public async Task<(
+            List<RecipeCategories> recipeCategories,
+            List<RecipeCourses> recipeCourses,
+            List<RecipeCuisines> recipeCuisines,
+            List<RecipeDifficulties> recipeDifficulties
+            )> GetCategoriesForCreateDisplay()
+        {
+            //get the categories, courses, cuisines, and difficulties from the database for display on form
+            string sqlMult = @"
+                SELECT * FROM recipe_categories;
+                SELECT * FROM recipe_courses;
+                SELECT * FROM recipe_cuisines;
+                SELECT * FROM recipe_difficulties;
+            ";
+            GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult);
+
+            List<RecipeCategories> recipeCategories = (List<RecipeCategories>)await gridReader.ReadAsync<RecipeCategories>();
+            List<RecipeCourses> recipeCourses = (List<RecipeCourses>)await gridReader.ReadAsync<RecipeCourses>();
+            List<RecipeCuisines> recipeCuisines = (List<RecipeCuisines>)await gridReader.ReadAsync<RecipeCuisines>();
+            List<RecipeDifficulties> recipeDifficulties = (List<RecipeDifficulties>)await gridReader.ReadAsync<RecipeDifficulties>();
+            return (recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties);
+        }
     }
 }
