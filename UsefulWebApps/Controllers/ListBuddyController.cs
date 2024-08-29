@@ -31,7 +31,10 @@ namespace UsefulWebApps.Controllers
             ToDoListVM toDoListVM = new()
             {
                 ToDoListItems = listItems,
-                ToDoList = new ToDoList()
+                ToDoList = new ToDoList
+                {
+                    UserId = userId,
+                }
             };
             return View(toDoListVM);
         }
