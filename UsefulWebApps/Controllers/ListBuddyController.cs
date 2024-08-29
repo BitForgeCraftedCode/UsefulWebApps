@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.ViewModels.ListBuddy;
 using UsefulWebApps.Repository.IRepository;
@@ -24,8 +25,9 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> ToDoList()
         {
-            
-            List<ToDoList> listItems = (List<ToDoList>)await _unitOfWork.ToDoList.GetAll();
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<ToDoList> listItems = (List<ToDoList>)await _unitOfWork.ToDoList.GetAllWhere("UserId", userId);
             ToDoListVM toDoListVM = new()
             {
                 ToDoListItems = listItems,

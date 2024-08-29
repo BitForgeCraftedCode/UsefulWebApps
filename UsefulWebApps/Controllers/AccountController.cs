@@ -37,7 +37,7 @@ namespace UsefulWebApps.Controllers
         public async Task<IActionResult> Register(Register userRegInfo)
         {
             if (!ModelState.IsValid) { return View(); }
-
+          
             IdentityUser user = new IdentityUser
             {
                 Email = userRegInfo.Email,

@@ -24,6 +24,15 @@ namespace UsefulWebApps.Repository
             await _connection.CloseAsync();
             return allDbRows;
         }
+
+        public async Task<IEnumerable<T>> GetAllWhere(string column, string value)
+        {
+            string tableName = GetTableName();
+            string sql = $"SELECT * FROM {tableName} WHERE {column} = @Parameter";
+            List<T> allDbRows = (List<T>)await _connection.QueryAsync<T>(sql, new { Parameter = value });
+            await _connection.CloseAsync();
+            return allDbRows;
+        }
         public async Task<T> GetById(int? id)
         {
             string tableName = GetTableName();
