@@ -37,12 +37,19 @@ INSERT INTO grocery_categories (Category) VALUES ("Frozen");
 INSERT INTO grocery_categories (Category) VALUES ("Dry/Baking");
 INSERT INTO grocery_categories (Category) VALUES ("Other");
 
-INSERT INTO grocery_list (GroceryItem, Category, Complete) VALUES ("Buy Beer", "Beverages", False);
-INSERT INTO grocery_list (GroceryItem, Category, Complete) VALUES ("Chicken Nuggets", "Frozen", False);
-INSERT INTO grocery_list (GroceryItem, Category, Complete) VALUES ("Dish soap", "Household", False);
-INSERT INTO grocery_list (GroceryItem, Category, Complete) VALUES ("Black beans 2 15oz cans", "Canned", False);
-INSERT INTO grocery_list (GroceryItem, Category, Complete) VALUES ("Pizza", "Frozen", False);
-INSERT INTO grocery_list (GroceryItem, Category, Complete) VALUES ("Sponges", "Household", False);
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Buy Beer", "Beverages", False, "818fd1e7-05ab-44f5-9276-68f20ec3c70d");
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Chicken Nuggets", "Frozen", False, "818fd1e7-05ab-44f5-9276-68f20ec3c70d");
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Dish soap", "Household", False, "818fd1e7-05ab-44f5-9276-68f20ec3c70d");
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Black beans 2 15oz cans", "Canned", False, "818fd1e7-05ab-44f5-9276-68f20ec3c70d");
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Pizza", "Frozen", False, "818fd1e7-05ab-44f5-9276-68f20ec3c70d");
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Sponges", "Household", False, "818fd1e7-05ab-44f5-9276-68f20ec3c70d");
+
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Soda", "Beverages", False, "19e5b54f-e998-4494-90a2-797cfcfc9fc3");
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Pizza", "Frozen", False, "19e5b54f-e998-4494-90a2-797cfcfc9fc3");
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Pet Food", "Household", False, "19e5b54f-e998-4494-90a2-797cfcfc9fc3");
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Diced Tomato", "Canned", False, "19e5b54f-e998-4494-90a2-797cfcfc9fc3");
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("TV Dinners", "Frozen", False, "19e5b54f-e998-4494-90a2-797cfcfc9fc3");
+INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Paper Plates", "Household", False, "19e5b54f-e998-4494-90a2-797cfcfc9fc3");
 
 
 DELETE FROM usefulwebapps.grocery_list WHERE Id >= 1;

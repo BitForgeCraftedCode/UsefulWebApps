@@ -14,13 +14,13 @@ namespace UsefulWebApps.Repository
         }
 
         //any GroceryList model specific database methods here
-        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemsAndCategories()
+        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemsAndCategories(string column, string value)
         {
-            string query = @"
-                    SELECT * FROM grocery_list;
+            string query = $@"
+                    SELECT * FROM grocery_list WHERE {column} = @Parameter;
                     SELECT * FROM grocery_categories;
                 ";
-            GridReader gridReader = await _connection.QueryMultipleAsync(query);
+            GridReader gridReader = await _connection.QueryMultipleAsync(query, new { Parameter = value});
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
             await _connection.CloseAsync();

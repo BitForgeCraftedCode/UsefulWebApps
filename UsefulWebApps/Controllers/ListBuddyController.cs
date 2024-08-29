@@ -130,7 +130,9 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> GroceryList()
         {
-            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories();
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories("UserId", userId);
             List<GroceryList> groceryListItems = result.groceryListItems;
             IEnumerable<GroceryCategories> groceryCategoriesEnum = result.groceryCategoriesEnum;
             
