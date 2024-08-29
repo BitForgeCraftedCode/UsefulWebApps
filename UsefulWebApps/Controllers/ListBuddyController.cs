@@ -164,7 +164,10 @@ namespace UsefulWebApps.Controllers
 
             GroceryListVM groceryListVM = new()
             {
-                GroceryList = new GroceryList(),
+                GroceryList = new GroceryList 
+                { 
+                    UserId = userId,
+                },
                 GroceryCategoriesList = groceryListCategories,
                 FilteredGroceryListItems = filteredGroceryListItems
             };
