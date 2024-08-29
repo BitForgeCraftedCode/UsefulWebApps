@@ -6,7 +6,6 @@ using UsefulWebApps.Repository.IRepository;
 
 namespace UsefulWebApps.Controllers
 {
-    [Authorize(Roles = "StandardUser, Admin")]
     public class MyRecipesController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -59,6 +58,7 @@ namespace UsefulWebApps.Controllers
             return View(recipe);
         }
 
+        [Authorize(Roles = "StandardUser, Admin")]
         public async Task<IActionResult> EditRecipe(int? id)
         {
             if (id == null || id == 0)
@@ -141,6 +141,7 @@ namespace UsefulWebApps.Controllers
             return View(recipeVM);
         }
 
+        [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost]
         public async Task<IActionResult> EditRecipe(RecipeVM recipeVM)
         {
@@ -189,6 +190,7 @@ namespace UsefulWebApps.Controllers
             return View(recipeVM);
         }
 
+        [Authorize(Roles = "StandardUser, Admin")]
         public async Task<IActionResult> CreateRecipe()
         {
             (
@@ -214,6 +216,7 @@ namespace UsefulWebApps.Controllers
             return View(recipeVM);
         }
 
+        [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateRecipe(RecipeVM recipeVM)
         {
@@ -263,6 +266,7 @@ namespace UsefulWebApps.Controllers
             return View(recipeVM);
         }
 
+        [Authorize(Roles = "StandardUser, Admin")]
         public async Task<IActionResult> DeleteRecipe(int? id)
         {
             if (id == null || id == 0)
@@ -275,6 +279,7 @@ namespace UsefulWebApps.Controllers
             return View(recipe);
         }
 
+        [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost, ActionName("DeleteRecipe")]
         public async Task<IActionResult> DeleteRecipeFromDb(int? id)
         {

@@ -32,7 +32,10 @@
     <notes html-notes-content="@Model.Notes"></notes>
     <h2 class="display-6">Nutrition</h2>
     <nutrition html-nutrition-content="@Model.Nutrition"></nutrition>
-    <a asp-controller="MyRecipes" asp-action="EditRecipe" asp-route-id="@Model.RecipeId">Edit Recipe</a>
-    <a asp-controller="MyRecipes" asp-action="DeleteRecipe" asp-route-id="@Model.RecipeId">Delete Recipe</a>
+    @if (User?.Identity?.IsAuthenticated == true)
+    {
+        <a asp-controller="MyRecipes" asp-action="EditRecipe" asp-route-id="@Model.RecipeId">Edit Recipe</a>
+        <a asp-controller="MyRecipes" asp-action="DeleteRecipe" asp-route-id="@Model.RecipeId">Delete Recipe</a>
+    }
 </div>
 

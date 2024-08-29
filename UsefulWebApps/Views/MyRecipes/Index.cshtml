@@ -7,7 +7,11 @@
 
 <div class="text-center list-buddy-index-container mx-auto">
     <h1 class="display-4">Recipes</h1>
-    <p>To make a new recipe click <a asp-controller="MyRecipes" asp-action="CreateRecipe">here</a></p>
+    @if (User?.Identity?.IsAuthenticated == true)
+    {
+        <p>To make a new recipe click <a asp-controller="MyRecipes" asp-action="CreateRecipe">here</a></p>
+    }
+    
     
     <form asp-controller="MyRecipes" asp-action="Index" id="search-form">
         <div class="input-group mb-3">
