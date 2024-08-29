@@ -13,15 +13,19 @@ namespace UsefulWebApps.Models.ListBuddy
         [Column("GroceryItem")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Please enter at least 3 characters.")]
         [Required(ErrorMessage = "Grocery item is required.")]
-        public string GroceryItem { get; set; }
+        public string GroceryItem { get; set; } = string.Empty;
 
         [Column("Category")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Please enter at least 3 characters.")]
         [Required(ErrorMessage = "Grocery category is required.")]
-        public string Category { get; set; }
+        public string Category { get; set; } = string.Empty;
 
         [Column("Complete")]
         [Required]
         public bool Complete { get; set; }
+
+        [Column("UserId")]
+        [Required]
+        public string UserId { get; set; } = string.Empty;
     }
 }
