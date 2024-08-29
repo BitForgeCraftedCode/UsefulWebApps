@@ -5,7 +5,7 @@ using UsefulWebApps.Models;
 
 namespace UsefulWebApps.Controllers
 {
-    [Authorize(Roles = "StandardUser, Admin")]
+ 
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

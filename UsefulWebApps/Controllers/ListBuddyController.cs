@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using UsefulWebApps.Models.ListBuddy;
@@ -8,6 +9,7 @@ using UsefulWebApps.Repository.IRepository;
 
 namespace UsefulWebApps.Controllers
 {
+    [Authorize(Roles = "StandardUser, Admin")]
     public class ListBuddyController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using UsefulWebApps.Models.MyRecipes;
 using UsefulWebApps.Models.ViewModels.MyRecipes;
 using UsefulWebApps.Repository.IRepository;
 
 namespace UsefulWebApps.Controllers
 {
+    [Authorize(Roles = "StandardUser, Admin")]
     public class MyRecipesController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

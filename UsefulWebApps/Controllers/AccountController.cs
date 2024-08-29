@@ -145,7 +145,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("Login");
         }
 
-       [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ChangePassword()
         {
             return View();
