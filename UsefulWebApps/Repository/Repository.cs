@@ -120,6 +120,15 @@ namespace UsefulWebApps.Repository
             return rowsEffected > 0 ? true : false;
         }
 
+        public async Task<bool> DeleteAllWhere(string column, string value)
+        {
+            int rowsEffected = 0;
+            string tableName = GetTableName();
+            string sql = $"DELETE FROM {tableName} WHERE {column} = @Parameter";
+            rowsEffected = await _connection.ExecuteAsync(sql, new { Parameter = value });
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
         private static string GetTableName()
         {
             string tableName = "";

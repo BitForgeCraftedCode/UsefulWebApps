@@ -88,7 +88,9 @@ namespace UsefulWebApps.Controllers
         [Route("/ListBuddy/ToDoListDeleteAll", Name = "deleteAllToDoList")]
         public async Task<IActionResult> ToDoListDeleteAll()
         {
-            await _unitOfWork.ToDoList.DeleteAll();
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            await _unitOfWork.ToDoList.DeleteAllWhere("UserId", userId);
             return RedirectToAction("ToDoList");
         }
 

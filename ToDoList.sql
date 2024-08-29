@@ -1,11 +1,14 @@
 DROP TABLE to_do_list;
 
-CREATE TABLE to_do_list (
-	Id int NOT NULL AUTO_INCREMENT,
-    ToDoItem varchar(100) NOT NULL,
-    Complete BOOLEAN NOT NULL,
-    PRIMARY KEY (Id)
-);
+CREATE TABLE `to_do_list` (
+  `Id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ToDoItem` varchar(100) NOT NULL,
+  `Complete` BOOLEAN NOT NULL,
+  `UserId` varchar(255) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 
 ALTER TABLE to_do_list ADD UserId varchar(255) NOT NULL;
 
