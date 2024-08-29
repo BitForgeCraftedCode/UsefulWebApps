@@ -282,7 +282,9 @@ namespace UsefulWebApps.Controllers
         [Route("/ListBuddy/GroceryListDeleteAll", Name = "deleteAllGroceryList")]
         public async Task<IActionResult> GroceryListDeleteAll()
         {
-            await _unitOfWork.GroceryList.DeleteAll();
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            await _unitOfWork.GroceryList.DeleteAllWhere("UserId", userId);
             return RedirectToAction("GroceryList");
         }
 
