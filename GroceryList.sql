@@ -1,12 +1,17 @@
 DROP TABLE grocery_list;
 
-CREATE TABLE grocery_list (
-	Id int NOT NULL AUTO_INCREMENT,
-    GroceryItem varchar(100) NOT NULL,
-    Category varchar(50) NOT NULL,
-    Complete BOOLEAN NOT NULL,
-    PRIMARY KEY (Id)
-);
+CREATE TABLE `grocery_list` (
+  `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `GroceryItem` varchar(100) NOT NULL,
+  `Category` varchar(50) NOT NULL,
+  `Complete` BOOLEAN NOT NULL,
+  `UserId` varchar(255) NOT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+ALTER TABLE grocery_list ADD UserId varchar(255) NOT NULL;
+
+ALTER TABLE grocery_list MODIFY Id bigint UNSIGNED NOT NULL AUTO_INCREMENT; 
 
 CREATE TABLE grocery_categories (
 	Id int NOT NULL AUTO_INCREMENT,
