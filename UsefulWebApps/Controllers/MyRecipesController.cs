@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using UsefulWebApps.Models.MyRecipes;
 using UsefulWebApps.Models.ViewModels.MyRecipes;
 using UsefulWebApps.Repository.IRepository;
@@ -193,6 +194,9 @@ namespace UsefulWebApps.Controllers
         [Authorize(Roles = "StandardUser, Admin")]
         public async Task<IActionResult> CreateRecipe()
         {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string userName = currentUser.FindFirstValue(ClaimTypes.Name);
             (
                 List<RecipeCategories> recipeCategories,
                 List<RecipeCourses> recipeCourses,
@@ -207,7 +211,11 @@ namespace UsefulWebApps.Controllers
 
             RecipeVM recipeVM = new()
             {
-                Recipe = new Recipe(),
+                Recipe = new Recipe 
+                { 
+                    UserId = userId,
+                    UserName = userName,
+                },
                 RecipeCategories = recipeCategories,
                 RecipeCourses = recipeCourses,
                 RecipeCuisines = recipeCuisines,

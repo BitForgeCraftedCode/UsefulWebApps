@@ -242,7 +242,9 @@ namespace UsefulWebApps.Repository
                         Nutrition, 
                         Ingredients,   
                         Instructions,   
-                        Notes
+                        Notes,
+                        UserId,
+                        UserName
                     )
                     VALUES 
                     (
@@ -258,7 +260,9 @@ namespace UsefulWebApps.Repository
                         @nutrition, 
                         @ingredients, 
                         @instructions, 
-                        @notes
+                        @notes,
+                        @userId,
+                        @userName
                     )";
             rowsEffected1 = await _connection.ExecuteAsync(sql, new
             {
@@ -274,7 +278,9 @@ namespace UsefulWebApps.Repository
                 nutrition = recipeVM.Recipe.Nutrition,
                 ingredients = recipeVM.Recipe.Ingredients,
                 instructions = recipeVM.Recipe.Instructions,
-                notes = recipeVM.Recipe.Notes
+                notes = recipeVM.Recipe.Notes,
+                userId = recipeVM.Recipe.UserId,
+                userName = recipeVM.Recipe.UserName
             }, transaction: txn);
 
             //need the id before adding to recipe_categories_join
