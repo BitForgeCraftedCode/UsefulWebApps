@@ -11,29 +11,49 @@ No edit or add of difficulties or courses
 
 Future note: primary keys best to be unsigned bigint-- why waste half the points
 RecipeId bigint unsigned NOT NULL AUTO_INCREMENT
-*/
-CREATE TABLE recipes (
-	RecipeId int NOT NULL AUTO_INCREMENT,
-    RecipeTitle varchar(100) NOT NULL,
-    RecipeDescription varchar(200),
-    CourseId int,
-    FOREIGN KEY (CourseId) REFERENCES recipe_courses(CourseId) ON UPDATE CASCADE ON DELETE RESTRICT,
-    CuisineId int,
-    FOREIGN KEY (CuisineId) REFERENCES recipe_cuisines(CuisineId) ON UPDATE CASCADE ON DELETE RESTRICT,
-    DifficultyId int,
-    FOREIGN KEY (DifficultyId) REFERENCES recipe_difficulties(DifficultyId) ON UPDATE CASCADE ON DELETE RESTRICT,
-    PrepTime smallint unsigned NOT NULL,
-    CookTime smallint unsigned NOT NULL,
-    Rating tinyint unsigned NOT NULL,
-    Servings tinyint unsigned NOT NULL,
-    Nutrition varchar(2000),
-    Ingredients varchar(3000) NOT NULL,
-    Instructions varchar(3000) NOT NULL,
-    Notes varchar(2000),
-    PRIMARY KEY (RecipeId)
-);
 
-alter table recipes add fulltext index `fulltext`(RecipeTitle, Ingredients);
+to back-up/restore use command prompt not power shell
+
+to back-up:
+
+mysqldump -u root -p usefulwebapps > C:\MySQLBackup\usefulwebapps_2024_09_03.sql
+
+to restore:
+
+mysql -u root -p usefulwebapps < C:\MySQLBackup\usefulwebapps_2024_09_03.sql
+
+*/
+CREATE TABLE `recipes` (
+  `RecipeId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `RecipeTitle` varchar(100) NOT NULL,
+  `RecipeDescription` varchar(200) DEFAULT NULL,
+  `CourseId` bigint unsigned DEFAULT NULL,
+  `CuisineId` bigint unsigned DEFAULT NULL,
+  `DifficultyId` bigint unsigned DEFAULT NULL,
+  `PrepTime` smallint unsigned NOT NULL,
+  `CookTime` smallint unsigned NOT NULL,
+  `Rating` tinyint unsigned NOT NULL,
+  `Servings` tinyint unsigned NOT NULL,
+  `Nutrition` varchar(2000) DEFAULT NULL,
+  `Ingredients` varchar(3000) NOT NULL,
+  `Instructions` varchar(3000) NOT NULL,
+  `Notes` varchar(2000) DEFAULT NULL,
+  `UserId` varchar(255) NOT NULL,
+  PRIMARY KEY (`RecipeId`),
+  KEY `CourseId` (`CourseId`),
+  KEY `CuisineId` (`CuisineId`),
+  KEY `DifficultyId` (`DifficultyId`),
+  FULLTEXT KEY `fulltext` (`RecipeTitle`,`Ingredients`),
+  CONSTRAINT `recipes_ibfk_1` FOREIGN KEY (`CourseId`) REFERENCES `recipe_courses` (`CourseId`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `recipes_ibfk_2` FOREIGN KEY (`CuisineId`) REFERENCES `recipe_cuisines` (`CuisineId`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `recipes_ibfk_3` FOREIGN KEY (`DifficultyId`) REFERENCES `recipe_difficulties` (`DifficultyId`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+ALTER TABLE recipes add fulltext index `fulltext`(RecipeTitle, Ingredients);
+
+ALTER TABLE recipes ADD UserId varchar(255) NOT NULL;
+
+ALTER TABLE recipes ADD UserName varchar(256) NOT NULL;
 
 show create table recipes;
 
@@ -44,11 +64,11 @@ One category can have many recipies
 
 */
 DROP TABLE recipe_categories;
-CREATE TABLE recipe_categories (
-	CategoryId int NOT NULL AUTO_INCREMENT,
-    Category varchar(50) NOT NULL,
-    PRIMARY KEY (CategoryId)
-);
+CREATE TABLE `recipe_categories` (
+  `CategoryId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `Category` varchar(50) NOT NULL,
+  PRIMARY KEY (`CategoryId`)
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO recipe_categories (Category) 
 VALUES ("Beverages"),("Sides"),("Breakfast"),
@@ -67,13 +87,14 @@ VALUES ("Beverages"),("Sides"),("Breakfast"),
 ("Custards & Puddings"),("Pies, Tarts, Cobblers, & Crisp"),("Chocolates & Candie"),
 ("Pastries"),("Frozen");
 
-CREATE TABLE recipe_categories_join (
-	RecipeId int,
-    CategoryId int,
-	PRIMARY KEY (RecipeId, CategoryId),
-    FOREIGN KEY (RecipeId) REFERENCES recipes(RecipeId),
-    FOREIGN KEY (CategoryId) REFERENCES recipe_categories(CategoryId)
-);
+CREATE TABLE `recipe_categories_join` (
+  `RecipeId` bigint unsigned NOT NULL,
+  `CategoryId` bigint unsigned NOT NULL,
+  PRIMARY KEY (`RecipeId`,`CategoryId`),
+  KEY `CategoryId` (`CategoryId`),
+  CONSTRAINT `recipe_categories_join_ibfk_1` FOREIGN KEY (`RecipeId`) REFERENCES `recipes` (`RecipeId`),
+  CONSTRAINT `recipe_categories_join_ibfk_2` FOREIGN KEY (`CategoryId`) REFERENCES `recipe_categories` (`CategoryId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 /*
 ONE TO MANY -- once recipe can have only one course but one course can have many recipes
@@ -81,21 +102,21 @@ ONE TO MANY -- once recipe can have only one course but one course can have many
 Parent tables to recipes
 */
 DROP TABLE recipe_courses;
-CREATE TABLE recipe_courses (
-	CourseId int NOT NULL AUTO_INCREMENT,
-    Course varchar(50) NOT NULL,
-    PRIMARY KEY (CourseId)
-);
+CREATE TABLE `recipe_courses` (
+  `CourseId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `Course` varchar(50) NOT NULL,
+  PRIMARY KEY (`CourseId`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO recipe_courses (Course) 
 VALUES ("Hors D'Oeuvre"),("Amuse-Bouche"),("Soup"),("Appetizer"),("Salad"),("Palate Cleanser"),("Main Course"),("Dessert"),("Mignardise");
 
 DROP TABLE recipe_cuisines;
-CREATE TABLE recipe_cuisines (
-	CuisineId INT NOT NULL AUTO_INCREMENT,
-    Cuisine varchar(50) NOT NULL,
-    PRIMARY KEY (CuisineId)
-);
+CREATE TABLE `recipe_cuisines` (
+  `CuisineId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `Cuisine` varchar(50) NOT NULL,
+  PRIMARY KEY (`CuisineId`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO recipe_cuisines (Cuisine)
 VALUES ("Italian"),("Indian"),("Mexican"),
@@ -107,11 +128,11 @@ VALUES ("Italian"),("Indian"),("Mexican"),
 INSERT INTO recipe_cuisines (cuisine) VALUES ("SOME OTHER VALUE");
 
 DROP TABLE recipe_difficulties;
-CREATE TABLE recipe_difficulties (
-	DifficultyId INT NOT NULL AUTO_INCREMENT,
-    Difficulty varchar(25) NOT NULL,
-    PRIMARY KEY (DifficultyId)
-);
+CREATE TABLE `recipe_difficulties` (
+  `DifficultyId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `Difficulty` varchar(25) NOT NULL,
+  PRIMARY KEY (`DifficultyId`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO recipe_difficulties (Difficulty)
 VALUES ("Easy"),("Medium"),("Hard"),("Pro Chef")
