@@ -141,8 +141,9 @@ namespace UsefulWebApps.Controllers
 
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string role = currentUser.FindFirstValue(ClaimTypes.Role);
 
-            if (recipeVM.Recipe.UserId != userId)
+            if (recipeVM.Recipe.UserId != userId && role != "Admin")
             {
                 TempData["error"] = $"Only the author {recipeVM.Recipe.UserName} can edit this recipe";
                 return RedirectToAction("Recipe", new { id } );
