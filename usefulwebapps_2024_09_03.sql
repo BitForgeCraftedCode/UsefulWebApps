@@ -301,7 +301,7 @@ CREATE TABLE `recipe_categories` (
   `CategoryId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `Category` varchar(50) NOT NULL,
   PRIMARY KEY (`CategoryId`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -310,7 +310,7 @@ CREATE TABLE `recipe_categories` (
 
 LOCK TABLES `recipe_categories` WRITE;
 /*!40000 ALTER TABLE `recipe_categories` DISABLE KEYS */;
-INSERT INTO `recipe_categories` VALUES (1,'Beverages'),(2,'Sides'),(3,'Breakfast'),(4,'Lunch'),(5,'Brunch'),(6,'Dinner'),(7,'Breads'),(8,'Appetizers'),(9,'Main Dish'),(10,'Dessert'),(11,'Soups'),(12,'Stews & Chili'),(13,'Pasta, Sauces, & Noodles'),(14,'Salad & Dressings'),(15,'Grilling'),(16,'Smoked'),(17,'Burgers'),(18,'Sandwiches'),(19,'Pizza'),(20,'Slow & Pressure Cooker'),(21,'Skillet & Stir-Fries'),(22,'Oven Baked & Broiled'),(23,'Beans, Grains, & Rice'),(24,'Casseroles'),(25,'Diet'),(26,'Meatless & Vegan'),(27,'Poultry'),(28,'Beef'),(29,'Pork'),(30,'Lamb'),(31,'Duck'),(32,'Turkey'),(33,'Sausages'),(34,'Seafood'),(35,'Fruit'),(36,'Vegetables'),(37,'Brownies'),(38,'Cookies & Biscuits'),(39,'Cakes & Cupcakes'),(40,'Custards & Puddings'),(41,'Pies, Tarts, Cobblers, & Crisp'),(42,'Chocolates & Candie'),(43,'Pastries'),(44,'Frozen');
+INSERT INTO `recipe_categories` VALUES (1,'Beverages'),(2,'Sides'),(3,'Breakfast'),(4,'Lunch'),(5,'Brunch'),(6,'Dinner'),(7,'Breads'),(8,'Appetizers'),(9,'Main Dish'),(10,'Dessert'),(11,'Soups'),(12,'Stews & Chili'),(13,'Pasta, Sauces, & Noodles'),(14,'Salad & Dressings'),(15,'Grilling'),(16,'Smoked'),(17,'Burgers'),(18,'Sandwiches'),(19,'Pizza'),(20,'Slow & Pressure Cooker'),(21,'Skillet & Stir-Fries'),(22,'Oven Baked & Broiled'),(23,'Beans, Grains, & Rice'),(24,'Tofu'),(25,'Casseroles'),(26,'Diet'),(27,'Meatless & Vegan'),(28,'Eggs'),(29,'Poultry'),(30,'Chicken'),(31,'Duck'),(32,'Turkey'),(33,'Beef'),(34,'Veal'),(35,'Pork'),(36,'Lamb'),(37,'Sausages'),(38,'Other Meat - wild game etc.'),(39,'Fish and Seafood'),(40,'Nuts and Seeds'),(41,'Fruit'),(42,'Vegetables'),(43,'Brownies'),(44,'Cookies & Biscuits'),(45,'Cakes & Cupcakes'),(46,'Custards & Puddings'),(47,'Pies, Tarts, Cobblers, & Crisp'),(48,'Chocolates & Candie'),(49,'Pastries'),(50,'Frozen');
 /*!40000 ALTER TABLE `recipe_categories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -337,7 +337,7 @@ CREATE TABLE `recipe_categories_join` (
 
 LOCK TABLES `recipe_categories_join` WRITE;
 /*!40000 ALTER TABLE `recipe_categories_join` DISABLE KEYS */;
-INSERT INTO `recipe_categories_join` VALUES (2,1),(2,2),(1,4),(2,4),(1,6),(2,6),(4,6),(18,6),(22,6),(3,8),(2,9),(22,9),(3,10),(21,10),(20,12),(2,20),(20,20),(22,20),(1,21),(15,21),(18,21),(4,24),(2,25),(1,27),(2,27),(4,27),(15,27),(16,27),(17,28),(18,28),(20,28),(22,29),(22,33),(19,34),(3,35),(21,35),(21,41);
+INSERT INTO `recipe_categories_join` VALUES (2,1),(2,2),(1,4),(2,4),(1,6),(2,6),(4,6),(18,6),(22,6),(3,8),(2,9),(22,9),(3,10),(21,10),(20,12),(2,20),(20,20),(22,20),(1,21),(15,21),(18,21),(4,24),(2,25),(1,27),(2,27),(4,27),(15,27),(16,27),(17,28),(18,28),(20,28),(19,34),(3,35),(21,35),(22,37),(21,41);
 /*!40000 ALTER TABLE `recipe_categories_join` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -493,4 +493,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-03 11:59:38
+-- Dump completed on 2024-09-03 12:58:59

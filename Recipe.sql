@@ -47,7 +47,7 @@ CREATE TABLE `recipes` (
   CONSTRAINT `recipes_ibfk_1` FOREIGN KEY (`CourseId`) REFERENCES `recipe_courses` (`CourseId`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `recipes_ibfk_2` FOREIGN KEY (`CuisineId`) REFERENCES `recipe_cuisines` (`CuisineId`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `recipes_ibfk_3` FOREIGN KEY (`DifficultyId`) REFERENCES `recipe_difficulties` (`DifficultyId`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 ALTER TABLE recipes add fulltext index `fulltext`(RecipeTitle, Ingredients);
 
@@ -68,7 +68,7 @@ CREATE TABLE `recipe_categories` (
   `CategoryId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `Category` varchar(50) NOT NULL,
   PRIMARY KEY (`CategoryId`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 INSERT INTO recipe_categories (Category) 
 VALUES ("Beverages"),("Sides"),("Breakfast"),
@@ -78,15 +78,17 @@ VALUES ("Beverages"),("Sides"),("Breakfast"),
 ("Pasta, Sauces, & Noodles"),("Salad & Dressings"),("Grilling"),
 ("Smoked"),("Burgers"),("Sandwiches"),
 ("Pizza"),("Slow & Pressure Cooker"),("Skillet & Stir-Fries"),
-("Oven Baked & Broiled"),("Beans, Grains, & Rice"),("Casseroles"),
-("Diet"),("Meatless & Vegan"),("Poultry"),
-("Beef"),("Pork"),("Lamb"),
-("Duck"),("Turkey"),("Sausages"),
-("Seafood"),("Fruit"),("Vegetables"),
+("Oven Baked & Broiled"),("Beans, Grains, & Rice"),("Tofu"),("Casseroles"),
+("Diet"),("Meatless & Vegan"),("Eggs"),
+("Poultry"),("Chicken"),("Duck"),("Turkey"),
+("Beef"),("Veal"),("Pork"),("Lamb"),("Sausages"),("Other Meat - wild game etc."),
+("Fish and Seafood"),("Nuts and Seeds"),
+("Fruit"),("Vegetables"),
 ("Brownies"),("Cookies & Biscuits"),("Cakes & Cupcakes"),
 ("Custards & Puddings"),("Pies, Tarts, Cobblers, & Crisp"),("Chocolates & Candie"),
 ("Pastries"),("Frozen");
 
+DROP TABLE recipe_categories_join;
 CREATE TABLE `recipe_categories_join` (
   `RecipeId` bigint unsigned NOT NULL,
   `CategoryId` bigint unsigned NOT NULL,
@@ -94,7 +96,7 @@ CREATE TABLE `recipe_categories_join` (
   KEY `CategoryId` (`CategoryId`),
   CONSTRAINT `recipe_categories_join_ibfk_1` FOREIGN KEY (`RecipeId`) REFERENCES `recipes` (`RecipeId`),
   CONSTRAINT `recipe_categories_join_ibfk_2` FOREIGN KEY (`CategoryId`) REFERENCES `recipe_categories` (`CategoryId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 /*
 ONE TO MANY -- once recipe can have only one course but one course can have many recipes
@@ -106,7 +108,7 @@ CREATE TABLE `recipe_courses` (
   `CourseId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `Course` varchar(50) NOT NULL,
   PRIMARY KEY (`CourseId`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 INSERT INTO recipe_courses (Course) 
 VALUES ("Hors D'Oeuvre"),("Amuse-Bouche"),("Soup"),("Appetizer"),("Salad"),("Palate Cleanser"),("Main Course"),("Dessert"),("Mignardise");
@@ -116,7 +118,7 @@ CREATE TABLE `recipe_cuisines` (
   `CuisineId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `Cuisine` varchar(50) NOT NULL,
   PRIMARY KEY (`CuisineId`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 INSERT INTO recipe_cuisines (Cuisine)
 VALUES ("Italian"),("Indian"),("Mexican"),
@@ -132,7 +134,7 @@ CREATE TABLE `recipe_difficulties` (
   `DifficultyId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `Difficulty` varchar(25) NOT NULL,
   PRIMARY KEY (`DifficultyId`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 INSERT INTO recipe_difficulties (Difficulty)
 VALUES ("Easy"),("Medium"),("Hard"),("Pro Chef")
