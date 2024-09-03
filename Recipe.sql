@@ -57,6 +57,20 @@ ALTER TABLE recipes ADD UserName varchar(256) NOT NULL;
 
 show create table recipes;
 
+UPDATE recipes SET UserId = '19e5b54f-e998-4494-90a2-797cfcfc9fc3', UserName = 'BeefCakeTheMightyStandardUser' WHERE RecipeId = 1;
+UPDATE recipes SET UserId = '19e5b54f-e998-4494-90a2-797cfcfc9fc3', UserName = 'BeefCakeTheMightyStandardUser' WHERE RecipeId = 2;
+UPDATE recipes SET UserId = '19e5b54f-e998-4494-90a2-797cfcfc9fc3', UserName = 'BeefCakeTheMightyStandardUser' WHERE RecipeId = 3;
+UPDATE recipes SET UserId = '19e5b54f-e998-4494-90a2-797cfcfc9fc3', UserName = 'BeefCakeTheMightyStandardUser' WHERE RecipeId = 4;
+UPDATE recipes SET UserId = '19e5b54f-e998-4494-90a2-797cfcfc9fc3', UserName = 'BeefCakeTheMightyStandardUser' WHERE RecipeId = 15;
+UPDATE recipes SET UserId = '19e5b54f-e998-4494-90a2-797cfcfc9fc3', UserName = 'BeefCakeTheMightyStandardUser' WHERE RecipeId = 16;
+UPDATE recipes SET UserId = '19e5b54f-e998-4494-90a2-797cfcfc9fc3', UserName = 'BeefCakeTheMightyStandardUser' WHERE RecipeId = 17;
+
+UPDATE recipes SET UserId = '818fd1e7-05ab-44f5-9276-68f20ec3c70d', UserName = 'BeefCakeTheMightyAdmin' WHERE RecipeId = 18;
+UPDATE recipes SET UserId = '818fd1e7-05ab-44f5-9276-68f20ec3c70d', UserName = 'BeefCakeTheMightyAdmin' WHERE RecipeId = 19;
+UPDATE recipes SET UserId = '818fd1e7-05ab-44f5-9276-68f20ec3c70d', UserName = 'BeefCakeTheMightyAdmin' WHERE RecipeId = 20;
+UPDATE recipes SET UserId = '818fd1e7-05ab-44f5-9276-68f20ec3c70d', UserName = 'BeefCakeTheMightyAdmin' WHERE RecipeId = 21;
+UPDATE recipes SET UserId = '818fd1e7-05ab-44f5-9276-68f20ec3c70d', UserName = 'BeefCakeTheMightyAdmin' WHERE RecipeId = 22;
+
 /*
 MANY TO MANY
 One recipe can have many categories
