@@ -294,6 +294,16 @@ namespace UsefulWebApps.Controllers
 
             Recipe recipe = await _unitOfWork.Recipe.GetRecipeById(id);
 
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string role = currentUser.FindFirstValue(ClaimTypes.Role);
+
+            if (recipe.UserId != userId && role != "Admin")
+            {
+                TempData["error"] = $"Only the author {recipe.UserName} can delete this recipe";
+                return RedirectToAction("Recipe", new { id });
+            }
+
             return View(recipe);
         }
 
