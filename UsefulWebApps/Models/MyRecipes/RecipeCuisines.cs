@@ -1,11 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UsefulWebApps.Models.MyRecipes
 {
+    [Table("recipe_cuisines")]
     public class RecipeCuisines
     {
+        [Key]
+        [Column("CuisineId")]
         public int CuisineId { get; set; }
 
+        [Column("Cuisine")]
         [Required(ErrorMessage = "Recipe cuisine is required.")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Please enter at least 3 characters.")]
         public string Cuisine { get; set; }
