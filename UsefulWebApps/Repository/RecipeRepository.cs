@@ -360,6 +360,34 @@ namespace UsefulWebApps.Repository
             return (rowsEffected1 > 0 && rowsEffected2 > 0) ? true : false;
         }
 
+        public async Task<bool> AddRecipeComment(RecipeComment recipeComment)
+        {
+            int rowsEffected = 0;
+            string sql = @"INSERT INTO recipe_comments 
+                            (
+                                Comment, 
+                                UserId, 
+                                UserName, 
+                                RecipeId
+                            ) 
+                            VALUES 
+                            (
+                                @comment,
+                                @userId, 
+                                @userName, 
+                                @recipeId
+                            )";
+            rowsEffected = await _connection.ExecuteAsync(sql, new 
+            { 
+                comment = recipeComment.Comment,
+                userId = recipeComment.UserId,
+                userName = recipeComment.UserName,
+                recipeId = recipeComment.RecipeId
+            });
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
+
         public async Task<bool> DeleteRecipe(int? id)
         {
             int rowsEffected1 = 0;

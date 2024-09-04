@@ -53,10 +53,41 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string userName = currentUser.FindFirstValue(ClaimTypes.Name);
 
             RecipeCommentsVM recipeCommentsVM = await _unitOfWork.Recipe.GetRecipeAndCommentsById(id);
-
+            recipeCommentsVM.RecipeComment.UserId = userId;
+            recipeCommentsVM.RecipeComment.UserName = userName;
             return View(recipeCommentsVM);
+        }
+
+        [Authorize(Roles = "StandardUser, Admin")]
+        [HttpPost]
+        [Route("/MyRecipes/PostComment", Name = "postComment")]
+        public async Task<IActionResult> PostComment(RecipeComment recipeComment)
+        {
+            if (ModelState.IsValid)
+            {
+                Console.WriteLine(recipeComment.UserName);
+                Console.WriteLine(recipeComment.Comment);
+                Console.WriteLine(ModelState.IsValid);
+                int? id = recipeComment.RecipeId;
+                bool success = await _unitOfWork.Recipe.AddRecipeComment(recipeComment);
+                if (success)
+                {
+                    TempData["success"] = "Posted comment successfully";
+                    return RedirectToAction("Recipe", new { id });
+                }
+                else
+                {
+                    TempData["error"] = "Post comment error. Please try again.";
+                    return RedirectToAction("Index");
+                }
+            }
+            TempData["error"] = "Post comment error. Please try again.";
+            return RedirectToAction("Index");
         }
 
         [Authorize(Roles = "StandardUser, Admin")]

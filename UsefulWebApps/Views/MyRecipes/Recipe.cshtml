@@ -50,10 +50,22 @@
             </ul>
         </section>
     }
-    <form>
+    
+    <form method="post" asp-route="postComment" id="postCommentForm">
         <div class="form-floating">
+            <input type="hidden" asp-for="RecipeComment.UserName" />
+            <input type="hidden" asp-for="RecipeComment.UserId" />
+            <input type="hidden" asp-for="RecipeComment.RecipeId" value="@Model.Recipe.RecipeId" />
             <textarea asp-for="RecipeComment.Comment" class="form-control textarea-input ignore"></textarea>
-            <label asp-for="RecipeComment.Comment">Recipe Notes</label>
+            <label asp-for="RecipeComment.Comment">Recipe Comment</label>
+        </div>
+        <div class="text-center">
+            <div class="mt-2">
+                <button class="btn btn-primary" type="submit">Post Comment</button>
+            </div>
+            <div class="mt-2">
+                <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-primary">Back to Recipe List</a>
+            </div>
         </div>
     </form>
    

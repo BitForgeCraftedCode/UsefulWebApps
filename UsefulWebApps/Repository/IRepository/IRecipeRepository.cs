@@ -26,6 +26,7 @@ namespace UsefulWebApps.Repository.IRepository
             )> GetCategoriesForCreateDisplay();
 
         Task<bool> AddRecipe(RecipeVM recipeVM);
+        Task<bool> AddRecipeComment(RecipeComment recipeComment);
         Task<bool> DeleteRecipe(int? id);
 
     }
