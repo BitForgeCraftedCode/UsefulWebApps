@@ -95,6 +95,57 @@ namespace UsefulWebApps.Repository
             return filteredRecipe[0];
         }
 
+        public async Task<RecipeCommentsVM> GetRecipeAndCommentsById(int? id)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+
+            //returns x rows of a single recipe at RecipeId where x is the number of categories
+            string sql = @"SELECT * FROM recipes
+                JOIN recipe_categories_join ON recipe_categories_join.RecipeId = recipes.RecipeId
+                JOIN recipe_categories ON recipe_categories_join.CategoryId = recipe_categories.CategoryId 
+                JOIN recipe_courses ON recipe_courses.CourseId = recipes.CourseId
+                JOIN recipe_cuisines ON recipe_cuisines.CuisineId = recipes.CuisineId
+                JOIN recipe_difficulties ON recipe_difficulties.DifficultyId = recipes.DifficultyId
+                WHERE recipes.RecipeId = @id;";
+
+            string sql2 = @"SELECT * FROM recipe_comments WHERE RecipeId = @id";
+
+            //https://www.learndapper.com/relationships -- map the JOIN to C# objects
+            //this is a list of 1 single recipe listed x times one for each category -- best to see this by running the above sql in workbench. 
+            List<Recipe> recipe = (List<Recipe>)await _connection.QueryAsync<Recipe, RecipeCategories, RecipeCourses, RecipeCuisines, RecipeDifficulties, Recipe>(sql,
+                (recipe, recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties) => {
+                    recipe.Categories.Add(recipeCategories);
+                    recipe.Course = recipeCourses;
+                    recipe.Cuisine = recipeCuisines;
+                    recipe.Difficulty = recipeDifficulties;
+                    return recipe;
+                }, new { id }, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId", transaction: txn);
+
+            //since we sql SELECT on 1 id GroupBy returns 1 group with x num recipe rows
+            //foreach group get the First recipe and add the categories to it
+            //this returns a list with 1 recipe in it that now has List<RecipeCategories> filled
+            List<Recipe> filteredRecipe = recipe.GroupBy(r => r.RecipeId).Select(g =>
+            {
+                Recipe singleRecipe = g.First();
+                //select each recipe in the group and return the list of categories
+                singleRecipe.Categories = g.Select(r => r.Categories.Single()).ToList();
+                return singleRecipe;
+            }).ToList();
+
+            List<RecipeComment> recipeComments = (List<RecipeComment>)await _connection.QueryAsync<RecipeComment>(sql2, new { id }, transaction: txn);
+
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            RecipeCommentsVM recipeCommentsVM = new RecipeCommentsVM 
+            { 
+                Recipe = filteredRecipe[0],
+                RecipeComments = recipeComments,
+                RecipeComment = new RecipeComment()
+            };
+            return recipeCommentsVM;
+        }
+
         public async Task<(
             List<Recipe> recipe,
             List<RecipeCategories> recipeCategories,

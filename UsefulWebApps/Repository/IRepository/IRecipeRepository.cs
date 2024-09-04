@@ -9,6 +9,7 @@ namespace UsefulWebApps.Repository.IRepository
         //Recipe is very specific no generic repo methods used
         Task<(int count, List<Recipe> recipes)> Pagination(int limit, int offset, string searchString);
         Task<Recipe> GetRecipeById(int? id);
+        Task<RecipeCommentsVM> GetRecipeAndCommentsById(int? id);
         Task<(
             List<Recipe> recipe, 
             List<RecipeCategories> recipeCategories, 

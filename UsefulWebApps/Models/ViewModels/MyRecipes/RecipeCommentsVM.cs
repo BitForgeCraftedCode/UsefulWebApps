@@ -7,5 +7,7 @@ namespace UsefulWebApps.Models.ViewModels.MyRecipes
         public Recipe Recipe { get; set; }
 
         public List<RecipeComment> RecipeComments { get; set; }
+
+        public RecipeComment RecipeComment { get; set; }
     }
 }

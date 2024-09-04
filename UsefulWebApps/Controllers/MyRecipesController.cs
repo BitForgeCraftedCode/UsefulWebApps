@@ -54,9 +54,9 @@ namespace UsefulWebApps.Controllers
                 return NotFound();
             }
 
-            Recipe recipe = await _unitOfWork.Recipe.GetRecipeById(id);
+            RecipeCommentsVM recipeCommentsVM = await _unitOfWork.Recipe.GetRecipeAndCommentsById(id);
 
-            return View(recipe);
+            return View(recipeCommentsVM);
         }
 
         [Authorize(Roles = "StandardUser, Admin")]
