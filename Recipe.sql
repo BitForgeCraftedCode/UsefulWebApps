@@ -151,5 +151,25 @@ CREATE TABLE `recipe_difficulties` (
 );
 
 INSERT INTO recipe_difficulties (Difficulty)
-VALUES ("Easy"),("Medium"),("Hard"),("Pro Chef")
+VALUES ("Easy"),("Medium"),("Hard"),("Pro Chef");
+/*
+https://stackoverflow.com/questions/1481476/when-to-use-on-update-cascade
+
+comments is the child of recipes
+
+one comment can have only 1 recipe but 1 recipe can have many comments ONE TO MANY
+
+ON DELETE CASCADE to delete all comments if a recipe is deleted 
+*/
+CREATE TABLE `recipe_comments`(
+	`CommentId` bigint unsigned NOT NULL AUTO_INCREMENT,
+    `Comment` varchar(1000) NOT NULL,
+    `UserId` varchar(255) NOT NULL,
+    `UserName` varchar(256) NOT NULL,
+    `RecipeId` bigint unsigned DEFAULT NULL,
+    PRIMARY KEY (`CommentId`),
+    KEY `RecipeId` (`RecipeId`),
+    CONSTRAINT `recipe_comments_ibfk_1` FOREIGN KEY (`RecipeId`) REFERENCES `recipes` (`RecipeId`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 
