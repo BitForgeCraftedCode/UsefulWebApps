@@ -35,40 +35,80 @@
     <nutrition html-nutrition-content="@Model.Recipe.Nutrition"></nutrition>
     @if (User?.Identity?.IsAuthenticated == true)
     {
-        <a asp-controller="MyRecipes" asp-action="EditRecipe" asp-route-id="@Model.Recipe.RecipeId">Edit Recipe</a>
-        <a asp-controller="MyRecipes" asp-action="DeleteRecipe" asp-route-id="@Model.Recipe.RecipeId">Delete Recipe</a>
-    }
-    @if(Model.RecipeComments.Count > 0)
-    {
-        <section>
-            <h2 class="display-6">Comments</h2>
-            <ul class="list-group">
-                @foreach (RecipeComment comment in Model.RecipeComments)
-                {
-                    <li class="list-group-item">@comment.Comment</li>
-                }
-            </ul>
-        </section>
-    }
-    
-    <form method="post" asp-route="postComment" id="postCommentForm">
-        <div class="form-floating">
-            <input type="hidden" asp-for="RecipeComment.UserName" />
-            <input type="hidden" asp-for="RecipeComment.UserId" />
-            <input type="hidden" asp-for="RecipeComment.RecipeId" value="@Model.Recipe.RecipeId" />
-            <textarea asp-for="RecipeComment.Comment" class="form-control textarea-input ignore"></textarea>
-            <label asp-for="RecipeComment.Comment">Recipe Comment</label>
-        </div>
         <div class="text-center">
             <div class="mt-2">
-                <button class="btn btn-primary" type="submit">Post Comment</button>
+                <a class="btn btn-primary" asp-controller="MyRecipes" asp-action="EditRecipe" asp-route-id="@Model.Recipe.RecipeId">Edit Recipe</a>
+            </div>
+            <div class="mt-2">
+                <a class="btn btn-primary" asp-controller="MyRecipes" asp-action="DeleteRecipe" asp-route-id="@Model.Recipe.RecipeId">Delete Recipe</a>
             </div>
             <div class="mt-2">
                 <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-primary">Back to Recipe List</a>
             </div>
         </div>
-    </form>
-   
-    
+        <div>
+            <section>
+                @if (Model.RecipeComments.Count > 0)
+                {
+                    <h2 class="display-6">Comments</h2>
+                }
+                else
+                {
+                    <h2 class="display-6">Be the first to post a comment.</h2>
+                }
+                <ul class="list-group">
+                    @foreach (RecipeComment comment in Model.RecipeComments)
+                    {
+                        <li class="list-group-item">
+                            <p>
+                                <span>@comment.UserName</span><br />
+                                @comment.Comment
+                            </p>
+                        </li>
+                    }
+                </ul>
+            </section>
+            <form method="post" asp-route="postComment" id="postCommentForm">
+                <div class="form-floating">
+                    <input type="hidden" asp-for="RecipeComment.UserName" />
+                    <input type="hidden" asp-for="RecipeComment.UserId" />
+                    <input type="hidden" asp-for="RecipeComment.RecipeId" value="@Model.Recipe.RecipeId" />
+                    <textarea asp-for="RecipeComment.Comment" class="form-control textarea-input ignore"></textarea>
+                    <label asp-for="RecipeComment.Comment">Recipe Comment</label>
+                </div>
+                <div class="text-center">
+                    <div class="mt-2">
+                        <button class="btn btn-primary" type="submit">Post Comment</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="text-center">
+            
+            <div class="mt-2">
+                <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-primary">Back to Recipe List</a>
+            </div>
+        </div>
+        <section>
+            @if (Model.RecipeComments.Count > 0)
+            {
+                <h2 class="display-6">Comments</h2>
+            }
+            <ul class="list-group">
+                @foreach (RecipeComment comment in Model.RecipeComments)
+                {
+                    <li class="list-group-item">
+                        <p>
+                            @comment.UserName<br />
+                            @comment.Comment
+                        </p>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
 </div>
 
