@@ -29,10 +29,17 @@
     <ingredients html-ingredients-content="@Model.Recipe.Ingredients"></ingredients>
     <h2 class="display-6">Instructions</h2>
     <instructions html-instructions-content="@Model.Recipe.Instructions"></instructions>
-    <h2 class="display-6">Notes</h2>
-    <notes html-notes-content="@Model.Recipe.Notes"></notes>
-    <h2 class="display-6">Nutrition</h2>
-    <nutrition html-nutrition-content="@Model.Recipe.Nutrition"></nutrition>
+    @if(Model.Recipe.Notes != "")
+    {
+        <h2 class="display-6">Notes</h2>
+        <notes html-notes-content="@Model.Recipe.Notes"></notes>
+    }
+    @if(Model.Recipe.Nutrition != "")
+    {
+        <h2 class="display-6">Nutrition</h2>
+        <nutrition html-nutrition-content="@Model.Recipe.Nutrition"></nutrition>
+    }
+    
     @if (User?.Identity?.IsAuthenticated == true)
     {
         <div class="text-center">
@@ -61,7 +68,7 @@
                     {
                         <li class="list-group-item">
                             <p>
-                                <span>@comment.UserName</span><br />
+                                <strong>@comment.UserName</strong><br />
                                 @comment.Comment
                             </p>
                         </li>
@@ -102,7 +109,7 @@
                 {
                     <li class="list-group-item">
                         <p>
-                            @comment.UserName<br />
+                            <strong>@comment.UserName</strong><br />
                             @comment.Comment
                         </p>
                     </li>
