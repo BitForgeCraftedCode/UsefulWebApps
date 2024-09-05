@@ -172,4 +172,14 @@ CREATE TABLE `recipe_comments`(
     CONSTRAINT `recipe_comments_ibfk_1` FOREIGN KEY (`RecipeId`) REFERENCES `recipes` (`RecipeId`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE `recipe_usersaved`(
+	`UserSavedId` bigint unsigned NOT NULL AUTO_INCREMENT,
+    `UserId` varchar(255) NOT NULL,
+    `UserName` varchar(256) NOT NULL,
+    `RecipeId` bigint unsigned DEFAULT NULL,
+    PRIMARY KEY (`UserSavedId`),
+    KEY `RecipeId` (`RecipeId`),
+    CONSTRAINT `recipe_usersaved_ibfk_1` FOREIGN KEY (`RecipeId`) REFERENCES `recipes` (`RecipeId`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 
