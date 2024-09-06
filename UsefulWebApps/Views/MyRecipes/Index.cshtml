@@ -10,6 +10,7 @@
     @if (User?.Identity?.IsAuthenticated == true)
     {
         <p>To make a new recipe click <a asp-controller="MyRecipes" asp-action="CreateRecipe">here</a></p>
+        <p>To view your saved recipes click <a asp-controller="MyRecipes" asp-action="SavedRecipes">here</a></p>
     }
     
     

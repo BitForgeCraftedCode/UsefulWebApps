@@ -65,6 +65,11 @@ namespace UsefulWebApps.Controllers
             return View(RecipePageVM);
         }
 
+        public async Task<IActionResult> SavedRecipes()
+        {
+            return View();
+        }
+
         [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost]
         [Route("/MyRecipes/PostComment", Name = "postComment")]
