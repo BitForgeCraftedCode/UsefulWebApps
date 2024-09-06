@@ -7,10 +7,16 @@
 
 <div class="text-center list-buddy-index-container mx-auto">
     <h1 class="display-4">Your Saved Recipes</h1>
-    <div class="list-group">
+    <ul class="list-group">
         @foreach (RecipeUserSaved recipe in Model.RecipeUserSaved)
         {
-            <a asp-controller="MyRecipes" asp-action="Recipe" asp-route-id="@recipe.RecipeId" class="list-group-item list-group-item-action">@recipe.RecipeTitle</a>
+            <li class="list-group-item">
+                <a asp-controller="MyRecipes" asp-action="Recipe" asp-route-id="@recipe.RecipeId">@recipe.RecipeTitle</a>
+                <form method="post" asp-route="deleteUserSavedRecipe" id="delete-user-saved-recipe">
+                    <input type="hidden" asp-for="@recipe.UserSavedId" name="id" />
+                    <button type="submit" class="btn btn-danger">Remove From List</button>
+                </form>
+            </li>
         }
-    </div>
+    </ul>
 </div>

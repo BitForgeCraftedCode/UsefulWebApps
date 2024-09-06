@@ -149,7 +149,7 @@ namespace UsefulWebApps.Repository
 
         public async Task<List<RecipeUserSaved>> GetUserSavedRecipes(string userId)
         {
-            string sql = @"SELECT RecipeId, RecipeTitle FROM recipe_usersaved WHERE UserId = @userId";
+            string sql = @"SELECT UserSavedId, RecipeId, RecipeTitle FROM recipe_usersaved WHERE UserId = @userId";
             List<RecipeUserSaved> recipeUserSaved = (List<RecipeUserSaved>)await _connection.QueryAsync<RecipeUserSaved>(sql, new { userId });
             await _connection.CloseAsync();
             return recipeUserSaved;
@@ -453,6 +453,15 @@ namespace UsefulWebApps.Repository
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return (rowsEffected1 > 0 && rowsEffected2 > 0) ? true : false;
+        }
+
+        public async Task<bool> DeleteUserSavedRecipe(int? id)
+        {
+            int rowsEffected = 0;
+            string sql = @"DELETE FROM recipe_usersaved WHERE UserSavedId = @id";
+            rowsEffected = await _connection.ExecuteAsync(sql, new { id });
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
         }
 
     }

@@ -132,6 +132,29 @@ namespace UsefulWebApps.Controllers
         }
 
         [Authorize(Roles = "StandardUser, Admin")]
+        [HttpPost]
+        [Route("/MyRecipes/DeleteUserSavedRecipe", Name = "deleteUserSavedRecipe")]
+        public async Task<IActionResult> DeleteUserSavedRecipe(int? id)
+        {
+            
+            if (id == null || id == 0)
+            {
+                TempData["error"] = "Delete saved recipe error. Please try again";
+                return RedirectToAction("SavedRecipes");
+            }
+            bool success = await _unitOfWork.Recipe.DeleteUserSavedRecipe(id);
+            if (success)
+            {
+                TempData["success"] = "Saved recipe deleted successfully";
+            }
+            else
+            {
+                TempData["error"] = "Delete saved recipe error. Please try again";
+            }
+            return RedirectToAction("SavedRecipes");
+        }
+
+        [Authorize(Roles = "StandardUser, Admin")]
         public async Task<IActionResult> EditRecipe(int? id)
         {
             if (id == null || id == 0)

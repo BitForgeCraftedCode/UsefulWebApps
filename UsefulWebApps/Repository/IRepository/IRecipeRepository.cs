@@ -30,6 +30,7 @@ namespace UsefulWebApps.Repository.IRepository
         Task<bool> AddRecipeComment(RecipeComment recipeComment);
         Task<bool> AddUserSavedRecipe(RecipeUserSaved recipeUserSaved);
         Task<bool> DeleteRecipe(int? id);
+        Task<bool> DeleteUserSavedRecipe(int? id);
 
     }
 }
