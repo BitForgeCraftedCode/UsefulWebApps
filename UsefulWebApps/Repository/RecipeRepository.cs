@@ -400,8 +400,22 @@ namespace UsefulWebApps.Repository
 
         public async Task<bool> AddUserSavedRecipe(RecipeUserSaved recipeUserSaved)
         {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             int rowsEffected = 0;
-            string sql = @"INSERT INTO recipe_usersaved
+            string sql1 = @"SELECT COUNT(*) FROM recipe_usersaved WHERE UserId = @userId";
+            int savedRecipeCount = await _connection.QuerySingleAsync<int>(sql1, new 
+            { 
+                userId = recipeUserSaved.UserId,
+            }, transaction: txn);
+
+            if (savedRecipeCount >= 10) 
+            { 
+                await txn.RollbackAsync();
+                await _connection.CloseAsync();
+                return rowsEffected > 0 ? true : false;
+            }
+            string sql2 = @"INSERT INTO recipe_usersaved
                             (
                                 UserId,
                                 UserName,
@@ -415,13 +429,14 @@ namespace UsefulWebApps.Repository
                                 @recipeId,
                                 @recipeTitle
                             )";
-            rowsEffected = await _connection.ExecuteAsync(sql, new 
+            rowsEffected = await _connection.ExecuteAsync(sql2, new 
             {
                 userId = recipeUserSaved.UserId,
                 userName = recipeUserSaved.UserName,
                 recipeId = recipeUserSaved.RecipeId,
                 recipeTitle = recipeUserSaved.RecipeTitle
-            });
+            }, transaction: txn);
+            await txn.CommitAsync();
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }

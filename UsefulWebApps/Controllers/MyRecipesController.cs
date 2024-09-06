@@ -123,8 +123,8 @@ namespace UsefulWebApps.Controllers
                 }
                 else
                 {
-                    TempData["error"] = "Save recipe to list error. Please try again.";
-                    return RedirectToAction("Index");
+                    TempData["error"] = "You can only save 10 recipes to your list";
+                    return RedirectToAction("Recipe", new { id });
                 }
             }
             TempData["error"] = "Save recipe to list error. Please try again.";
