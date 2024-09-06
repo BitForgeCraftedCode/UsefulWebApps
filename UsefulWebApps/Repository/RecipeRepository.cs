@@ -147,6 +147,14 @@ namespace UsefulWebApps.Repository
             return RecipePageVM;
         }
 
+        public async Task<List<RecipeUserSaved>> GetUserSavedRecipes(string userId)
+        {
+            string sql = @"SELECT RecipeId, RecipeTitle FROM recipe_usersaved WHERE UserId = @userId";
+            List<RecipeUserSaved> recipeUserSaved = (List<RecipeUserSaved>)await _connection.QueryAsync<RecipeUserSaved>(sql, new { userId });
+            await _connection.CloseAsync();
+            return recipeUserSaved;
+        }
+
         public async Task<(
             List<Recipe> recipe,
             List<RecipeCategories> recipeCategories,
@@ -269,6 +277,7 @@ namespace UsefulWebApps.Repository
             List<RecipeCourses> recipeCourses = (List<RecipeCourses>)await gridReader.ReadAsync<RecipeCourses>();
             List<RecipeCuisines> recipeCuisines = (List<RecipeCuisines>)await gridReader.ReadAsync<RecipeCuisines>();
             List<RecipeDifficulties> recipeDifficulties = (List<RecipeDifficulties>)await gridReader.ReadAsync<RecipeDifficulties>();
+            await _connection.CloseAsync();
             return (recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties);
         }
 

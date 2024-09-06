@@ -65,9 +65,21 @@ namespace UsefulWebApps.Controllers
             return View(RecipePageVM);
         }
 
+        [Authorize(Roles = "StandardUser, Admin")]
         public async Task<IActionResult> SavedRecipes()
         {
-            return View();
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<RecipeUserSaved> recipeUserSaved = await _unitOfWork.Recipe.GetUserSavedRecipes(userId);
+            SavedRecipesVM savedRecipesVM = new SavedRecipesVM 
+            { 
+                RecipeUserSaved = recipeUserSaved,
+            };
+            if(recipeUserSaved.Count == 0)
+            {
+                TempData["success"] = "You don't have any saved recipes.";
+            }
+            return View(savedRecipesVM);
         }
 
         [Authorize(Roles = "StandardUser, Admin")]

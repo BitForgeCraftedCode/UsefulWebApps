@@ -10,6 +10,7 @@ namespace UsefulWebApps.Repository.IRepository
         Task<(int count, List<Recipe> recipes)> Pagination(int limit, int offset, string searchString);
         Task<Recipe> GetRecipeById(int? id);
         Task<RecipePageVM> GetRecipeAndCommentsById(int? id);
+        Task<List<RecipeUserSaved>> GetUserSavedRecipes(string userId);
         Task<(
             List<Recipe> recipe, 
             List<RecipeCategories> recipeCategories, 

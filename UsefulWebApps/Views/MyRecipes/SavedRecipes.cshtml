@@ -1,7 +1,16 @@
-﻿@{
+﻿@using UsefulWebApps.Models.MyRecipes
+@{
     ViewData["Title"] = "My Recipes";
 }
 
-<div>
-    List user's saved recipes here
+@model UsefulWebApps.Models.ViewModels.MyRecipes.SavedRecipesVM
+
+<div class="text-center list-buddy-index-container mx-auto">
+    <h1 class="display-4">Your Saved Recipes</h1>
+    <div class="list-group">
+        @foreach (RecipeUserSaved recipe in Model.RecipeUserSaved)
+        {
+            <a asp-controller="MyRecipes" asp-action="Recipe" asp-route-id="@recipe.RecipeId" class="list-group-item list-group-item-action">@recipe.RecipeTitle</a>
+        }
+    </div>
 </div>
