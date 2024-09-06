@@ -57,10 +57,12 @@ namespace UsefulWebApps.Controllers
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
             string userName = currentUser.FindFirstValue(ClaimTypes.Name);
 
-            RecipeCommentsVM recipeCommentsVM = await _unitOfWork.Recipe.GetRecipeAndCommentsById(id);
-            recipeCommentsVM.RecipeComment.UserId = userId;
-            recipeCommentsVM.RecipeComment.UserName = userName;
-            return View(recipeCommentsVM);
+            RecipePageVM RecipePageVM = await _unitOfWork.Recipe.GetRecipeAndCommentsById(id);
+            RecipePageVM.RecipeComment.UserId = userId;
+            RecipePageVM.RecipeComment.UserName = userName;
+            RecipePageVM.RecipeUserSaved.UserId = userId;
+            RecipePageVM.RecipeUserSaved.UserName = userName;
+            return View(RecipePageVM);
         }
 
         [Authorize(Roles = "StandardUser, Admin")]
@@ -70,9 +72,7 @@ namespace UsefulWebApps.Controllers
         {
             if (ModelState.IsValid)
             {
-                Console.WriteLine(recipeComment.UserName);
-                Console.WriteLine(recipeComment.Comment);
-                Console.WriteLine(ModelState.IsValid);
+               
                 int? id = recipeComment.RecipeId;
                 bool success = await _unitOfWork.Recipe.AddRecipeComment(recipeComment);
                 if (success)
@@ -87,6 +87,30 @@ namespace UsefulWebApps.Controllers
                 }
             }
             TempData["error"] = "Post comment error. Please try again.";
+            return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = "StandardUser, Admin")]
+        [HttpPost]
+        [Route("/MyRecipes/UserSavedRecipe", Name = "userSavedRecipe")]
+        public async Task<IActionResult> UserSavedRecipe(RecipeUserSaved recipeUserSaved)
+        {
+            if (ModelState.IsValid)
+            {
+                int? id = recipeUserSaved.RecipeId;
+                bool success = await _unitOfWork.Recipe.AddUserSavedRecipe(recipeUserSaved);
+                if (success)
+                {
+                    TempData["success"] = "Recipe saved to your list successfully";
+                    return RedirectToAction("Recipe", new { id });
+                }
+                else
+                {
+                    TempData["error"] = "Save recipe to list error. Please try again.";
+                    return RedirectToAction("Index");
+                }
+            }
+            TempData["error"] = "Save recipe to list error. Please try again.";
             return RedirectToAction("Index");
         }
 

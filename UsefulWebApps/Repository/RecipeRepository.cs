@@ -95,7 +95,7 @@ namespace UsefulWebApps.Repository
             return filteredRecipe[0];
         }
 
-        public async Task<RecipeCommentsVM> GetRecipeAndCommentsById(int? id)
+        public async Task<RecipePageVM> GetRecipeAndCommentsById(int? id)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
@@ -137,13 +137,14 @@ namespace UsefulWebApps.Repository
 
             await txn.CommitAsync();
             await _connection.CloseAsync();
-            RecipeCommentsVM recipeCommentsVM = new RecipeCommentsVM 
+            RecipePageVM RecipePageVM = new RecipePageVM 
             { 
                 Recipe = filteredRecipe[0],
                 RecipeComments = recipeComments,
-                RecipeComment = new RecipeComment()
+                RecipeComment = new RecipeComment(),
+                RecipeUserSaved = new RecipeUserSaved()
             };
-            return recipeCommentsVM;
+            return RecipePageVM;
         }
 
         public async Task<(
@@ -388,6 +389,30 @@ namespace UsefulWebApps.Repository
             return rowsEffected > 0 ? true : false;
         }
 
+        public async Task<bool> AddUserSavedRecipe(RecipeUserSaved recipeUserSaved)
+        {
+            int rowsEffected = 0;
+            string sql = @"INSERT INTO recipe_usersaved
+                            (
+                                UserId,
+                                UserName,
+                                RecipeId
+                            )
+                            VALUES 
+                            (
+                                @userId,   
+                                @userName,
+                                @recipeId
+                            )";
+            rowsEffected = await _connection.ExecuteAsync(sql, new 
+            {
+                userId = recipeUserSaved.UserId,
+                userName = recipeUserSaved.UserName,
+                recipeId = recipeUserSaved.RecipeId
+            });
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
         public async Task<bool> DeleteRecipe(int? id)
         {
             int rowsEffected1 = 0;

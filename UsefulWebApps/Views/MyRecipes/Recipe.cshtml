@@ -3,7 +3,7 @@
     ViewData["Title"] = "My Recipes";
 }
 
-@model UsefulWebApps.Models.ViewModels.MyRecipes.RecipeCommentsVM
+@model UsefulWebApps.Models.ViewModels.MyRecipes.RecipePageVM
 
 <div class="list-buddy-index-container mx-auto">
     <h1 class="display-4">@Model.Recipe.RecipeTitle</h1>
@@ -43,6 +43,21 @@
     @if (User?.Identity?.IsAuthenticated == true)
     {
         <div class="text-center">
+            <div class="mt-2">
+                <form method="post" asp-route="userSavedRecipe" id="userSavedRecipeForm">
+                    <div class="form-floating">
+                        <input type="hidden" asp-for="RecipeUserSaved.UserName" />
+                        <input type="hidden" asp-for="RecipeUserSaved.UserId" />
+                        <input type="hidden" asp-for="RecipeUserSaved.RecipeId" value="@Model.Recipe.RecipeId" />
+                   
+                    </div>
+                    <div class="text-center">
+                        <div class="mt-2">
+                            <button class="btn btn-primary" type="submit">Save Recipe to my list</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
             <div class="mt-2">
                 <a class="btn btn-primary" asp-controller="MyRecipes" asp-action="EditRecipe" asp-route-id="@Model.Recipe.RecipeId">Edit Recipe</a>
             </div>
