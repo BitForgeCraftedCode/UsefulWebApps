@@ -182,4 +182,6 @@ CREATE TABLE `recipe_usersaved`(
     CONSTRAINT `recipe_usersaved_ibfk_1` FOREIGN KEY (`RecipeId`) REFERENCES `recipes` (`RecipeId`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+ALTER TABLE recipe_usersaved ADD RecipeTitle varchar(100) NOT NULL;
+
 

@@ -21,5 +21,8 @@ namespace UsefulWebApps.Models.MyRecipes
         [ForeignKey("RecipeId")]
         [Column("RecipeId")]
         public int RecipeId { get; set; }
+
+        [Column("RecipeTitle")]
+        public string RecipeTitle { get; set; } = string.Empty;
     }
 }

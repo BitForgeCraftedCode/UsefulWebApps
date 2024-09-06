@@ -396,19 +396,22 @@ namespace UsefulWebApps.Repository
                             (
                                 UserId,
                                 UserName,
-                                RecipeId
+                                RecipeId,
+                                RecipeTitle
                             )
                             VALUES 
                             (
                                 @userId,   
                                 @userName,
-                                @recipeId
+                                @recipeId,
+                                @recipeTitle
                             )";
             rowsEffected = await _connection.ExecuteAsync(sql, new 
             {
                 userId = recipeUserSaved.UserId,
                 userName = recipeUserSaved.UserName,
-                recipeId = recipeUserSaved.RecipeId
+                recipeId = recipeUserSaved.RecipeId,
+                recipeTitle = recipeUserSaved.RecipeTitle
             });
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
