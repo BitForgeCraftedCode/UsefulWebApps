@@ -40,6 +40,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
+//https://github.com/ligershark/WebOptimizer
+builder.Services.AddWebOptimizer();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -50,6 +53,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseWebOptimizer();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
