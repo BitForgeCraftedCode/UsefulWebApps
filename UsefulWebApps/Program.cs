@@ -4,6 +4,8 @@ using MySqlConnector;
 using UsefulWebApps.Data;
 using UsefulWebApps.Repository.IRepository;
 using UsefulWebApps.Repository;
+using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
+using JavaScriptEngineSwitcher.V8;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,8 +42,21 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
+//add JS engine for compiling Scss
+builder.Services.AddJsEngineSwitcher(options =>
+{
+    options.AllowCurrentProperty = false;
+    options.DefaultEngineName = V8JsEngine.EngineName;
+}).AddV8();
+
 //https://github.com/ligershark/WebOptimizer
-builder.Services.AddWebOptimizer();
+builder.Services.AddWebOptimizer(pipeline => 
+{
+    pipeline.MinifyCssFiles("css/**/*.css");
+    pipeline.MinifyJsFiles("js/**/*.js");
+    pipeline.AddScssBundle("/css/all.css", "/css/styles.scss");
+    
+});
 
 var app = builder.Build();
 
