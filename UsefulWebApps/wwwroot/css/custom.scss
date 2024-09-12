@@ -1,4 +1,13 @@
-﻿html {
+﻿// Your variable overrides can go here, e.g.:
+// $h1-font-size: 3rem;
+
+@import "../lib/bootswatch/dist/scss/_variablesSketchy.scss";
+@import "../lib/bootstrap/dist/scss/bootstrap.scss";
+@import "../lib/bootswatch/dist/scss/_bootswatchSketchy.scss";
+
+// Then add additional custom code here
+
+html {
     font-size: 14px;
 }
 

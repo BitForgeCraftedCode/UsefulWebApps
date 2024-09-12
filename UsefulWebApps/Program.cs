@@ -54,7 +54,7 @@ builder.Services.AddWebOptimizer(pipeline =>
 {
     pipeline.MinifyCssFiles("css/**/*.css");
     pipeline.MinifyJsFiles("js/**/*.js");
-    pipeline.AddScssBundle("/css/all.css", "/css/styles.scss");
+    pipeline.AddScssBundle("/css/custom.css", "/css/custom.scss");
     
 });
 
