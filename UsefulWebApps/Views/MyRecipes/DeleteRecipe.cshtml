@@ -5,7 +5,7 @@
 
 @model UsefulWebApps.Models.MyRecipes.Recipe
 
-<div class="list-buddy-index-container mx-auto">
+<div class="max-width-500 mx-auto">
     <p>Click Delete below to remove this recipe. This action cannot be undone.</p>
     <form method="post" id="deleteRecipeForm">
         <input asp-for="@Model.RecipeId" hidden />

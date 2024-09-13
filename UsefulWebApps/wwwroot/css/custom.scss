@@ -4,8 +4,22 @@
 @import "../lib/bootswatch/dist/scss/_variablesMorph.scss";
 @import "../lib/bootstrap/dist/scss/bootstrap.scss";
 @import "../lib/bootswatch/dist/scss/_bootswatchMorph.scss";
+@import "../css/listBuddy";
+
 
 // Then add additional custom code here
+
+.max-width-175 {
+    max-width: 175px;
+}
+
+.max-width-200 {
+    max-width: 200px;
+}
+
+.max-width-500 {
+    max-width: 550px;
+}
 
 html {
     font-size: 14px;
@@ -50,81 +64,6 @@ body {
     font-weight: bold;
     color: red;
 }
-
-
-.list-buddy-index-container {
-    max-width: 550px;
-}
-
-.list-links-container {
-    max-width: 200px;
-}
-/*To Do List Styles*/
-.to-do-list-container {
-    max-width: 550px;
-}
-
-.to-do-list-delete-item {
-    display: inline-block;
-}
-
-.add-to-do-item {
-    max-width: 550px;
-}
-
-.to-do-list-edit {
-    display: inline-block;
-}
-
-.to-do-list-mark-complete {
-    display: inline-block;
-}
-
-.to-do-list-item {
-    margin-bottom: 10px;
-    display: inline-block;
-}
-
-.line-through {
-    text-decoration: line-through;
-}
-
-.delete-all-to-do-item {
-    max-width: 175px;
-}
-/*End To Do List Styles*/
-
-/*Grocery List Styles*/
-.grocery-list-container {
-    max-width: 550px;
-}
-
-.grocery-list-delete-item {
-    display: inline-block;
-}
-
-.add-grocery-item {
-    max-width: 550px;
-}
-
-.grocery-list-edit {
-    display: inline-block;
-}
-
-.grocery-list-mark-complete {
-    display: inline-block;
-}
-
-.grocery-list-item {
-    margin-bottom: 10px;
-    display: inline-block;
-}
-
-.delete-all-grocery-item {
-    max-width: 175px;
-}
-
-/*End Grocery List Styles*/
 
 /*Recipe Edit*/
 

@@ -5,7 +5,7 @@
 
 @model UsefulWebApps.Models.ViewModels.ListBuddy.GroceryListVM
 
-<div class="text-center grocery-list-container mx-auto">
+<div class="text-center max-width-500 mx-auto">
     <h1 class="display-4">Grocery List</h1>
 
     @foreach (List<GroceryList> listOfGroceryLists in Model.FilteredGroceryListItems)
@@ -37,7 +37,7 @@
         
     }
     
-    <form method="post" asp-route="createGroceryItem" class="add-grocery-item">
+    <form method="post" asp-route="createGroceryItem" class="max-width-500">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->
             <input asp-for="GroceryList.Complete" hidden />
@@ -57,7 +57,7 @@
         </div>
     </form>
 
-    <form method="post" asp-route="deleteAllGroceryList" class="delete-all-grocery-item mx-auto" id="delete-all-grocery-list">
+    <form method="post" asp-route="deleteAllGroceryList" class="max-width-175 mx-auto" id="delete-all-grocery-list">
         <div>
             <button type="submit" class="btn btn-danger mb-2 w-100">Delete All</button>
         </div>
