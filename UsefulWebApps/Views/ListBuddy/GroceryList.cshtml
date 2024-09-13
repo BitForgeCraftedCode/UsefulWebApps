@@ -6,7 +6,7 @@
 @model UsefulWebApps.Models.ViewModels.ListBuddy.GroceryListVM
 
 <div class="text-center max-width-500 mx-auto">
-    <h1 class="display-4">Grocery List</h1>
+    <h1 class="display-3 mt-3">Grocery List</h1>
 
     @foreach (List<GroceryList> listOfGroceryLists in Model.FilteredGroceryListItems)
     {
@@ -15,19 +15,19 @@
             <ul class="list-group">
                 @foreach (GroceryList grocerylist in listOfGroceryLists)
                 {
-                    <li class="list-group-item">
+                    <li class="list-group-item list-group-item-action active">
                         <span class="fw-bold grocery-list-item @(grocerylist.Complete == true ? "line-through" : "")">@grocerylist.GroceryItem</span>
                         <div>
                             <form method="post" asp-route="toggleGroceryComplete" class="grocery-list-mark-complete">
                                 <input asp-for="@grocerylist.Id" name="id" hidden />
-                                <button type="submit" class="btn btn-success">Complete</button>
+                                <button type="submit" class="btn btn-dark btn-sm">Complete</button>
                             </form>
                             <div class="grocery-list-edit">
-                                <a asp-controller="ListBuddy" asp-action="GroceryListEdit" asp-route-id="@grocerylist.Id" class="btn btn-primary">Edit</a>
+                                <a asp-controller="ListBuddy" asp-action="GroceryListEdit" asp-route-id="@grocerylist.Id" class="btn btn-dark btn-sm">Edit</a>
                             </div>
-                            <form method="post" asp-route="deleteGroceryItem" class="grocery-list-delete-item" id="delete-grocery-item">
+                            <form method="post" asp-route="deleteGroceryItem" class="grocery-list-delete-item">
                                 <input asp-for="@grocerylist.Id" name="id" hidden />
-                                <button type="submit" class="btn btn-danger">Delete</button>
+                                <button type="submit" class="btn btn-sm @(grocerylist.Complete == true ? "btn-outline-danger" : "btn-danger")">Delete</button>
                             </form>
                         </div>
                     </li>
@@ -42,15 +42,13 @@
             <!--Complete default value is False-->
             <input asp-for="GroceryList.Complete" hidden />
             <input asp-for="GroceryList.UserId" hidden />
-            <input asp-for="GroceryList.GroceryItem" type="text" class="form-control" placeholder="new item" minlength="3" maxlength="100" />
+            <input asp-for="GroceryList.GroceryItem" type="text" class="form-control" placeholder="New Item" minlength="3" maxlength="100" />
+            <button class="btn btn-outline-dark" type="submit">Add Item</button>
         </div>
-        <div>
+        <div class="mb-3">
             <select class="form-select" asp-for="Category" asp-items="Model.GroceryCategoriesList">
                 <option selected value="Please Select a Category">Please Select a Category</option>
             </select>
-        </div>
-        <div class="mt-2">
-            <button class="btn btn-primary" type="submit">Add Item</button>
         </div>
         <div class="mb-2 mt-2">
             <span asp-validation-for="GroceryList.GroceryItem" class="text-danger"></span>
@@ -59,10 +57,10 @@
 
     <form method="post" asp-route="deleteAllGroceryList" class="max-width-175 mx-auto" id="delete-all-grocery-list">
         <div>
-            <button type="submit" class="btn btn-danger mb-2 w-100">Delete All</button>
+            <button type="submit" class="btn btn-danger mb-3 w-100">Delete All</button>
         </div>
         <div>
-            <a asp-controller="ListBuddy" asp-action="Index" class="btn btn-primary w-100">List Buddy Home</a>
+            <a asp-controller="ListBuddy" asp-action="Index" class="btn btn-outline-dark w-100">List Buddy Home</a>
         </div>
     </form>
 
@@ -86,7 +84,7 @@
                 });
             }
         });
-        $("#delete-grocery-item").validate({
+        $(".grocery-list-delete-item").validate({
             submitHandler: function (form) {
                 //ask to confirm delete
                 toastConfirm().then(deleteConfirm => {

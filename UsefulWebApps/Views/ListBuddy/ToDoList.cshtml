@@ -19,9 +19,9 @@
                     <div class="to-do-list-edit">
                         <a asp-controller="ListBuddy" asp-action="ToDoListEdit" asp-route-id="@obj.Id" class="btn btn-dark btn-sm">Edit</a>
                     </div>
-                    <form method="post" asp-route="deleteToDoItem" class="to-do-list-delete-item" id="delete-to-do-item">
+                    <form method="post" asp-route="deleteToDoItem" class="to-do-list-delete-item">
                         <input asp-for="@obj.Id" name="id" hidden />
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        <button type="submit" class="btn  btn-sm @(obj.Complete == true ? "btn-outline-danger" : "btn-danger")">Delete</button>
                     </form>
                 </div>
             </li>
@@ -35,14 +35,14 @@
             <input asp-for="ToDoList.ToDoItem" type="text" class="form-control" placeholder="New Item" minlength="3" maxlength="100" />
             <button class="btn btn-outline-dark" type="submit">Add Item</button>
         </div>
-        <div class="mb-2">
+        <div class="mb-3">
             <span asp-validation-for="ToDoList.ToDoItem" class="text-danger"></span>
         </div>
     </form>
 
     <form method="post" asp-route="deleteAllToDoList" class="max-width-175 mx-auto" id="delete-all-to-do">
         <div>
-            <button type="submit" class="btn btn-danger mb-2 w-100">Delete All</button>
+            <button type="submit" class="btn btn-danger mb-3 w-100">Delete All</button>
         </div>
         <div>
             <a asp-controller="ListBuddy" asp-action="Index" class="btn btn-outline-dark w-100">List Buddy Home</a>
