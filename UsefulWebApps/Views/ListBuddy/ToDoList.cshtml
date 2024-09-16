@@ -4,7 +4,7 @@
 
 @model UsefulWebApps.Models.ViewModels.ListBuddy.ToDoListVM
 
-<div class="text-center max-width-500 mx-auto">
+<div class="text-center max-width-550 mx-auto">
     <h1 class="display-3 mt-3">To Do List</h1>
     <ul class="list-group">
         @foreach (var obj in Model.ToDoListItems)
@@ -27,7 +27,7 @@
             </li>
         }
     </ul>
-    <form method="post" asp-route="createToDoItem" class="max-width-500">
+    <form method="post" asp-route="createToDoItem" class="max-width-550">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->
             <input asp-for="ToDoList.Complete" hidden />

@@ -5,39 +5,81 @@
 
 @model UsefulWebApps.Models.ViewModels.MyRecipes.RecipePageVM
 
-<div class="max-width-500 mx-auto">
-    <h1 class="display-4">@Model.Recipe.RecipeTitle</h1>
-    <p>@Model.Recipe.RecipeDescription</p>
-    <p>Author: @Model.Recipe.UserName</p>
-    <p>Coures: @Model.Recipe.Course.Course</p>
-    <p>Cuisine: @Model.Recipe.Cuisine.Cuisine</p>
-    <p>Difficulty: @Model.Recipe.Difficulty.Difficulty</p>
-    <p>Prep Time: @Model.Recipe.PrepTime</p>
-    <p>Cook Time: @Model.Recipe.CookTime</p>
-    <p>Rating: @Model.Recipe.Rating</p>
-    <p>Servings: @Model.Recipe.Servings</p>
-    <section>
-        <h2 class="display-6">Categories/Tags</h2>
+<div class="max-width-550 mx-auto">
+    <h1 class="mt-3 text-center">@Model.Recipe.RecipeTitle</h1>
+    @if(Model.Recipe.RecipeDescription != "")
+    {
+        <div class="row">
+            <div class="col-12">
+                <p>@Model.Recipe.RecipeDescription</p>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col-12">
+            <p><strong>Author:</strong> @Model.Recipe.UserName</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <p><strong>Coures:</strong> @Model.Recipe.Course.Course</p>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <p><strong>Cuisine:</strong> @Model.Recipe.Cuisine.Cuisine</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <p><strong>Prep Time:</strong> @Model.Recipe.PrepTime</p>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <p><strong>Cook Time:</strong> @Model.Recipe.CookTime</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <p><strong>Servings:</strong> @Model.Recipe.Servings</p>
+        </div>
+        <div class="col-sm-12 col-md-6 col-lg-6">
+            <p><strong>Rating:</strong> @Model.Recipe.Rating</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <p><strong>Difficulty:</strong> @Model.Recipe.Difficulty.Difficulty</p>
+        </div>
+    </div>
+    <section class="mb-3">
+        <h3 class="">Categories/Tags</h3>
         <ul class="list-group">
             @foreach (RecipeCategories category in Model.Recipe.Categories)
             {
-                <li class="list-group-item">@category.Category</li>
+                <li class="list-group-item active">@category.Category</li>
             }
         </ul>
     </section>
-    <h2 class="display-6">Ingredients</h2>
-    <ingredients html-ingredients-content="@Model.Recipe.Ingredients"></ingredients>
-    <h2 class="display-6">Instructions</h2>
-    <instructions html-instructions-content="@Model.Recipe.Instructions"></instructions>
+    <div class="mb-3">
+        <h3>Ingredients</h3>
+        <ingredients html-ingredients-content="@Model.Recipe.Ingredients"></ingredients>
+    </div>
+    <div class="mb-3">
+        <h3>Instructions</h3>
+        <instructions html-instructions-content="@Model.Recipe.Instructions"></instructions>
+    </div>
+    
     @if(Model.Recipe.Notes != "")
     {
-        <h2 class="display-6">Notes</h2>
-        <notes html-notes-content="@Model.Recipe.Notes"></notes>
+        <div class="mb-3">
+            <h3>Notes</h3>
+            <notes html-notes-content="@Model.Recipe.Notes"></notes>
+        </div>
     }
     @if(Model.Recipe.Nutrition != "")
     {
-        <h2 class="display-6">Nutrition</h2>
-        <nutrition html-nutrition-content="@Model.Recipe.Nutrition"></nutrition>
+        <div class="mb-3">
+            <h3>Nutrition</h3>
+            <nutrition html-nutrition-content="@Model.Recipe.Nutrition"></nutrition>
+        </div>
     }
     
     @if (User?.Identity?.IsAuthenticated == true)
@@ -73,11 +115,11 @@
             <section>
                 @if (Model.RecipeComments.Count > 0)
                 {
-                    <h2 class="display-6">Comments</h2>
+                    <h3>Comments</h3>
                 }
                 else
                 {
-                    <h2 class="display-6">Be the first to post a comment.</h2>
+                    <h3>Be the first to post a comment.</h3>
                 }
                 <ul class="list-group">
                     @foreach (RecipeComment comment in Model.RecipeComments)
@@ -118,7 +160,7 @@
         <section>
             @if (Model.RecipeComments.Count > 0)
             {
-                <h2 class="display-6">Comments</h2>
+                <h3>Comments</h3>
             }
             <ul class="list-group">
                 @foreach (RecipeComment comment in Model.RecipeComments)
