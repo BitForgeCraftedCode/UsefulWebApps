@@ -5,7 +5,7 @@
 
 @model UsefulWebApps.Models.ViewModels.MyRecipes.RecipePageVM
 
-<div class="max-width-550 mx-auto">
+<div class="max-width-700 mx-auto">
     <h1 class="mt-3 text-center">@Model.Recipe.RecipeTitle</h1>
     @if(Model.Recipe.RecipeDescription != "")
     {
@@ -84,35 +84,34 @@
     
     @if (User?.Identity?.IsAuthenticated == true)
     {
-        <div class="text-center">
-            <div class="mt-2">
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-6 max-width-250 mx-auto">
                 <form method="post" asp-route="userSavedRecipe" id="userSavedRecipeForm">
-                    <div class="form-floating">
+                    <div>
                         <input type="hidden" asp-for="RecipeUserSaved.UserName" />
                         <input type="hidden" asp-for="RecipeUserSaved.UserId" />
                         <input type="hidden" asp-for="RecipeUserSaved.RecipeId" value="@Model.Recipe.RecipeId" />
                         <input type="hidden" asp-for="RecipeUserSaved.RecipeTitle" value="@Model.Recipe.RecipeTitle" />
-                   
                     </div>
-                    <div class="text-center">
-                        <div class="mt-2">
-                            <button class="btn btn-primary" type="submit">Save Recipe to my list</button>
-                        </div>
+                    <div>
+                        <button class="btn btn-primary mb-3 w-100" type="submit">Save Recipe To My List</button>
                     </div>
                 </form>
+                <div>
+                    <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-outline-dark mb-3 w-100">Back To Recipe List</a>
+                </div>
             </div>
-            <div class="mt-2">
-                <a class="btn btn-primary" asp-controller="MyRecipes" asp-action="EditRecipe" asp-route-id="@Model.Recipe.RecipeId">Edit Recipe</a>
-            </div>
-            <div class="mt-2">
-                <a class="btn btn-primary" asp-controller="MyRecipes" asp-action="DeleteRecipe" asp-route-id="@Model.Recipe.RecipeId">Delete Recipe</a>
-            </div>
-            <div class="mt-2">
-                <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-primary">Back to Recipe List</a>
+            <div class="col-sm-12 col-md-6 col-lg-6 max-width-250 mx-auto">
+                <div>
+                    <a class="btn btn-primary mb-3 w-100" asp-controller="MyRecipes" asp-action="EditRecipe" asp-route-id="@Model.Recipe.RecipeId">Edit Recipe</a>
+                </div>
+                <div>
+                    <a class="btn btn-outline-dark mb-3 w-100" asp-controller="MyRecipes" asp-action="DeleteRecipe" asp-route-id="@Model.Recipe.RecipeId">Delete Recipe</a>
+                </div>
             </div>
         </div>
-        <div>
-            <section>
+        <div class="max-width-450 mx-auto">
+            <section class="mb-3">
                 @if (Model.RecipeComments.Count > 0)
                 {
                     <h3>Comments</h3>
@@ -121,17 +120,16 @@
                 {
                     <h3>Be the first to post a comment.</h3>
                 }
-                <ul class="list-group">
-                    @foreach (RecipeComment comment in Model.RecipeComments)
-                    {
-                        <li class="list-group-item">
-                            <p>
-                                <strong>@comment.UserName</strong><br />
-                                @comment.Comment
-                            </p>
-                        </li>
-                    }
-                </ul>
+                @foreach (RecipeComment comment in Model.RecipeComments)
+                { 
+                    <div class="card text-white bg-info mb-3 max-width-550">
+                        <div class="card-header">@comment.UserName</div>
+                        <div class="card-body">
+                            @* <span class="card-title">Add comment date here</span> *@
+                            <p class="card-text">@comment.Comment</p>
+                        </div>
+                    </div>
+                }
             </section>
             <form method="post" asp-route="postComment" id="postCommentForm">
                 <div class="form-floating">
@@ -142,8 +140,8 @@
                     <label asp-for="RecipeComment.Comment">Recipe Comment</label>
                 </div>
                 <div class="text-center">
-                    <div class="mt-2">
-                        <button class="btn btn-primary" type="submit">Post Comment</button>
+                    <div>
+                        <button class="btn btn-outline-dark mb-3 mt-3" type="submit">Post Comment</button>
                     </div>
                 </div>
             </form>
@@ -152,27 +150,25 @@
     else
     {
         <div class="text-center">
-            
-            <div class="mt-2">
-                <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-primary">Back to Recipe List</a>
+            <div>
+                <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-outline-dark mb-3 mt-3">Back To Recipe List</a>
             </div>
         </div>
-        <section>
+        <section class="max-width-450 mx-auto">
             @if (Model.RecipeComments.Count > 0)
             {
                 <h3>Comments</h3>
             }
-            <ul class="list-group">
-                @foreach (RecipeComment comment in Model.RecipeComments)
-                {
-                    <li class="list-group-item">
-                        <p>
-                            <strong>@comment.UserName</strong><br />
-                            @comment.Comment
-                        </p>
-                    </li>
-                }
-            </ul>
+            @foreach (RecipeComment comment in Model.RecipeComments)
+            {
+                <div class="card text-white bg-info mb-3 max-width-550">
+                    <div class="card-header">@comment.UserName</div>
+                    <div class="card-body">
+                        @* <span class="card-title">Add comment date here</span> *@
+                        <p class="card-text">@comment.Comment</p>
+                    </div>
+                </div>
+            }
         </section>
     }
 </div>
