@@ -1,22 +1,42 @@
 ﻿@using UsefulWebApps.Models.MyRecipes
 @{
-    ViewData["Title"] = "My Recipes";
+    ViewData["Title"] = "My Saved Recipes";
 }
 
 @model UsefulWebApps.Models.ViewModels.MyRecipes.SavedRecipesVM
 
 <div class="text-center max-width-500 mx-auto">
-    <h1 class="display-4">Your Saved Recipes</h1>
-    <ul class="list-group">
+    <h1 class="display-3 mt-3">Saved Recipes</h1>
+    <div class="list-group">
         @foreach (RecipeUserSaved recipe in Model.RecipeUserSaved)
         {
-            <li class="list-group-item">
-                <a asp-controller="MyRecipes" asp-action="Recipe" asp-route-id="@recipe.RecipeId">@recipe.RecipeTitle</a>
-                <form method="post" asp-route="deleteUserSavedRecipe" id="delete-user-saved-recipe">
-                    <input type="hidden" asp-for="@recipe.UserSavedId" name="id" />
-                    <button type="submit" class="btn btn-danger">Remove From List</button>
-                </form>
-            </li>
+            <a asp-controller="MyRecipes" asp-action="Recipe" asp-route-id="@recipe.RecipeId" class="list-group-item list-group-item-action">@recipe.RecipeTitle</a>
+            <form method="post" asp-route="deleteUserSavedRecipe" class="delete-user-saved-recipe">
+                <input type="hidden" asp-for="@recipe.UserSavedId" name="id" />
+                <button type="submit" class="btn btn-outline-danger btn-sm">Remove From List</button>
+            </form>
         }
-    </ul>
+    </div>
 </div>
+
+@section Scripts
+{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <script>
+        $(".delete-user-saved-recipe").validate({
+            submitHandler: function (form) {
+                //ask to confirm delete
+                toastConfirm().then(deleteConfirm => {
+                    if (deleteConfirm == true) {
+                        form.submit();
+                    }
+                    else {
+                        toastr.success("Item has NOT been deleted");
+                    }
+                });
+            }
+        });
+    </script>
+}
