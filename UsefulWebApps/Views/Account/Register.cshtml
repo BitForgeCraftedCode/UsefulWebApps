@@ -4,45 +4,28 @@
 
 @model UsefulWebApps.IdentityModels.Register
 
-<h3>User Registration</h3>
-<br />
-<div class="container border" style="padding: 20px;">
+<div class="max-width-500 mx-auto">
+    <h1 class="display-3 mt-3 text-center">User Registration</h1>
     <form method="post">
         <div class="text-danger" asp-validation-summary="All"></div>
-
-        <div class="mb-3 row">
-            <div class="col-2">
-                <label asp-for="UserName"></label>
-            </div>
-            <div class="col-5">
-                <input type="text" asp-for="UserName" class="form-control" />
-                <span class="text-danger" asp-validation-for="UserName"></span>
-            </div>
+        <div class="form-floating mb-3">
+            <input type="text" asp-for="UserName" class="form-control" id="userNameInput" placeholder="User Name" />
+            <label asp-for="UserName" for="userNameInput">User Name</label>
+            <span class="text-danger" asp-validation-for="UserName"></span>
         </div>
-        <div class="mb-3 row">
-            <div class="col-2">
-                <label asp-for="Email"></label>
-            </div>
-            <div class="col-5">
-                <input type="text" asp-for="Email" class="form-control" />
-                <span class="text-danger" asp-validation-for="Email"></span>
-            </div>
+        <div class="form-floating mb-3">
+            <input type="text" asp-for="Email" class="form-control" id="emailInput" placeholder="Email" />
+            <label asp-for="Email" for="emailInput">Email</label>
+            <span class="text-danger" asp-validation-for="Email"></span>
         </div>
-        <div class="mb-3 row">
-            <div class="col-2">
-                <label asp-for="Password"></label>
-            </div>
-            <div class="col-5">
-                <input type="password" asp-for="Password" class="form-control" />
-                <span class="text-danger" asp-validation-for="Password"></span>
-            </div>
+        <div class="form-floating mb-3">
+            <input type="password" asp-for="Password" class="form-control" id="passwordInput" placeholder="Password" />
+            <label asp-for="Password" for="passwordInput"></label>
+            <span class="text-danger" asp-validation-for="Password"></span>
         </div>
-
-        <div class="mb-3 row">
-            <div class="col-2">
-                <input type="submit" class="btn btn-primary" value="Register" />
-            </div>
-            <div class="col-5">
+        <div class="max-width-175 mx-auto">
+            <div>
+                <button type="submit" class="btn btn-primary mb-3 w-100" value="Register">Register</button>
             </div>
         </div>
     </form>

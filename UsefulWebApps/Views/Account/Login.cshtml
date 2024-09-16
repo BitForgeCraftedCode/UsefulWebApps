@@ -7,6 +7,7 @@
 <div class="max-width-500 mx-auto">
     <h1 class="display-3 mt-3 text-center">User Login</h1>
     <form method="post">
+        <div class="text-danger" asp-validation-summary="All"></div>
         <div class="form-floating mb-3">
             <input type="text" asp-for="UserName" class="form-control" id="userNameInput" placeholder="User Name"/>
             <label asp-for="UserName" for="userNameInput">User Name</label>
