@@ -6,45 +6,22 @@
 @model UsefulWebApps.Models.MyRecipes.Recipe
 
 <div class="max-width-550 mx-auto">
-    <p>Click Delete below to remove this recipe. This action cannot be undone.</p>
+    <h1 class="mt-3 text-center">Delete: @Model.RecipeTitle</h1>
+    <p>Click Delete below to remove this recipe. <strong>This action cannot be undone.</strong></p>
+    
     <form method="post" id="deleteRecipeForm">
         <input asp-for="@Model.RecipeId" hidden />
-        <div class="text-center">
-            <div class="mt-2">
-                <button class="btn btn-danger" type="submit">Delete</button>
+        <div class="max-width-200 mx-auto">
+            <div>
+                <button class="btn btn-danger mt-3 mb-3 w-100" type="submit">Delete</button>
             </div>
             <div class="mt-2">
-                <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-primary">Back to Recipe List</a>
+                <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-outline-dark w-100">Back to Recipe List</a>
             </div>
         </div>
     </form>
-    <h1 class="display-4">@Model.RecipeTitle</h1>
-    <p>@Model.RecipeDescription</p>
-    <p>Author: @Model.UserName</p>
-    <p>Coures: @Model.Course.Course</p>
-    <p>Cuisine: @Model.Cuisine.Cuisine</p>
-    <p>Difficulty: @Model.Difficulty.Difficulty</p>
-    <p>Prep Time: @Model.PrepTime</p>
-    <p>Cook Time: @Model.CookTime</p>
-    <p>Rating: @Model.Rating</p>
-    <p>Servings: @Model.Servings</p>
-    <section>
-        <h2 class="display-6">Categories/Tags</h2>
-        <ul class="list-group">
-            @foreach (RecipeCategories category in Model.Categories)
-            {
-                <li class="list-group-item">@category.Category</li>
-            }
-        </ul>
-    </section>
-    <h2 class="display-6">Ingredients</h2>
-    <ingredients html-ingredients-content="@Model.Ingredients"></ingredients>
-    <h2 class="display-6">Instructions</h2>
-    <instructions html-instructions-content="@Model.Instructions"></instructions>
-    <h2 class="display-6">Notes</h2>
-    <notes html-notes-content="@Model.Notes"></notes>
-    <h2 class="display-6">Nutrition</h2>
-    <nutrition html-nutrition-content="@Model.Nutrition"></nutrition>
+    
+   
     
 </div>
 
