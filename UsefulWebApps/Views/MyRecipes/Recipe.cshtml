@@ -139,6 +139,9 @@
                     <textarea asp-for="RecipeComment.Comment" class="form-control textarea-input ignore"></textarea>
                     <label asp-for="RecipeComment.Comment">Recipe Comment</label>
                 </div>
+                <div class="mt-2">
+                    <span asp-validation-for="RecipeComment.Comment" class="text-danger"></span>
+                </div>
                 <div class="text-center">
                     <div>
                         <button class="btn btn-outline-dark mb-3 mt-3" type="submit">Post Comment</button>
@@ -172,4 +175,10 @@
         </section>
     }
 </div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
 
