@@ -18,91 +18,115 @@
             <textarea asp-for="Recipe.RecipeDescription" class="form-control ignore"></textarea>
             <label asp-for="Recipe.RecipeDescription">Recipe Description</label>
         </div>
-        <h3 class="mt-3 text-center">Course</h3>
-        <p style="font-size: 10px;">Check one.</p>
-        <!--hidden input just for jquery validate-->
-        <input type="hidden" name="courseError" id="courseError" />
-        <ul class="list-group mt-3 choice-list">
-            @for (int i = 0; i < Model.RecipeCourses.Count; i++)
-            {
-                <li class="list-group-item list-group-item-action active">
-                    <input class="form-check-input me-1 course-radio-btn" type="radio" asp-for="Recipe.CourseId" value="@Model.RecipeCourses[i].CourseId" checked="@(Model.RecipeCourses[i].IsChecked == true ? "checked" : null )" />
-                    @Model.RecipeCourses[i].Course
-                    <input type="hidden" asp-for="@Model.RecipeCourses[i].Course" />
-                    <input type="hidden" asp-for="@Model.RecipeCourses[i].CourseId" />
-                </li>
-            }
-        </ul>
-        <h3 class="mt-3 text-center">Cuisine</h3>
-        <p style="font-size: 10px;">Check one.</p>
-        <!--hidden input just for jquery validate-->
-        <input type="hidden" name="cuisineError" id="cuisineError" />
-        <ul class="list-group mt-3 choice-list">
-            @for (int i = 0; i < Model.RecipeCuisines.Count; i++)
-            {
-                <li class="list-group-item list-group-item-action active">
-                    <input class="form-check-input me-1 cuisine-radio-btn" type="radio" asp-for="Recipe.CuisineId" value="@Model.RecipeCuisines[i].CuisineId" checked="@(Model.RecipeCuisines[i].IsChecked == true ? "checked" : null)" />
-                    @Model.RecipeCuisines[i].Cuisine
-                    <input type="hidden" asp-for="@Model.RecipeCuisines[i].Cuisine" />
-                    <input type="hidden" asp-for="@Model.RecipeCuisines[i].CuisineId" />
-                </li>
-            }
-        </ul>
-        <h3 class="mt-3 text-center">Difficulty</h3>
-        <p style="font-size: 10px;">Check one.</p>
-        <!--hidden input just for jquery validate-->
-        <input type="hidden" name="difficultyError" id="difficultyError" />
-        <ul class="list-group mt-3">
-            @for (int i = 0; i < Model.RecipeDifficulties.Count; i++)
-            {
-                <li class="list-group-item list-group-item-action active">
-                    <input class="form-check-input me-1 difficulty-radio-btn" type="radio" asp-for="Recipe.DifficultyId" value="@Model.RecipeDifficulties[i].DifficultyId" checked="@(Model.RecipeDifficulties[i].IsChecked == true ? "checked" : null)" />
-                    @Model.RecipeDifficulties[i].Difficulty
-                    <input type="hidden" asp-for="@Model.RecipeDifficulties[i].Difficulty" />
-                    <input type="hidden" asp-for="@Model.RecipeDifficulties[i].DifficultyId" />
-                </li>
-            }
-        </ul>
-        <!-- https://stackoverflow.com/questions/40555543/how-do-i-implement-a-checkbox-list-in-asp-net-core -->
-        <h3 class="mt-3 text-center">Tags</h3>
-        <p style="font-size: 10px;">Check at least one tag.</p>
-        <!--hidden input just for jquery validate-->
-        <input type="hidden" name="tags" id="tags" />
-        <span asp-validation-for="Recipe.Categories" class="text-danger"></span>
-        <ul class="list-group list-group-flush mt-3 choice-list">
-            @for (int i = 0; i < Model.RecipeCategories.Count; i++)
-            {
-                <li class="list-group-item list-group-item-action active">
-                    <input class="form-check-input me-1 tags-ck-box" type="checkbox" asp-for="@Model.RecipeCategories[i].IsChecked" />
-                    <label class="form-check-label stretched-link" asp-for="@Model.RecipeCategories[i].IsChecked">@Model.RecipeCategories[i].Category</label>
-                    <input type="hidden" asp-for="@Model.RecipeCategories[i].CategoryId" />
-                    <input type="hidden" asp-for="@Model.RecipeCategories[i].Category" />
-                </li>
-            }
-        </ul>
-        <h3 class="mt-3 text-center">Prep Time</h3>
-        <div class="form-floating mb-3">
-            <input asp-for="Recipe.PrepTime" type="number" step="1" max="65535" min="0" class="form-control" required />
-            <label asp-for="Recipe.PrepTime">Prep Time - Minutes</label>
-            <span asp-validation-for="Recipe.PrepTime" class="text-danger"></span>
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <h3 class="mt-3 text-center">Course</h3>
+                <p style="font-size: 10px;">Check one.</p>
+                <!--hidden input just for jquery validate-->
+                <input type="hidden" name="courseError" id="courseError" />
+                <ul class="list-group mt-3 choice-list">
+                    @for (int i = 0; i < Model.RecipeCourses.Count; i++)
+                    {
+                        <li class="list-group-item list-group-item-action active">
+                            <input class="form-check-input me-1 course-radio-btn" type="radio" asp-for="Recipe.CourseId" value="@Model.RecipeCourses[i].CourseId" checked="@(Model.RecipeCourses[i].IsChecked == true ? "checked" : null )" />
+                            @Model.RecipeCourses[i].Course
+                            <input type="hidden" asp-for="@Model.RecipeCourses[i].Course" />
+                            <input type="hidden" asp-for="@Model.RecipeCourses[i].CourseId" />
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <h3 class="mt-3 text-center">Cuisine</h3>
+                <p style="font-size: 10px;">Check one.</p>
+                <!--hidden input just for jquery validate-->
+                <input type="hidden" name="cuisineError" id="cuisineError" />
+                <ul class="list-group mt-3 choice-list">
+                    @for (int i = 0; i < Model.RecipeCuisines.Count; i++)
+                    {
+                        <li class="list-group-item list-group-item-action active">
+                            <input class="form-check-input me-1 cuisine-radio-btn" type="radio" asp-for="Recipe.CuisineId" value="@Model.RecipeCuisines[i].CuisineId" checked="@(Model.RecipeCuisines[i].IsChecked == true ? "checked" : null)" />
+                            @Model.RecipeCuisines[i].Cuisine
+                            <input type="hidden" asp-for="@Model.RecipeCuisines[i].Cuisine" />
+                            <input type="hidden" asp-for="@Model.RecipeCuisines[i].CuisineId" />
+                        </li>
+                    }
+                </ul>
+            </div>
         </div>
-        <h3 class="mt-3 text-center">Cook Time</h3>
-        <div class="form-floating mb-3">
-            <input asp-for="Recipe.CookTime" type="number" step="1" max="65535" min="0" class="form-control" required />
-            <label asp-for="Recipe.CookTime">Cook Time - Minutes</label>
-            <span asp-validation-for="Recipe.CookTime" class="text-danger"></span>
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <h3 class="mt-3 text-center">Difficulty</h3>
+                <p style="font-size: 10px;">Check one.</p>
+                <!--hidden input just for jquery validate-->
+                <input type="hidden" name="difficultyError" id="difficultyError" />
+                <ul class="list-group mt-3">
+                    @for (int i = 0; i < Model.RecipeDifficulties.Count; i++)
+                    {
+                        <li class="list-group-item list-group-item-action active">
+                            <input class="form-check-input me-1 difficulty-radio-btn" type="radio" asp-for="Recipe.DifficultyId" value="@Model.RecipeDifficulties[i].DifficultyId" checked="@(Model.RecipeDifficulties[i].IsChecked == true ? "checked" : null)" />
+                            @Model.RecipeDifficulties[i].Difficulty
+                            <input type="hidden" asp-for="@Model.RecipeDifficulties[i].Difficulty" />
+                            <input type="hidden" asp-for="@Model.RecipeDifficulties[i].DifficultyId" />
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <!-- https://stackoverflow.com/questions/40555543/how-do-i-implement-a-checkbox-list-in-asp-net-core -->
+                <h3 class="mt-3 text-center">Tags</h3>
+                <p style="font-size: 10px;">Check at least one tag.</p>
+                <!--hidden input just for jquery validate-->
+                <input type="hidden" name="tags" id="tags" />
+                <span asp-validation-for="Recipe.Categories" class="text-danger"></span>
+                <ul class="list-group list-group-flush mt-3 choice-list">
+                    @for (int i = 0; i < Model.RecipeCategories.Count; i++)
+                    {
+                        <li class="list-group-item list-group-item-action active">
+                            <input class="form-check-input me-1 tags-ck-box" type="checkbox" asp-for="@Model.RecipeCategories[i].IsChecked" />
+                            <label class="form-check-label stretched-link" asp-for="@Model.RecipeCategories[i].IsChecked">@Model.RecipeCategories[i].Category</label>
+                            <input type="hidden" asp-for="@Model.RecipeCategories[i].CategoryId" />
+                            <input type="hidden" asp-for="@Model.RecipeCategories[i].Category" />
+                        </li>
+                    }
+                </ul>
+            </div>
         </div>
-        <h3 class="mt-3 text-center">Rating</h3>
-        <div class="form-floating mb-3">
-            <input asp-for="Recipe.Rating" type="number" step="1" max="10" min="1" class="form-control" required />
-            <label asp-for="Recipe.Rating">Rating 1-10</label>
-            <span asp-validation-for="Recipe.Rating" class="text-danger"></span>
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <h3 class="mt-3 text-center">Prep Time</h3>
+                <div class="form-floating mb-3">
+                    <input asp-for="Recipe.PrepTime" type="number" step="1" max="65535" min="0" class="form-control" required />
+                    <label asp-for="Recipe.PrepTime">Prep Time - Minutes</label>
+                    <span asp-validation-for="Recipe.PrepTime" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <h3 class="mt-3 text-center">Cook Time</h3>
+                <div class="form-floating mb-3">
+                    <input asp-for="Recipe.CookTime" type="number" step="1" max="65535" min="0" class="form-control" required />
+                    <label asp-for="Recipe.CookTime">Cook Time - Minutes</label>
+                    <span asp-validation-for="Recipe.CookTime" class="text-danger"></span>
+                </div>
+            </div>
         </div>
-        <h3 class="mt-3 text-center">Servings</h3>
-        <div class="form-floating mb-3">
-            <input asp-for="Recipe.Servings" type="number" step="1" max="20" min="1" class="form-control" required />
-            <label asp-for="Recipe.Servings">Servings 1-20</label>
-            <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <h3 class="mt-3 text-center">Rating</h3>
+                <div class="form-floating mb-3">
+                    <input asp-for="Recipe.Rating" type="number" step="1" max="10" min="1" class="form-control" required />
+                    <label asp-for="Recipe.Rating">Rating 1-10</label>
+                    <span asp-validation-for="Recipe.Rating" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6 col-lg-6">
+                <h3 class="mt-3 text-center">Servings</h3>
+                <div class="form-floating mb-3">
+                    <input asp-for="Recipe.Servings" type="number" step="1" max="20" min="1" class="form-control" required />
+                    <label asp-for="Recipe.Servings">Servings 1-20</label>
+                    <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
+                </div>
+            </div>
         </div>
         <h3 class="mt-3 text-center">Ingredients</h3>
         <div class="form-floating">
