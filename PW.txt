@@ -8,5 +8,3 @@ testNew!6757
 Bugs:
 
 post empty comment -- validate
-
-delete from saved recipe list -- semes to delete the wron ones
