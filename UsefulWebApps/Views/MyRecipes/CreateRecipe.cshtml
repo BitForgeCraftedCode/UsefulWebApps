@@ -9,13 +9,13 @@
     <form asp-controller="MyRecipes" asp-action="CreateRecipe" method="post" id="createRecipeForm">
         <h3 class="mt-3 text-center">Title</h3>
         <div class="form-floating mb-3">
-            <input asp-for="Recipe.RecipeTitle" type="text" class="form-control" minlength="3" required />
+            <input asp-for="Recipe.RecipeTitle" type="text" class="form-control" id="recipeTitelInput" placeholder="Recipe Title" minlength="3" required />
             <label asp-for="Recipe.RecipeTitle">Recipe Title</label>
             <span asp-validation-for="Recipe.RecipeTitle" class="text-danger"></span>
         </div>
         <h3 class="mt-3 text-center">Description</h3>
         <div class="form-floating">
-            <textarea asp-for="Recipe.RecipeDescription" class="form-control ignore"></textarea>
+            <textarea asp-for="Recipe.RecipeDescription" class="form-control ignore" placeholder="Recipe Description"></textarea>
             <label asp-for="Recipe.RecipeDescription">Recipe Description</label>
         </div>
         <div class="row">
@@ -114,7 +114,7 @@
             <div class="col-sm-12 col-md-6 col-lg-6">
                 <h3 class="mt-3 text-center">Rating</h3>
                 <div class="form-floating mb-3">
-                    <input asp-for="Recipe.Rating" type="number" step="1" max="10" min="1" class="form-control" required />
+                    <input asp-for="Recipe.Rating" type="number" step="1" max="10" min="1" value="1" class="form-control" required />
                     <label asp-for="Recipe.Rating">Rating 1-10</label>
                     <span asp-validation-for="Recipe.Rating" class="text-danger"></span>
                 </div>
@@ -122,7 +122,7 @@
             <div class="col-sm-12 col-md-6 col-lg-6">
                 <h3 class="mt-3 text-center">Servings</h3>
                 <div class="form-floating mb-3">
-                    <input asp-for="Recipe.Servings" type="number" step="1" max="20" min="1" class="form-control" required />
+                    <input asp-for="Recipe.Servings" type="number" step="1" max="20" min="1" value="1" class="form-control" required />
                     <label asp-for="Recipe.Servings">Servings 1-20</label>
                     <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
                 </div>
@@ -130,38 +130,38 @@
         </div>
         <h3 class="mt-3 text-center">Ingredients</h3>
         <div class="form-floating">
-            <textarea asp-for="Recipe.Ingredients" class="form-control textarea-input" minlength="3" required></textarea>
+            <textarea asp-for="Recipe.Ingredients" class="form-control textarea-input" minlength="3" required placeholder="Recipe Ingredients"></textarea>
             <label asp-for="Recipe.Ingredients">Recipe Ingredients</label>
             <span asp-validation-for="Recipe.Ingredients" class="text-danger"></span>
         </div>
         <h3 class="mt-3 text-center">Instructions</h3>
         <div class="form-floating">
-            <textarea asp-for="Recipe.Instructions" class="form-control textarea-input" minlength="3" required></textarea>
+            <textarea asp-for="Recipe.Instructions" class="form-control textarea-input" minlength="3" required placeholder="Recipe Instructions"></textarea>
             <label asp-for="Recipe.Instructions">Recipe Instructions</label>
             <span asp-validation-for="Recipe.Instructions" class="text-danger"></span>
         </div>
         <h3 class="mt-3 text-center">Notes</h3>
         <div class="form-floating">
-            <textarea asp-for="Recipe.Notes" class="form-control textarea-input ignore"></textarea>
+            <textarea asp-for="Recipe.Notes" class="form-control textarea-input ignore" placeholder="Recipe Notes"></textarea>
             <label asp-for="Recipe.Notes">Recipe Notes</label>
         </div>
         <h3 class="mt-3 text-center">Nutrition</h3>
         <div class="form-floating mb-3">
-            <textarea asp-for="Recipe.Nutrition" class="form-control textarea-input ignore"></textarea>
+            <textarea asp-for="Recipe.Nutrition" class="form-control textarea-input ignore" placeholder="Recipe Nutrition"></textarea>
             <label asp-for="Recipe.Nutrition">Recipe Nutrition</label>
         </div>
         <h3 class="mt-3 text-center">Author</h3>
         <div class="form-floating">
             <input type="hidden" asp-for="Recipe.UserId" />
-            <input type="text" asp-for="Recipe.UserName" class="form-control" readonly />
+            <input type="text" asp-for="Recipe.UserName" class="form-control" readonly placeholder="Author" />
             <label asp-for="Recipe.UserName">Author</label>
         </div>
-        <div class="text-center">
-            <div class="mt-2">
-                <button class="btn btn-primary" type="submit">Create Recipe</button>
+        <div class="max-width-200 mx-auto">
+            <div>
+                <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Create Recipe</button>
             </div>
-            <div class="mt-2">
-                <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-primary">Back to Recipe List</a>
+            <div>
+                <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-outline-dark w-100">Back to Recipe List</a>
             </div>
         </div>
     </form>
