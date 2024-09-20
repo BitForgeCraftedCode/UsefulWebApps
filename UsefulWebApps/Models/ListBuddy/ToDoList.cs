@@ -11,8 +11,8 @@ namespace UsefulWebApps.Models.ListBuddy
         public int Id { get; set; }
 
         [Column("ToDoItem")]
-        [StringLength(100, MinimumLength = 3, ErrorMessage = "Please enter at least 3 characters.")]
-        [Required(ErrorMessage = "To do item is required.")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Please Enter At Least 3 Characters.")]
+        [Required(ErrorMessage = "To Do Item Is Required.")]
         public string ToDoItem { get; set; } = string.Empty;
 
         [Column("Complete")]

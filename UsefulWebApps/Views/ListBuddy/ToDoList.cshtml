@@ -1,33 +1,15 @@
 ﻿@{
     ViewData["Title"] = "List Buddy";
 }
-
+@* https://stackoverflow.com/questions/65378476/how-to-refresh-data-without-page-reloading-in-asp-net-core-mvc-using-ajax *@
 @model UsefulWebApps.Models.ViewModels.ListBuddy.ToDoListVM
 
 <div class="text-center max-width-550 mx-auto">
     <h1 class="display-3 mt-3">To Do List</h1>
-    <ul class="list-group">
-        @foreach (var obj in Model.ToDoListItems)
-        {
-            <li class="list-group-item list-group-item-action active">
-                <span class="fw-bold to-do-list-item @(obj.Complete == true ? "line-through" : "")">@obj.ToDoItem</span>
-                <div>
-                    <form method="post" asp-route="toggleToDoComplete" class="to-do-list-mark-complete">
-                        <input asp-for="@obj.Id" name="id" hidden />
-                        <button type="submit" class="btn btn-dark btn-sm">Complete</button>
-                    </form>
-                    <div class="to-do-list-edit">
-                        <a asp-controller="ListBuddy" asp-action="ToDoListEdit" asp-route-id="@obj.Id" class="btn btn-dark btn-sm">Edit</a>
-                    </div>
-                    <form method="post" asp-route="deleteToDoItem" class="to-do-list-delete-item">
-                        <input asp-for="@obj.Id" name="id" hidden />
-                        <button type="submit" class="btn  btn-sm @(obj.Complete == true ? "btn-outline-danger" : "btn-danger")">Delete</button>
-                    </form>
-                </div>
-            </li>
-        }
-    </ul>
-    <form method="post" asp-route="createToDoItem" class="max-width-550">
+    <div id="to-do-list-container">
+        <partial name="_ToDoListPartial" />
+    </div>
+    <form method="post" class="max-width-550" id="add-to-do-item" data-ajax="true" data-ajax-method="post">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->
             <input asp-for="ToDoList.Complete" hidden />
@@ -35,11 +17,8 @@
             <input asp-for="ToDoList.ToDoItem" type="text" class="form-control" placeholder="New Item" minlength="3" maxlength="100" />
             <button class="btn btn-outline-dark" type="submit">Add Item</button>
         </div>
-        <div class="mb-3">
-            <span asp-validation-for="ToDoList.ToDoItem" class="text-danger"></span>
-        </div>
+        <div class="mb-3" id="new-to-do-error"></div>
     </form>
-
     <form method="post" asp-route="deleteAllToDoList" class="max-width-175 mx-auto" id="delete-all-to-do">
         <div>
             <button type="submit" class="btn btn-danger mb-3 w-100">Delete All</button>
@@ -48,42 +27,13 @@
             <a asp-controller="ListBuddy" asp-action="Index" class="btn btn-outline-dark w-100">List Buddy Home</a>
         </div>
     </form>
-    
+
 </div>
 <!--Partial View scripts-->
 @section Scripts {
     @{
         <partial name="_ValidationScriptsPartial" />
     }
-    <script type="text/javascript">
-        $("#delete-all-to-do").validate({
-            submitHandler: function (form) {
-                //ask to confirm delete
-                toastConfirm().then(deleteConfirm => {
-                    if (deleteConfirm == true) {
-                        form.submit();
-                    }
-                    else {
-                        toastr.success("Item has NOT been deleted");
-                    }
-                });
-            }
-        });
-        //have to loop through each form and submit "this" one that is clicked
-        $(".to-do-list-delete-item").each(function () {
-            $(this).validate({
-                submitHandler: function (form) {
-                    //ask to confirm delete
-                    toastConfirm().then(deleteConfirm => {
-                        if (deleteConfirm == true) {
-                            form.submit();
-                        }
-                        else {
-                            toastr.success("Item has NOT been deleted");
-                        }
-                    });
-                }
-            });
-        });  
-    </script>
+    <!--Ajax and validation-->
+    <script type="text/javascript" src="~/js/ToDoList.js"></script>
 }

@@ -1,0 +1,21 @@
+﻿
+<ul class="list-group">
+    @foreach (var obj in Model.ToDoListItems)
+    {
+        <li class="list-group-item list-group-item-action active" id="to-do-li-@obj.Id">
+            <span class="fw-bold to-do-list-item @(obj.Complete == true ? "line-through" : "")">@obj.ToDoItem</span>
+            <div>
+                <div class="to-do-list-mark-complete">
+                    <button type="button" class="btn btn-dark btn-sm" onclick="toggleComplete(@obj.Id)">Complete</button>
+                </div>
+
+                <div class="to-do-list-edit">
+                    <a asp-controller="ListBuddy" asp-action="ToDoListEdit" asp-route-id="@obj.Id" class="btn btn-dark btn-sm">Edit</a>
+                </div>
+                <div class="to-do-list-delete-item">
+                    <button type="submit" class="btn  btn-sm @(obj.Complete == true ? "btn-outline-danger" : "btn-danger")" onclick="validateDeleteToDo(@obj.Id)">Delete</button>
+                </div>
+            </div>
+        </li>
+    }
+</ul>

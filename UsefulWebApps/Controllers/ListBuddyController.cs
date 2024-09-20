@@ -42,48 +42,60 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        [Route("/ListBuddy/ToDoListToggleComplete", Name = "toggleToDoComplete")]
         public async Task<IActionResult> ToDoListToggleComplete(int? id)
         {
             if (id == null || id == 0)
             {
                 return NotFound();
             }
-            await _unitOfWork.ToDoList.ToDoListToggleComplete(id);
-            return RedirectToAction("ToDoList");
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<ToDoList> listItems = await _unitOfWork.ToDoList.ToDoListToggleComplete(id, userId);
+            ToDoListVM toDoListVM = new()
+            {
+                ToDoListItems = listItems,
+                ToDoList = new ToDoList
+                {
+                    UserId = userId,
+                }
+            };
+            return PartialView("_ToDoListPartial", toDoListVM);
         }
 
         [HttpPost]
-        [Route("/ListBuddy/ToDoListCreate", Name = "createToDoItem")]
         public async Task<IActionResult> ToDoListCreate(ToDoList toDoList)
         {
             if (ModelState.IsValid)
             {
-                bool success = await _unitOfWork.ToDoList.Add(toDoList);
-                if (success)
+                List<ToDoList> listItems = await _unitOfWork.ToDoList.ToDoListAdd(toDoList);
+                ToDoListVM toDoListVM = new()
                 {
-                    TempData["success"] = "To do item created successfully";
-                }   
-                else
-                {
-                    TempData["error"] = "Add To do item error. Please try again.";
-                }
-                return RedirectToAction("ToDoList");
+                    ToDoListItems = listItems,
+                    ToDoList = new ToDoList
+                    {
+                        UserId = toDoList.UserId,
+                    }
+                };
+                return PartialView("_ToDoListPartial", toDoListVM);
             }
-            TempData["error"] = "Add To do item error. Please try again.";
-            return RedirectToAction("ToDoList");
+            return StatusCode(400);
         }
 
         [HttpPost]
-        [Route("/ListBuddy/ToDoListDeleteItem", Name = "deleteToDoItem")]
-        public async Task<IActionResult> ToDoListDeleteItem(int? id)
+        public async Task<JsonResult> ToDoListDeleteItem(int? id)
         {
             if (id == null || id == 0)
             {
-                return NotFound();
+                return Json("error id was 0 or null");
             }
             await _unitOfWork.ToDoList.Delete(id);
-            return RedirectToAction("ToDoList");
+            string jsonString = """
+            { 
+                "deleteId": "ID"
+            }
+            """;
+            jsonString = jsonString.Replace("ID", $"{id}");
+            return Json(jsonString);
         }
 
         [HttpPost]
