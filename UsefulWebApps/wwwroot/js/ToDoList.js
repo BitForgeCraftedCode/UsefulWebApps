@@ -83,7 +83,8 @@ function deleteToDo(deleteId) {
             $("#to-do-li-" + obj.deleteId).remove();
         },
         error: function (request, status, error) {
-            console.log(request.responseText)
+            console.log(request.responseText);
+            toastr.error("Delete To Do Item Error. Please Try Again.");
         }
     });
 }
@@ -101,7 +102,8 @@ function toggleComplete(toggleId) {
             $("#to-do-list-container").append(response);
         },
         error: function (request, status, error) {
-            console.log(request.responseText)
+            console.log(request.responseText);
+            toastr.error("Toggle Complete Error. Please Try Again.");
         }
     });
 }
