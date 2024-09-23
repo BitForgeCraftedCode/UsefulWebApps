@@ -8,35 +8,8 @@
 <div class="text-center max-width-550 mx-auto">
     <h1 class="display-3 mt-3">Grocery List</h1>
 
-    @foreach (List<GroceryList> listOfGroceryLists in Model.FilteredGroceryListItems)
-    {
-        <section>
-            <h2 class="display-6">@listOfGroceryLists[0].Category</h2>
-            <ul class="list-group">
-                @foreach (GroceryList grocerylist in listOfGroceryLists)
-                {
-                    <li class="list-group-item list-group-item-action active">
-                        <span class="fw-bold grocery-list-item @(grocerylist.Complete == true ? "line-through" : "")">@grocerylist.GroceryItem</span>
-                        <div>
-                            <form method="post" asp-route="toggleGroceryComplete" class="grocery-list-mark-complete">
-                                <input asp-for="@grocerylist.Id" name="id" hidden />
-                                <button type="submit" class="btn btn-dark btn-sm">Complete</button>
-                            </form>
-                            <div class="grocery-list-edit">
-                                <a asp-controller="ListBuddy" asp-action="GroceryListEdit" asp-route-id="@grocerylist.Id" class="btn btn-dark btn-sm">Edit</a>
-                            </div>
-                            <form method="post" asp-route="deleteGroceryItem" class="grocery-list-delete-item">
-                                <input asp-for="@grocerylist.Id" name="id" hidden />
-                                <button type="submit" class="btn btn-sm @(grocerylist.Complete == true ? "btn-outline-danger" : "btn-danger")">Delete</button>
-                            </form>
-                        </div>
-                    </li>
-                }
-            </ul>
-        </section>
-        
-    }
-    
+    <partial name="_GroceryListPartial" />
+ 
     <form method="post" asp-route="createGroceryItem" class="max-width-550">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->
