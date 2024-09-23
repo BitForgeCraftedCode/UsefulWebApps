@@ -142,64 +142,8 @@ namespace UsefulWebApps.Controllers
 
         #region Grocery List
 
-        public async Task<IActionResult> GroceryList()
+        private static GroceryListVM FormatGroceryListForDisplay(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, string userId)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories("UserId", userId);
-            List<GroceryList> groceryListItems = result.groceryListItems;
-            IEnumerable<GroceryCategories> groceryCategoriesEnum = result.groceryCategoriesEnum;
-            
-            //for UI display we need a list of grocery items for each category
-            //A list of lists where each individual list will contain the all items in a specific category
-            List<List<GroceryList>> filteredGroceryListItems = new List<List<GroceryList>>();
-
-            //for select list html to populate you need IEnum of SelectListItem with Text and Value populated
-            //thus we must Select through the Query and return the new item
-            IEnumerable<SelectListItem> groceryListCategories = groceryCategoriesEnum.Select(u => new SelectListItem
-            {
-                Text = u.Category,
-                Value = u.Category
-            });
-
-            //filter out the List of lists
-            //for each category filter out the grocery list items in that category to their own list 
-            //add each new list to the filteredGroceryList variable
-            foreach (SelectListItem glistCategory in groceryListCategories)
-            {
-                List<GroceryList> filter = groceryListItems.Where(x => x.Category == glistCategory.Text).ToList();
-                //https://stackoverflow.com/questions/1191919/what-does-linq-return-when-the-results-are-empty
-                //Empty enum returned if nothing in category found
-                if (filter.Count > 0)
-                {
-                    filteredGroceryListItems.Add(filter);
-                }
-            }
-
-            GroceryListVM groceryListVM = new()
-            {
-                GroceryList = new GroceryList 
-                { 
-                    UserId = userId,
-                },
-                GroceryCategoriesList = groceryListCategories,
-                FilteredGroceryListItems = filteredGroceryListItems
-            };
-
-            return View(groceryListVM);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> GroceryListToggleComplete(int? id, string userId)
-        {
-            if (id == null || id == 0 || userId == "")
-            {
-                return NotFound();
-            }
-            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GroceryListToggleComplete(id, userId);
-            List<GroceryList> groceryListItems = result.groceryListItems;
-            IEnumerable<GroceryCategories> groceryCategoriesEnum = result.groceryCategoriesEnum;
-
             //for UI display we need a list of grocery items for each category
             //A list of lists where each individual list will contain the all items in a specific category
             List<List<GroceryList>> filteredGroceryListItems = new List<List<GroceryList>>();
@@ -235,6 +179,31 @@ namespace UsefulWebApps.Controllers
                 GroceryCategoriesList = groceryListCategories,
                 FilteredGroceryListItems = filteredGroceryListItems
             };
+            return groceryListVM;
+        }
+
+        public async Task<IActionResult> GroceryList()
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories("UserId", userId);
+
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, userId);
+
+            return View(groceryListVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GroceryListToggleComplete(int? id, string userId)
+        {
+            if (id == null || id == 0 || userId == "")
+            {
+                return NotFound();
+            }
+            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GroceryListToggleComplete(id, userId);
+
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, userId);
+
             return PartialView("_GroceryListPartial", groceryListVM);
         }
 
