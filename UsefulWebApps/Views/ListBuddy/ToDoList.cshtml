@@ -9,6 +9,12 @@
     <div id="to-do-list-container">
         <partial name="_ToDoListPartial" />
     </div>
+    <div id="spinner-container" class="mt-3">
+        <div id="spinner" class="loader">
+            Loading...
+        </div>
+    </div>
+   
     <form method="post" class="max-width-550" id="add-to-do-item" data-ajax="true" data-ajax-method="post">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->

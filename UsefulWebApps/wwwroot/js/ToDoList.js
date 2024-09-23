@@ -107,3 +107,13 @@ function toggleComplete(toggleId) {
         }
     });
 }
+
+var loading = $('#spinner').hide();
+$(document).on("ajaxStart", function () {
+    //$("#spinner").show();
+    loading.show();
+});
+$(document).on("ajaxStop", function () {
+    //$("#spinner").hide();
+    loading.hide();
+});
