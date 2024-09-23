@@ -9,10 +9,9 @@
                 <li class="list-group-item list-group-item-action active">
                     <span class="fw-bold grocery-list-item @(grocerylist.Complete == true ? "line-through" : "")">@grocerylist.GroceryItem</span>
                     <div>
-                        <form method="post" asp-route="toggleGroceryComplete" class="grocery-list-mark-complete">
-                            <input asp-for="@grocerylist.Id" name="id" hidden />
-                            <button type="submit" class="btn btn-dark btn-sm">Complete</button>
-                        </form>
+                        <div class="grocery-list-mark-complete">
+                            <button type="button" class="btn btn-dark btn-sm" onclick="toggleComplete(@grocerylist.Id, `@grocerylist.UserId`);">Complete</button>
+                        </div>
                         <div class="grocery-list-edit">
                             <a asp-controller="ListBuddy" asp-action="GroceryListEdit" asp-route-id="@grocerylist.Id" class="btn btn-dark btn-sm">Edit</a>
                         </div>

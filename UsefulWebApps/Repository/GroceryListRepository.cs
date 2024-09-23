@@ -40,8 +40,7 @@ namespace UsefulWebApps.Repository
             return (groceryListItem, groceryCategoriesEnum);
         }
 
-
-        public async Task GroceryListToggleComplete(int? id)
+        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GroceryListToggleComplete(int? id, string userId)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
@@ -57,8 +56,16 @@ namespace UsefulWebApps.Repository
                 sql2 = "UPDATE grocery_list SET Complete = True WHERE Id = @id";
             }
             await _connection.ExecuteAsync(sql2, new { id }, transaction: txn);
+            string sql3 = $@"
+                SELECT * FROM grocery_list WHERE UserId = @Parameter;
+                SELECT * FROM grocery_categories;
+            ";
+            GridReader gridReader = await _connection.QueryMultipleAsync(sql3, new { Parameter = userId }, transaction: txn);
+            List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
+            IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
             await txn.CommitAsync();
             await _connection.CloseAsync();
+            return (groceryListItems, groceryCategoriesEnum);
         }
     }
 }

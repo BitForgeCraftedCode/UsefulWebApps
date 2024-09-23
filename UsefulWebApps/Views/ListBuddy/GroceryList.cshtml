@@ -7,9 +7,9 @@
 
 <div class="text-center max-width-550 mx-auto">
     <h1 class="display-3 mt-3">Grocery List</h1>
-
-    <partial name="_GroceryListPartial" />
- 
+    <div id="grocery-list-container">
+        <partial name="_GroceryListPartial" />
+    </div>
     <form method="post" asp-route="createGroceryItem" class="max-width-550">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->
