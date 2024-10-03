@@ -256,15 +256,20 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        [Route("/ListBuddy/GroceryListDeleteItem", Name = "deleteGroceryItem")]
-        public async Task<IActionResult> GroceryListDeleteItem(int? id)
+        public async Task<JsonResult> GroceryListDeleteItem(int? id)
         {
             if (id == null || id == 0)
             {
-                return NotFound();
+                return Json("error id was 0 or null");
             }
             await _unitOfWork.GroceryList.Delete(id);
-            return RedirectToAction("GroceryList");
+            string jsonString = """
+            { 
+                "deleteId": "ID"
+            }
+            """;
+            jsonString = jsonString.Replace("ID", $"{id}");
+            return Json(jsonString);
         }
 
         [HttpPost]
