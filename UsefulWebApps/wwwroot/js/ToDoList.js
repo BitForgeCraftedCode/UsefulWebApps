@@ -14,6 +14,7 @@
 
 $("#add-to-do-item").validate({
     rules: {
+        //ToDoList.ToDoItem is just the name of the html element
         "ToDoList.ToDoItem": {
             required: true,
             minlength: 3,

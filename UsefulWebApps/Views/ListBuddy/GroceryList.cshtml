@@ -10,7 +10,7 @@
     <div id="grocery-list-container">
         <partial name="_GroceryListPartial" />
     </div>
-    <form method="post" asp-route="createGroceryItem" class="max-width-550">
+    <form method="post" class="max-width-550" id="add-grocery-list-item">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->
             <input asp-for="GroceryList.Complete" hidden />
@@ -19,13 +19,11 @@
             <button class="btn btn-outline-dark" type="submit">Add Item</button>
         </div>
         <div class="mb-3">
-            <select class="form-select" asp-for="Category" asp-items="Model.GroceryCategoriesList">
-                <option selected value="Please Select a Category">Please Select a Category</option>
+            <select class="form-select required" asp-for="Category" asp-items="Model.GroceryCategoriesList">
+                <option selected value="">Please Select a Category</option>
             </select>
         </div>
-        <div class="mb-2 mt-2">
-            <span asp-validation-for="GroceryList.GroceryItem" class="text-danger"></span>
-        </div>
+        <div class="mb-2 mt-2" id="new-grocery-item-error"></div>
     </form>
 
     <form method="post" asp-route="deleteAllGroceryList" class="max-width-175 mx-auto" id="delete-all-grocery-list">

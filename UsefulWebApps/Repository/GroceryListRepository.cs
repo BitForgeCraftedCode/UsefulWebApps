@@ -14,6 +14,8 @@ namespace UsefulWebApps.Repository
         }
 
         //any GroceryList model specific database methods here
+
+        //return multiple types with a tuple https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-tuples 
         public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemsAndCategories(string column, string value)
         {
             string query = $@"
@@ -61,6 +63,30 @@ namespace UsefulWebApps.Repository
                 SELECT * FROM grocery_categories;
             ";
             GridReader gridReader = await _connection.QueryMultipleAsync(sql3, new { Parameter = userId }, transaction: txn);
+            List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
+            IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (groceryListItems, groceryCategoriesEnum);
+        }
+
+        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GroceryListAdd(GroceryList groceryList)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string sql = "INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES (@groceryItem, @category, @complete, @userId)";
+            await _connection.ExecuteAsync(sql, new
+            {
+                groceryItem = groceryList.GroceryItem,
+                category = groceryList.Category,
+                complete = groceryList.Complete,
+                userId = groceryList.UserId
+            }, transaction: txn);
+            string sql2 = $@"
+                SELECT * FROM grocery_list WHERE UserId = @Parameter;
+                SELECT * FROM grocery_categories;
+            ";
+            GridReader gridReader = await _connection.QueryMultipleAsync(sql2, new { Parameter = groceryList.UserId }, transaction: txn);
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
             await txn.CommitAsync();

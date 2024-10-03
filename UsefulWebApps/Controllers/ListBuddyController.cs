@@ -273,34 +273,20 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        [Route("/ListBuddy/GroceryListCreate", Name = "createGroceryItem")]
         public async Task<IActionResult> GroceryListCreate(GroceryListVM groceryListVM)
         {
             //https://stackoverflow.com/questions/29309803/asp-net-mvc-modelstate-how-to-re-run-validation
             //add the VM Category to the GroceryList and re-validate
-            if (groceryListVM.Category == "Please Select a Category")
-            {
-                TempData["error"] = "Please Select a Category. Please try again.";
-                return RedirectToAction("GroceryList");
-            }
             groceryListVM.GroceryList.Category = groceryListVM.Category;
             ModelState.Clear();
             TryValidateModel(groceryListVM.GroceryList);
             if (ModelState.IsValid)
             {
-                bool success = await _unitOfWork.GroceryList.Add(groceryListVM.GroceryList);
-                if (success)
-                {
-                    TempData["success"] = "Grocery item created successfully";
-                }
-                else
-                {
-                    TempData["error"] = "Add grocery item error. Please try again.";
-                }
-                return RedirectToAction("GroceryList");
+                (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GroceryListAdd(groceryListVM.GroceryList);
+                GroceryListVM newGroceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, groceryListVM.GroceryList.UserId);
+                return PartialView("_GroceryListPartial", newGroceryListVM);
             }
-            TempData["error"] = "Add grocery item error. Please try again.";
-            return RedirectToAction("GroceryList");
+            return StatusCode(400);
         }
 
         [HttpPost]
