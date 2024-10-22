@@ -31,6 +31,11 @@ to transer files to Digital Ocean server from local windows PC using ubuntu term
 
 scp Documents/my_file.txt user@123.45.67.89:/home/user/uploads
 
+to transfer publish files
+
+open ubuntu terminal in publish root foler then run this
+
+scp -r * user@hostIP:/var/www/thedotnetwizard.com/html
 
 scp (secure copy) is part of openssh-server which was installed durning ubuntu server setup -- ip above is bogus
 
