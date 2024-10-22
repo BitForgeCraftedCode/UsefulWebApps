@@ -27,12 +27,14 @@ namespace UsefulWebApps.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Register()
         {
             return View();
         }
 
         //register a StandardUser
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Register(Register userRegInfo)
         {
