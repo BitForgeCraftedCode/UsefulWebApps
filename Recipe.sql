@@ -26,6 +26,14 @@ to restore:
 
 mysql -u root -p usefulwebapps < C:\MySQLBackup\usefulwebapps_2024_09_03.sql
 
+
+to transer files to Digital Ocean server from local windows PC using ubuntu terminal
+
+scp Documents/my_file.txt user@123.45.67.89:/home/user/uploads
+
+
+scp (secure copy) is part of openssh-server which was installed durning ubuntu server setup -- ip above is bogus
+
 */
 CREATE TABLE `recipes` (
   `RecipeId` bigint unsigned NOT NULL AUTO_INCREMENT,
