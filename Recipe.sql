@@ -14,6 +14,10 @@ RecipeId bigint unsigned NOT NULL AUTO_INCREMENT
 
 to back-up/restore use command prompt not power shell
 
+first open command promp in C:\Program Files\MySQL\MySQL Server 8.0\bin
+
+then run the below commands
+
 to back-up:
 
 mysqldump -u root -p usefulwebapps > C:\MySQLBackup\usefulwebapps_2024_09_03.sql
