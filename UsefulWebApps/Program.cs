@@ -6,6 +6,7 @@ using UsefulWebApps.Repository.IRepository;
 using UsefulWebApps.Repository;
 using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 using JavaScriptEngineSwitcher.V8;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +60,12 @@ builder.Services.AddWebOptimizer(pipeline =>
 });
 
 var app = builder.Build();
+
+//in production ngnix forwards requests to Kestrel 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
