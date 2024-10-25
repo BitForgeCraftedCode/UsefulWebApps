@@ -164,9 +164,24 @@ namespace UsefulWebApps.Controllers
             string token = await _userManager.GeneratePasswordResetTokenAsync(user);
             if (string.IsNullOrEmpty(token)) { return View(); }
             await _userManager.ResetPasswordAsync(user, token, userInfo.Password);
-
+            
             return RedirectToAction("Index", "Home");
 
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult DeleteUser() { return View(); }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(RemoveUser userInfo)
+        {
+            if (!ModelState.IsValid) { return View(); }
+            IdentityUser user = await _userManager.FindByEmailAsync(userInfo.Email);
+            if (user == null) { return View(); };
+            await _userManager.DeleteAsync(user);
+            
+            return RedirectToAction("Index", "Home");
         }
     }
 }
