@@ -39,6 +39,9 @@ scp -r * user@hostIP:/var/www/thedotnetwizard.com/html
 
 scp (secure copy) is part of openssh-server which was installed durning ubuntu server setup -- ip above is bogus
 
+to run the app on Ubuntu
+go to /var/www/thedotnetwizard.com/html and type ./UsefulWebApps
+
 */
 CREATE TABLE `recipes` (
   `RecipeId` bigint unsigned NOT NULL AUTO_INCREMENT,
