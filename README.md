@@ -17,12 +17,12 @@ The vision or purpose of this app is to be an open source self hosted family org
 
 ## Back up and restore Windows
 
-1. to back-up/restore use Windows command prompt not power shell
-2. first open command promp in C:\Program Files\MySQL\MySQL Server 8.0\bin
-3. to back-up: mysqldump -u root -p usefulwebapps > C\MySQLBackup\usefulwebapps_2024_09_03.sql
-4. to restore run: mysql -u root -p usefulwebapps < C:\MySQLBackup\usefulwebapps_2024_09_03.sql
+1. To back-up/restore use Windows command prompt not power shell
+2. First open command promp in C:\Program Files\MySQL\MySQL Server 8.0\bin
+3. To back-up: mysqldump -u root -p usefulwebapps > C\MySQLBackup\usefulwebapps_2024_09_03.sql
+4. To restore run: mysql -u root -p usefulwebapps < C:\MySQLBackup\usefulwebapps_2024_09_03.sql
 
-the plan will be to have a development database with dummy users and data. Then you can login as admin change and change the PW before hosting. Then backup data base and host with new PW.
+The plan will be to have a development database with dummy users and data. Then you can login as admin change and change the PW before hosting. Then backup data base and host with new PW.
 
 ## Transfer publish files to Ubuntu server
 
@@ -35,3 +35,18 @@ the plan will be to have a development database with dummy users and data. Then 
 1. Go to /var/www/thedotnetwizard.com/html and type ./UsefulWebApps
 
 ## Back up and restore from Ubuntu server
+
+1. Navigate to folder with backups
+2. sudo mysqldump usefulwebapps > backupfilename.sql
+	* This will dump the usefulwebapps database in the backup folder
+3. sudo mysql usefulwebapps < backupfilename.sql
+	* This will restore the usefulwebapps database with the backup file.
+	
+## Transfer files from Ubuntu server to Windows
+
+1. I use Windows Subsystem for Linux so open Ubuntu terminal
+2. scp user@hostIP:/home/beefcake/UseFulWebAppsSqlDumps/usefulwebapps_2024_11_01.sql /mnt/c/Users/arogala/Documents/SqlDumpFromServer
+3. SCP (secure copy) works like this
+	* scp [OPTION] [user@]SRC_HOST:]file1 [user@]DEST_HOST:]file2
+4. Don't need host IP if host is local PC
+
