@@ -28,6 +28,12 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="MyRecipes" asp-action="Index">My Recipes</a>
                         </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Manage">Manage Accounts</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <partial name="_LoginStatusPartial" />
                         </li>

@@ -183,5 +183,8 @@ namespace UsefulWebApps.Controllers
             
             return RedirectToAction("Index", "Home");
         }
+
+        [Authorize(Roles ="Admin")]
+        public IActionResult Manage() { return View(); }
     }
 }
