@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using UsefulWebApps.IdentityModels;
+using UsefulWebApps.Repository.IRepository;
 
 namespace UsefulWebApps.Controllers
 {
@@ -10,11 +11,16 @@ namespace UsefulWebApps.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager)
+
+        //only used to clear user account data
+        private readonly IUnitOfWork _unitOfWork;
+        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
@@ -190,5 +196,37 @@ namespace UsefulWebApps.Controllers
 
         [Authorize(Roles = "Admin")]
         public IActionResult DeleteUserData() { return View(); }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<IActionResult> DeleteUserData(DeleteUserData userInfo)
+        {
+            if (!ModelState.IsValid) 
+            {
+                return View(); 
+            }
+            IdentityUser user = await _userManager.FindByEmailAsync(userInfo.Email);
+            IdentityUser admin = await _userManager.FindByEmailAsync(userInfo.AdminEmail);
+            if (user == null || admin == null) 
+            {
+                TempData["error"] = "User data clean up error. Please try again.";
+                return View(); 
+            };
+            Console.WriteLine(user.UserName);
+            Console.WriteLine(user.Id);
+            Console.WriteLine(admin.UserName);
+            Console.WriteLine(admin.Id);
+            bool success = await _unitOfWork.ManageAccountData.DeleteUserData(user, admin);
+            if (success) 
+            {
+                TempData["success"] = "User data cleaned up successfully";
+                return View();
+            }
+            else
+            {
+                TempData["error"] = "User data clean up error. Please try again.";
+                return View();
+            }
+        }
     }
 }
