@@ -212,10 +212,6 @@ namespace UsefulWebApps.Controllers
                 TempData["error"] = "User data clean up error. Please try again.";
                 return View(); 
             };
-            Console.WriteLine(user.UserName);
-            Console.WriteLine(user.Id);
-            Console.WriteLine(admin.UserName);
-            Console.WriteLine(admin.Id);
             bool success = await _unitOfWork.ManageAccountData.DeleteUserData(user, admin);
             if (success) 
             {
