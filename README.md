@@ -19,7 +19,7 @@ The vision or purpose of this app is to be an open source self hosted family org
 
 1. To back-up/restore use Windows command prompt not power shell
 2. First open command promp in C:\Program Files\MySQL\MySQL Server 8.0\bin
-3. To back-up: mysqldump -u root -p usefulwebapps > C\MySQLBackup\usefulwebapps_2024_09_03.sql
+3. To back-up: mysqldump -u root -p usefulwebapps > C:\MySQLBackup\usefulwebapps_2024_09_03.sql
 4. To restore run: mysql -u root -p usefulwebapps < C:\MySQLBackup\usefulwebapps_2024_09_03.sql
 
 The plan will be to have a development database with dummy users and data. Then you can login as admin change and change the PW before hosting. Then backup data base and host with new PW.
