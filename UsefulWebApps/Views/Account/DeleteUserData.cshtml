@@ -1,11 +1,15 @@
 ﻿@{
-    ViewData["Title"] = "Change Password";
+    ViewData["Title"] = "Delete User Data";
 }
 
-@model UsefulWebApps.IdentityModels.Register
+@model UsefulWebApps.IdentityModels.RemoveUser
 
 <div class="max-width-550 mx-auto">
-    <h1 class="display-3 mt-3 text-center">Change User's Password</h1>
+    <h1 class="display-3 mt-3 text-center">Delete User Data</h1>
+    <p>
+        This function will remove the user's saved data and set the author of their recipes to the admin who runs this function.
+        This will prevent orphaned data in the data base and must be run before deleting the user.
+    </p>
     <form method="post">
         <div class="text-danger" asp-validation-summary="All"></div>
         <div class="form-floating mb-3">
@@ -18,14 +22,10 @@
             <label asp-for="Email" for="emailInput">Email</label>
             <span class="text-danger" asp-validation-for="Email"></span>
         </div>
-        <div class="form-floating mb-3">
-            <input type="password" asp-for="Password" class="form-control" id="passwordInput" placeholder="Enter New Password" />
-            <label asp-for="Password" for="passwordInput">Enter New Password</label>
-            <span class="text-danger" asp-validation-for="Password"></span>
-        </div>
+
         <div class="max-width-175 mx-auto">
             <div>
-                <button type="submit" class="btn btn-primary mb-3 w-100">Update User Password</button>
+                <button type="submit" class="btn btn-primary mb-3 w-100">Delete User Data</button>
             </div>
         </div>
     </form>

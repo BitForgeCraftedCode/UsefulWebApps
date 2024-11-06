@@ -184,7 +184,11 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Manage() { return View(); }
+
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult DeleteUserData() { return View(); }
     }
 }

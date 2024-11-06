@@ -6,8 +6,12 @@
     <h1 class="display-3 mt-3">Manage Accounts</h1>
     <p>Before deleting a user account clean up their data</p>
     <div class="list-group max-width-200 mx-auto">
-        <a asp-controller="Account" asp-action="Manage" class="list-group-item list-group-item-action">Clean User Data</a>
+        <a asp-controller="Account" asp-action="Register" class="list-group-item list-group-item-action">Register Standard User</a>
+        <a asp-controller="Account" asp-action="RegisterAdmin" class="list-group-item list-group-item-action">Register Admin User</a>
+        <a asp-controller="Account" asp-action="ChangePassword" class="list-group-item list-group-item-action">Change User Password</a>
+        <a asp-controller="Account" asp-action="DeleteUserData" class="list-group-item list-group-item-action">Clean User Data</a>
         <a asp-controller="Account" asp-action="DeleteUser" class="list-group-item list-group-item-action">Delete User</a>
+        
     </div>
 </div>
 
