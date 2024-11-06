@@ -23,21 +23,12 @@ namespace UsefulWebApps.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public IActionResult Index() { return View(); }
 
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
+        public IActionResult AccessDenied() { return View(); }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Register()
-        {
-            return View();
-        }
+        public IActionResult Register() { return View(); }
 
         //register a StandardUser
         [Authorize(Roles = "Admin")]
@@ -48,10 +39,10 @@ namespace UsefulWebApps.Controllers
           
             IdentityUser user = new IdentityUser
             {
-                Email = userRegInfo.Email,
-                UserName = userRegInfo.UserName
+                Email = userRegInfo.Email.Trim(),
+                UserName = userRegInfo.UserName.Trim(),
             };
-            IdentityResult result = await _userManager.CreateAsync(user, userRegInfo.Password);
+            IdentityResult result = await _userManager.CreateAsync(user, userRegInfo.Password.Trim());
             if (result.Succeeded)
             {
 
@@ -61,7 +52,8 @@ namespace UsefulWebApps.Controllers
                     await _roleManager.CreateAsync(standerUserRole);
                 }
                 await _userManager.AddToRoleAsync(user, "StandardUser");
-                return RedirectToAction("Login");
+                TempData["success"] = "User registered successfully";
+                return RedirectToAction("Manage", "Account");
             }
             else
             {
@@ -69,15 +61,13 @@ namespace UsefulWebApps.Controllers
                 {
                     ModelState.AddModelError("Register", error.Description);
                 }
+                TempData["error"] = "Register user error. Please try again.";
                 return View();
             }
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult RegisterAdmin()
-        {
-            return View();
-        }
+        public IActionResult RegisterAdmin() { return View(); }
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
@@ -87,10 +77,10 @@ namespace UsefulWebApps.Controllers
 
             IdentityUser user = new IdentityUser
             {
-                Email = userRegInfo.Email,
-                UserName = userRegInfo.UserName
+                Email = userRegInfo.Email.Trim(),
+                UserName = userRegInfo.UserName.Trim()
             };
-            IdentityResult result = await _userManager.CreateAsync(user, userRegInfo.Password);
+            IdentityResult result = await _userManager.CreateAsync(user, userRegInfo.Password.Trim());
             if (result.Succeeded)
             {
 
@@ -100,7 +90,8 @@ namespace UsefulWebApps.Controllers
                     await _roleManager.CreateAsync(adminUserRole);
                 }
                 await _userManager.AddToRoleAsync(user, "Admin");
-                return RedirectToAction("Login");
+                TempData["success"] = "Admin user registered successfully";
+                return RedirectToAction("Manage", "Account");
             }
             else
             {
@@ -108,14 +99,12 @@ namespace UsefulWebApps.Controllers
                 {
                     ModelState.AddModelError("Register", error.Description);
                 }
+                TempData["error"] = "Register admin user error. Please try again.";
                 return View();
             }
         }
 
-        public IActionResult Login()
-        {
-            return View();
-        }
+        public IActionResult Login() { return View(); }
 
         [HttpPost]
         public async Task<IActionResult> Login(Credential userLoginInfo)
@@ -123,8 +112,8 @@ namespace UsefulWebApps.Controllers
             if (!ModelState.IsValid) { return View(); }
 
             var result = await _signInManager.PasswordSignInAsync(
-                    userLoginInfo.UserName,
-                    userLoginInfo.Password,
+                    userLoginInfo.UserName.Trim(),
+                    userLoginInfo.Password.Trim(),
                     userLoginInfo.RememberMe,
                     false
                 );
@@ -154,10 +143,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult ChangePassword()
-        {
-            return View();
-        }
+        public IActionResult ChangePassword() { return View(); }
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
@@ -165,13 +151,21 @@ namespace UsefulWebApps.Controllers
         {
             if (!ModelState.IsValid) { return View(); }
 
-            IdentityUser user = await _userManager.FindByEmailAsync(userInfo.Email);
-            if (user == null) { return View(); }
+            IdentityUser user = await _userManager.FindByEmailAsync(userInfo.Email.Trim());
+            if (user == null) 
+            {
+                TempData["error"] = "Change password error. Please try again.";
+                return View(); 
+            }
             string token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            if (string.IsNullOrEmpty(token)) { return View(); }
-            await _userManager.ResetPasswordAsync(user, token, userInfo.Password);
-            
-            return RedirectToAction("Index", "Home");
+            if (string.IsNullOrEmpty(token)) 
+            {
+                TempData["error"] = "Change password error. Please try again.";
+                return View(); 
+            }
+            await _userManager.ResetPasswordAsync(user, token, userInfo.Password.Trim());
+            TempData["success"] = "Password changed successfully";
+            return RedirectToAction("Manage", "Account");
 
         }
 
@@ -183,11 +177,15 @@ namespace UsefulWebApps.Controllers
         public async Task<IActionResult> DeleteUser(RemoveUser userInfo)
         {
             if (!ModelState.IsValid) { return View(); }
-            IdentityUser user = await _userManager.FindByEmailAsync(userInfo.Email);
-            if (user == null) { return View(); };
+            IdentityUser user = await _userManager.FindByEmailAsync(userInfo.Email.Trim());
+            if (user == null) 
+            {
+                TempData["error"] = "Delete user error. Please try again.";
+                return View(); 
+            };
             await _userManager.DeleteAsync(user);
-            
-            return RedirectToAction("Index", "Home");
+            TempData["success"] = "Deleted user successfully";
+            return RedirectToAction("Manage", "Account");
         }
 
         [Authorize(Roles = "Admin")]
@@ -201,12 +199,9 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteUserData(DeleteUserData userInfo)
         {
-            if (!ModelState.IsValid) 
-            {
-                return View(); 
-            }
-            IdentityUser user = await _userManager.FindByEmailAsync(userInfo.Email);
-            IdentityUser admin = await _userManager.FindByEmailAsync(userInfo.AdminEmail);
+            if (!ModelState.IsValid) { return View(); }
+            IdentityUser user = await _userManager.FindByEmailAsync(userInfo.Email.Trim());
+            IdentityUser admin = await _userManager.FindByEmailAsync(userInfo.AdminEmail.Trim());
             if (user == null || admin == null) 
             {
                 TempData["error"] = "User data clean up error. Please try again.";
@@ -216,7 +211,7 @@ namespace UsefulWebApps.Controllers
             if (success) 
             {
                 TempData["success"] = "User data cleaned up successfully";
-                return View();
+                return RedirectToAction("Manage", "Account");
             }
             else
             {
