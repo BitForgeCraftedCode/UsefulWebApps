@@ -26,9 +26,15 @@ The plan will be to have a development database with dummy users and data. Then 
 
 ## Transfer publish files to Ubuntu server
 
-1. I use Windows Subsystem for Linux
-2. Open Ubuntu terminal in publish root folder then run this
-3. scp -r * user@hostIP:/var/www/thedotnetwizard.com/html
+1. First shut down the Kestrel server (the app)
+2. login to Ubuntu server cd /etc/systemd/system
+3. sudo systemctl stop kestrel-usefulwebapps.service
+4. On the local pc I use Windows Subsystem for Linux
+5. Open Ubuntu terminal on local pc in publish root folder then run this
+6. scp -r * user@hostIP:/var/www/thedotnetwizard.com/html
+7. After transefer complete restart the service 
+8. sudo systemctl start kestrel-usefulwebapps.service
+9. you could also just reboot the server and now may be a good time to update it.
 
 ## To run the app on Ubuntu server
 
