@@ -4,11 +4,13 @@ using System.Security.Claims;
 using UsefulWebApps.Models.MyRecipes;
 using UsefulWebApps.Models.ViewModels.MyRecipes;
 using UsefulWebApps.Repository.IRepository;
+using Ganss.Xss;
 
 namespace UsefulWebApps.Controllers
 {
     public class MyRecipesController : Controller
     {
+        private HtmlSanitizer sanitizer = new HtmlSanitizer();
         private readonly IUnitOfWork _unitOfWork;
         public MyRecipesController(IUnitOfWork unitOfWork)
         {
@@ -251,6 +253,11 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> EditRecipe(RecipeVM recipeVM)
         {
+            recipeVM.Recipe.Ingredients = sanitizer.Sanitize(recipeVM.Recipe.Ingredients);
+            recipeVM.Recipe.Instructions = sanitizer.Sanitize(recipeVM.Recipe.Instructions);
+            recipeVM.Recipe.Notes = sanitizer.Sanitize(recipeVM.Recipe.Notes);
+            recipeVM.Recipe.Nutrition = sanitizer.Sanitize(recipeVM.Recipe.Nutrition);
+            
             //set Recipe.Course equal to the new chosen course
             //basically map the users choice to the Recipe model
             foreach (RecipeCourses course in recipeVM.RecipeCourses)
@@ -334,6 +341,10 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRecipe(RecipeVM recipeVM)
         {
+            recipeVM.Recipe.Ingredients = sanitizer.Sanitize(recipeVM.Recipe.Ingredients);
+            recipeVM.Recipe.Instructions = sanitizer.Sanitize(recipeVM.Recipe.Instructions);
+            recipeVM.Recipe.Notes = sanitizer.Sanitize(recipeVM.Recipe.Notes);
+            recipeVM.Recipe.Nutrition = sanitizer.Sanitize(recipeVM.Recipe.Nutrition);
             //set Recipe.Course equal to the chosen course
             //basically map the users choice to the Recipe model
             foreach (RecipeCourses course in recipeVM.RecipeCourses)
