@@ -290,7 +290,8 @@ namespace UsefulWebApps.Controllers
                 {
                     TempData["error"] = "Update recipe error. Please try again.";
                 }
-                return RedirectToAction("Index");
+                //return RedirectToAction("Index");
+                return RedirectToAction("Recipe", new { id = recipeVM.Recipe.RecipeId });
             }
             TempData["error"] = "Update recipe error. Please try again.";
             return View(recipeVM);

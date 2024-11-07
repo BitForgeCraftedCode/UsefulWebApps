@@ -109,7 +109,7 @@
             <div class="col-sm-12 col-md-6 col-lg-6">
                 <h3 class="mt-3 text-center">Rating</h3>
                 <div class="form-floating mb-3">
-                    <input asp-for="Recipe.Rating" type="number" step="1" max="10" min="1" value="1" class="form-control" required />
+                    <input asp-for="Recipe.Rating" type="number" step="1" max="10" min="1" class="form-control" required />
                     <label asp-for="Recipe.Rating">Rating 1-10</label>
                     <span asp-validation-for="Recipe.Rating" class="text-danger"></span>
                 </div>
@@ -117,7 +117,7 @@
             <div class="col-sm-12 col-md-6 col-lg-6">
                 <h3 class="mt-3 text-center">Servings</h3>
                 <div class="form-floating mb-3">
-                    <input asp-for="Recipe.Servings" type="number" step="1" max="20" min="1" value="1" class="form-control" required />
+                    <input asp-for="Recipe.Servings" type="number" step="1" max="20" min="1" class="form-control" required />
                     <label asp-for="Recipe.Servings">Servings 1-20</label>
                     <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
                 </div>
