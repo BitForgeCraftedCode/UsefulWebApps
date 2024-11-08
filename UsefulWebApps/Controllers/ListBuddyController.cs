@@ -92,6 +92,16 @@ namespace UsefulWebApps.Controllers
             TempData["error"] = "Delete note error. Try again.";
             return RedirectToAction("MyNotes");
         }
+
+        public async Task<IActionResult> EditNote(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            Notes note = await _unitOfWork.Notes.GetById(id);
+            return View(note);
+        }
         #endregion
 
         #region To Do List

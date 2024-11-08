@@ -12,11 +12,16 @@
             <notes html-notes-content="@Model.Note" class="card-text" style="white-space: pre-line"></notes>
          </div>
     </div>
-    <div class="max-width-175 mx-auto">
-        <div>
-            <a asp-controller="ListBuddy" asp-action="MyNotes" class="btn btn-outline-dark w-100 mb-3">My Notes</a>
+    <div class="max-width-350 mx-auto">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <a asp-controller="ListBuddy" asp-action="MyNotes" class="btn btn-outline-dark w-100 mb-3">My Notes</a>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <a asp-controller="ListBuddy" asp-action="EditNote" asp-route-id="@Model.Id" class="btn btn-outline-dark w-100 mb-3">Edit Note</a>
+            </div>
         </div>
-        <form method="post" asp-action="DeleteNote" id="delete-note">
+        <form method="post" asp-action="DeleteNote" id="delete-note" class="max-width-175 mx-auto">
             <div>
                 <input type="hidden" asp-for="@Model.Id" />
                 <button type="submit" class="btn btn-danger mb-3 w-100">Delete Note</button>
