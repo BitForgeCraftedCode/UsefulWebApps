@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Note";
+}
+@* https://stackoverflow.com/questions/65378476/how-to-refresh-data-without-page-reloading-in-asp-net-core-mvc-using-ajax *@
+<div class="text-center max-width-550 mx-auto">
+    <h1 class="display-3 mt-3">Note Title here</h1>
+    <div id="to-do-list-container">
+        @* <partial name="_ToDoListPartial" /> *@
+    </div>
+    <div id="spinner-container" class="mt-3">
+        <div id="spinner" class="loader">
+            Loading...
+        </div>
+    </div>
+
+
+
+</div>
+<!--Partial View scripts-->
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <!--Ajax and validation-->
+    @* <script type="text/javascript" src="~/js/ToDoList.js"></script> *@
+}
