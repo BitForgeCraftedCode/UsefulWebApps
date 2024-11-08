@@ -66,13 +66,30 @@ namespace UsefulWebApps.Controllers
                 bool success = await _unitOfWork.Notes.Add(obj);
                 if (success)
                 {
-                    TempData["success"] = "Note created successfully";
+                    TempData["success"] = "Note created successfully.";
                     return RedirectToAction("MyNotes");
                 }
                 TempData["error"] = "Create note error. Try again.";
                 return RedirectToAction("MyNotes");
             }
             TempData["error"] = "Create note error. Try again.";
+            return RedirectToAction("MyNotes");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteNote(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            bool success = await _unitOfWork.Notes.Delete(id);
+            if (success)
+            {
+                TempData["success"] = "Note deleted successfully.";
+                return RedirectToAction("MyNotes");
+            }
+            TempData["error"] = "Delete note error. Try again.";
             return RedirectToAction("MyNotes");
         }
         #endregion
@@ -180,7 +197,7 @@ namespace UsefulWebApps.Controllers
                 bool success = await _unitOfWork.ToDoList.Update(obj);
                 if (success)
                 {
-                    TempData["success"] = "To do item updated successfully";
+                    TempData["success"] = "To do item updated successfully.";
                 }
                 else
                 {
@@ -297,7 +314,7 @@ namespace UsefulWebApps.Controllers
                 bool success = await _unitOfWork.GroceryList.Update(groceryList);
                 if (success) 
                 {
-                    TempData["success"] = "Grocery item updated successfully";
+                    TempData["success"] = "Grocery item updated successfully.";
                 }
                 else
                 {
