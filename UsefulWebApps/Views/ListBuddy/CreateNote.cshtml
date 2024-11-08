@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Create Note";
+}
+@model UsefulWebApps.Models.ListBuddy.Notes
+
+<div class="max-width-550 mx-auto">
+    <h1 class="display-3 mt-3 text-center">Create Note</h1>
+    <form asp-controller="ListBuddy" asp-action="CreateNote" method="post">
+        <input type="hidden" asp-for="UserId" />
+        <h3 class="mt-3 text-center">Title</h3>
+        <div class="form-floating mb-3">
+            <input asp-for="NoteTitle" type="text" class="form-control" placeholder="Note Title" minlength="3" maxlength="100" required />
+            <label asp-for="NoteTitle">Note Title</label>
+            <span asp-validation-for="NoteTitle" class="text-danger"></span>
+        </div>
+        <p>
+            The below note input allow basic HTML.
+            Click <a asp-action="Directions" asp-controller="MyRecipes" target="_blank">here</a> for more detail.
+        </p>
+
+        <h3 class="mt-3 text-center">Note</h3>
+        <div class="form-floating">
+            <textarea asp-for="Note" class="form-control textarea-input" minlength="10" maxlength="5000" required placeholder="Note"></textarea>
+            <label asp-for="Note">Note</label>
+            <span asp-validation-for="Note" class="text-danger"></span>
+        </div>
+
+        <div class="max-width-200 mx-auto">
+            <div>
+                <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Create Note</button>
+            </div>
+            <div>
+                <a asp-controller="ListBuddy" asp-action="MyNotes" class="btn btn-outline-dark w-100">Back To My Notes</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

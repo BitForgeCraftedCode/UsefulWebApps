@@ -12,4 +12,7 @@
             <a asp-controller="ListBuddy" asp-action="Note" asp-route-id="@note.Id" class="list-group-item list-group-item-action">@note.NoteTitle</a>
         }
     </div>
+    <div class="max-width-175 mx-auto">
+        <a asp-controller="ListBuddy" asp-action="CreateNote" class="btn btn-outline-dark w-100">Add New Note</a>
+    </div>
 </div>

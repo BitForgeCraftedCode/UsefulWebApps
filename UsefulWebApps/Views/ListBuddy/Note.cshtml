@@ -8,7 +8,8 @@
     <div class="card text-white bg-info mb-3">
          <div class="card-header">@Model.NoteTitle</div>
          <div class="card-body">
-            <notes html-notes-content="@Model.Note" class="card-text"></notes>
+            @* https://stackoverflow.com/questions/498461/how-to-save-user-entered-line-breaks-from-a-textarea-to-a-database *@
+            <notes html-notes-content="@Model.Note" class="card-text" style="white-space: pre-line"></notes>
          </div>
     </div>
     <div class="max-width-175 mx-auto">

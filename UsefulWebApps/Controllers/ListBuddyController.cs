@@ -46,6 +46,23 @@ namespace UsefulWebApps.Controllers
             Notes note = await _unitOfWork.Notes.GetById(id);
             return View(note);
         }
+
+        public IActionResult CreateNote() 
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            Notes note = new()
+            {
+                UserId = userId
+            };
+            return View(note); 
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> CreateNote()
+        //{
+
+        //}
         #endregion
 
         #region To Do List
