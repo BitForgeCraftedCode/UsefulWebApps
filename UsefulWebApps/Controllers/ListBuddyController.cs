@@ -36,6 +36,16 @@ namespace UsefulWebApps.Controllers
             };
             return View(notesVM);
         }
+
+        public async Task<IActionResult> Note(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            Notes note = await _unitOfWork.Notes.GetById(id);
+            return View(note);
+        }
         #endregion
 
         #region To Do List

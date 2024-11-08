@@ -9,7 +9,7 @@
     <div class="list-group max-width-200 mx-auto">
         @foreach (var note in Model.Notes)
         {
-            <a asp-controller="ListBuddy" asp-action="" class="list-group-item list-group-item-action">@note.NoteTitle</a>
+            <a asp-controller="ListBuddy" asp-action="Note" asp-route-id="@note.Id" class="list-group-item list-group-item-action">@note.NoteTitle</a>
         }
     </div>
 </div>
