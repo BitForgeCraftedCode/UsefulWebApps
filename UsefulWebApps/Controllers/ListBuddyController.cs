@@ -102,6 +102,24 @@ namespace UsefulWebApps.Controllers
             Notes note = await _unitOfWork.Notes.GetById(id);
             return View(note);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> EditNote(Notes obj)
+        {
+            if (ModelState.IsValid)
+            {
+                bool success = await _unitOfWork.Notes.Update(obj);
+                if (success)
+                {
+                    TempData["success"] = "Note edited successfully.";
+                    return RedirectToAction("MyNotes");
+                }
+                TempData["error"] = "Edit note error. Try again.";
+                return RedirectToAction("MyNotes");
+            }
+            TempData["error"] = "Edit note error. Try again.";
+            return RedirectToAction("MyNotes");
+        }
         #endregion
 
         #region To Do List
