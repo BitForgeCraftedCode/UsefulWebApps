@@ -433,7 +433,5 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
-        public IActionResult Directions() { return View(); }
     }
 }
