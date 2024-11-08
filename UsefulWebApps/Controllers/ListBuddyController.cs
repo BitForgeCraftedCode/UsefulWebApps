@@ -5,6 +5,7 @@ using System.Security.Claims;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.ViewModels.ListBuddy;
 using UsefulWebApps.Repository.IRepository;
+using Ganss.Xss;
 
 
 namespace UsefulWebApps.Controllers
@@ -12,6 +13,7 @@ namespace UsefulWebApps.Controllers
     [Authorize(Roles = "StandardUser, Admin")]
     public class ListBuddyController : Controller
     {
+        private HtmlSanitizer sanitizer = new HtmlSanitizer();
         private readonly IUnitOfWork _unitOfWork;
 
         public ListBuddyController(IUnitOfWork unitOfWork)
@@ -31,8 +33,7 @@ namespace UsefulWebApps.Controllers
             List<Notes> notes = (List<Notes>)await _unitOfWork.Notes.GetAllWhere("UserId", userId);
             NotesVM notesVM = new()
             {
-                Notes = notes,
-                //Note = new Notes()
+                Notes = notes
             };
             return View(notesVM);
         }
@@ -61,6 +62,7 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateNote(Notes obj)
         {
+            obj.Note = sanitizer.Sanitize(obj.Note);
             if (ModelState.IsValid)
             {
                 bool success = await _unitOfWork.Notes.Add(obj);
@@ -106,6 +108,7 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> EditNote(Notes obj)
         {
+            obj.Note = sanitizer.Sanitize(obj.Note);
             if (ModelState.IsValid)
             {
                 bool success = await _unitOfWork.Notes.Update(obj);
