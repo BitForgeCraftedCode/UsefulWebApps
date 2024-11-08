@@ -112,7 +112,7 @@ namespace UsefulWebApps.Controllers
                 if (success)
                 {
                     TempData["success"] = "Note edited successfully.";
-                    return RedirectToAction("MyNotes");
+                    return RedirectToAction("Note", new { id = obj.Id });
                 }
                 TempData["error"] = "Edit note error. Try again.";
                 return RedirectToAction("MyNotes");

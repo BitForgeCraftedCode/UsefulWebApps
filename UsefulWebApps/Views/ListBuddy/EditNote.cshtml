@@ -31,7 +31,7 @@
                 <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Edit Note</button>
             </div>
             <div>
-                <a asp-controller="ListBuddy" asp-action="MyNotes" class="btn btn-outline-dark w-100">Back To My Notes</a>
+                <a asp-controller="ListBuddy" asp-action="Note" asp-route-id="@Model.Id" class="btn btn-outline-dark w-100">Back To Note</a>
             </div>
         </div>
     </form>
