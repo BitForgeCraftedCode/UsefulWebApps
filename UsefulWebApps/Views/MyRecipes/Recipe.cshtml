@@ -60,25 +60,26 @@
     </section>
     <div class="mb-3">
         <h3>Ingredients</h3>
-        <ingredients html-ingredients-content="@Model.Recipe.Ingredients"></ingredients>
+        @* https://stackoverflow.com/questions/498461/how-to-save-user-entered-line-breaks-from-a-textarea-to-a-database *@
+        <ingredients html-ingredients-content="@Model.Recipe.Ingredients" style="white-space: pre-line"></ingredients>
     </div>
     <div class="mb-3">
         <h3>Instructions</h3>
-        <instructions html-instructions-content="@Model.Recipe.Instructions"></instructions>
+        <instructions html-instructions-content="@Model.Recipe.Instructions" style="white-space: pre-line"></instructions>
     </div>
     
     @if(Model.Recipe.Notes != "")
     {
         <div class="mb-3">
             <h3>Notes</h3>
-            <notes html-notes-content="@Model.Recipe.Notes"></notes>
+            <notes html-notes-content="@Model.Recipe.Notes" style="white-space: pre-line"></notes>
         </div>
     }
     @if(Model.Recipe.Nutrition != "")
     {
         <div class="mb-3">
             <h3>Nutrition</h3>
-            <nutrition html-nutrition-content="@Model.Recipe.Nutrition"></nutrition>
+            <nutrition html-nutrition-content="@Model.Recipe.Nutrition" style="white-space: pre-line"></nutrition>
         </div>
     }
     
