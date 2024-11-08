@@ -13,6 +13,7 @@ namespace UsefulWebApps.Repository
         public IGroceryListRepository GroceryList { get; private set; }
         public IRecipeRepository Recipe { get; private set; }
         public IManageAccountDataRepository ManageAccountData { get; private set; }
+        public INotesRepository Notes { get; private set; }
         //other repos here
 
         public UnitOfWork(MySqlConnection db)
@@ -22,6 +23,7 @@ namespace UsefulWebApps.Repository
             GroceryList = new GroceryListRepository(_connection);
             Recipe = new RecipeRepository(_connection);
             ManageAccountData = new ManageAccountDataRepository(_connection);
+            Notes = new NotesRepository(_connection);
             //other repos here
         }
     }

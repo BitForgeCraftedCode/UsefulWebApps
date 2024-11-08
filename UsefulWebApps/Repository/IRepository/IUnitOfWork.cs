@@ -6,6 +6,7 @@
         IGroceryListRepository GroceryList { get; }
         IRecipeRepository Recipe { get; }
         IManageAccountDataRepository ManageAccountData { get; }
+        INotesRepository Notes { get; }
         //other repos here
     }
 }
