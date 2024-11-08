@@ -24,12 +24,18 @@ namespace UsefulWebApps.Controllers
         }
 
         #region Notes
-        //public async Task<IActionResult> MyNotes()
-        //{
-        //    ClaimsPrincipal currentUser = this.User;
-        //    string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-        //    List<Notes> notes = (List<Notes>)await _unitOfWork.
-        //}
+        public async Task<IActionResult> MyNotes()
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<Notes> notes = (List<Notes>)await _unitOfWork.Notes.GetAllWhere("UserId", userId);
+            NotesVM notesVM = new()
+            {
+                Notes = notes,
+                //Note = new Notes()
+            };
+            return View(notesVM);
+        }
         #endregion
 
         #region To Do List
