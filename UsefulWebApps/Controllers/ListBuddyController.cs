@@ -23,6 +23,15 @@ namespace UsefulWebApps.Controllers
             return View();
         }
 
+        #region Notes
+        //public async Task<IActionResult> MyNotes()
+        //{
+        //    ClaimsPrincipal currentUser = this.User;
+        //    string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    List<Notes> notes = (List<Notes>)await _unitOfWork.
+        //}
+        #endregion
+
         #region To Do List
 
         public async Task<IActionResult> ToDoList()

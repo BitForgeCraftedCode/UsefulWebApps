@@ -1,12 +1,12 @@
 DROP TABLE notes;
 
 CREATE TABLE `notes` (
-  `Id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `Note` varchar(5000) NOT NULL,
   `UserId` varchar(255) NOT NULL,
   `NoteTitle` varchar(100) NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 
@@ -21,6 +21,6 @@ INSERT INTO notes (Note, UserId, NoteTitle) VALUES ("clean the ferrit cage and a
 
 SELECT * FROM notes WHERE UserId = '251d80ae-93a3-401c-9be9-1ef83e30d541';
 
-DELETE FROM usefulwebapps.to_do_list WHERE ID>=1;
+DELETE FROM usefulwebapps.notes WHERE ID>=1;
 
-ALTER TABLE usefulwebapps.to_do_list AUTO_INCREMENT = 1;
+ALTER TABLE usefulwebapps.notes AUTO_INCREMENT = 1;
