@@ -8,7 +8,10 @@
     <div class="card text-white bg-info mb-3">
          <div class="card-header">@Model.NoteTitle</div>
          <div class="card-body">
-             <p class="card-text">@Model.Note</p>
+            <notes html-notes-content="@Model.Note" class="card-text"></notes>
          </div>
+    </div>
+    <div class="max-width-175 mx-auto">
+        <a asp-controller="ListBuddy" asp-action="MyNotes" class="btn btn-outline-dark w-100">My Notes</a>
     </div>
 </div>
