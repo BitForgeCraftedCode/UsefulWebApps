@@ -58,11 +58,23 @@ namespace UsefulWebApps.Controllers
             return View(note); 
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> CreateNote()
-        //{
-
-        //}
+        [HttpPost]
+        public async Task<IActionResult> CreateNote(Notes obj)
+        {
+            if (ModelState.IsValid)
+            {
+                bool success = await _unitOfWork.Notes.Add(obj);
+                if (success)
+                {
+                    TempData["success"] = "Note created successfully";
+                    return RedirectToAction("MyNotes");
+                }
+                TempData["error"] = "Create note error. Try again.";
+                return RedirectToAction("MyNotes");
+            }
+            TempData["error"] = "Create note error. Try again.";
+            return RedirectToAction("MyNotes");
+        }
         #endregion
 
         #region To Do List
