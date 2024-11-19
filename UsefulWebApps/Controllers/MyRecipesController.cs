@@ -8,6 +8,7 @@ using Ganss.Xss;
 
 namespace UsefulWebApps.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class MyRecipesController : Controller
     {
         private HtmlSanitizer sanitizer = new HtmlSanitizer();

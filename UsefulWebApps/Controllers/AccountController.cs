@@ -6,6 +6,7 @@ using UsefulWebApps.Repository.IRepository;
 
 namespace UsefulWebApps.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public class AccountController : Controller
     {
         private readonly UserManager<IdentityUser> _userManager;
