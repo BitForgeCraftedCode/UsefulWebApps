@@ -77,6 +77,10 @@ function deleteToDo(deleteId) {
     $.ajax({
         url: "/ListBuddy/ToDoListDeleteItem",
         type: "POST",
+        headers: {
+            RequestVerificationToken:
+                $("#RequestVerificationToken")[0].value
+        },
         data: formData,
         dataType: "json",
         success: function (response) {
@@ -96,6 +100,10 @@ function toggleComplete(toggleId) {
     $.ajax({
         url: "/ListBuddy/ToDoListToggleComplete",
         type: "POST",
+        headers: {
+            RequestVerificationToken:
+                $("#RequestVerificationToken")[0].value
+        },
         data: formData,
         dataType: "html",
         success: function (response) {

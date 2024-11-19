@@ -11,6 +11,7 @@ using Ganss.Xss;
 namespace UsefulWebApps.Controllers
 {
     [Authorize(Roles = "StandardUser, Admin")]
+    [AutoValidateAntiforgeryToken]
     public class ListBuddyController : Controller
     {
         private HtmlSanitizer sanitizer = new HtmlSanitizer();

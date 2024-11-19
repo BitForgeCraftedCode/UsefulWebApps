@@ -1,11 +1,14 @@
-﻿@using UsefulWebApps.Models.ListBuddy
+﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@using UsefulWebApps.Models.ListBuddy
 @{
     ViewData["Title"] = "Grocery List";
+    var requestToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
 
 @model UsefulWebApps.Models.ViewModels.ListBuddy.GroceryListVM
 
 <div class="text-center max-width-550 mx-auto">
+    <input id="RequestVerificationToken" type="hidden" value="@requestToken" />
     <h1 class="display-3 mt-3">Grocery List</h1>
     <div id="grocery-list-container">
         <partial name="_GroceryListPartial" />

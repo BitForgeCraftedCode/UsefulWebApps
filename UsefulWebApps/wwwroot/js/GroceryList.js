@@ -31,6 +31,10 @@ function deleteGroceryItem(deleteId, category) {
     $.ajax({
         url: "/ListBuddy/GroceryListDeleteItem",
         type: "POST",
+        headers: {
+            RequestVerificationToken:
+                $("#RequestVerificationToken")[0].value
+        },
         data: formData,
         dataType: "json",
         success: function (response) {
@@ -56,6 +60,10 @@ function toggleComplete(toggleId, userID) {
     $.ajax({
         url: "/ListBuddy/GroceryListToggleComplete",
         type: "POST",
+        headers: {
+            RequestVerificationToken:
+                $("#RequestVerificationToken")[0].value
+        },
         data: formData,
         dataType: "html",
         success: function (response) {
