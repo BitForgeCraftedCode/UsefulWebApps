@@ -86,6 +86,12 @@ namespace UsefulWebApps.Models.MyRecipes
         [Required(ErrorMessage = "User Name is required.")]
         public string UserName { get; set; } = string.Empty;
 
+        [Column("ImagePath")]
+        //allow null empty ImagePath
+        [ValidateNever]
+        [StringLength(500, MinimumLength = 0)]
+        public string ImagePath { get; set; } = string.Empty;
+
         //fields for table JOINS
         //MANY TO MANY -- one recipe can have many categories -- one category can have many recipes
         [Required]

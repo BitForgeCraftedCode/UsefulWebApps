@@ -6,7 +6,7 @@
 
 <div class="max-width-700 mx-auto">
     <h1 class="mt-3 mb-3 text-center">Create Recipe</h1>
-    <form asp-controller="MyRecipes" asp-action="CreateRecipe" method="post" id="createRecipeForm">
+    <form asp-controller="MyRecipes" asp-action="CreateRecipe" method="post" id="createRecipeForm" enctype="multipart/form-data">
         <h3 class="mt-3 text-center">Title</h3>
         <div class="form-floating mb-3">
             <input asp-for="Recipe.RecipeTitle" type="text" class="form-control" placeholder="Recipe Title" minlength="3" required />
@@ -17,6 +17,11 @@
         <div class="form-floating">
             <textarea asp-for="Recipe.RecipeDescription" class="form-control ignore" placeholder="Recipe Description"></textarea>
             <label asp-for="Recipe.RecipeDescription">Recipe Description</label>
+        </div>
+        <h3 class="mt-3 text-center">Recipe Image</h3>
+        <div>
+            <label asp-for="ImageFile" class="form-label">Choose Image</label>
+            <input asp-for="ImageFile" type="file" class="form-control ignore" placeholder="Choose Image" accept="image/*" />
         </div>
         <div class="row">
             <div class="col-sm-12 col-md-6 col-lg-6">

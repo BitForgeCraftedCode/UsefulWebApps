@@ -75,6 +75,8 @@ ALTER TABLE recipes ADD UserId varchar(255) NOT NULL;
 
 ALTER TABLE recipes ADD UserName varchar(256) NOT NULL;
 
+ALTER TABLE recipes ADD ImagePath varchar(500) DEFAULT NULL;
+
 show create table recipes;
 
 UPDATE recipes SET UserId = '19e5b54f-e998-4494-90a2-797cfcfc9fc3', UserName = 'BeefCakeTheMightyStandardUser' WHERE RecipeId = 1;

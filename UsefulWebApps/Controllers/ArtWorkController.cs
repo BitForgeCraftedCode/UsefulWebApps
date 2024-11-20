@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.IO;
 using UsefulWebApps.Models.ViewModels.ArtWork;
 
 namespace UsefulWebApps.Controllers

@@ -226,7 +226,7 @@ namespace UsefulWebApps.Repository
                     SET RecipeTitle = @recipeTitle, RecipeDescription = @recipeDescription, CourseId = @courseId,
                     CuisineId = @cuisineId, DifficultyId = @difficultyId, PrepTime = @prepTime, CookTime = @cookTime,
                     Rating = @rating, Servings = @servings, Nutrition = @nutrition, Ingredients = @ingredients,
-                    Instructions = @instructions, Notes = @notes
+                    Instructions = @instructions, Notes = @notes, ImagePath = @imagePath
                     WHERE RecipeId = @id";
 
             //to update the many to many -- delete all the records then insert the new categories
@@ -247,6 +247,7 @@ namespace UsefulWebApps.Repository
                 ingredients = recipeVM.Recipe.Ingredients,
                 instructions = recipeVM.Recipe.Instructions,
                 notes = recipeVM.Recipe.Notes,
+                imagePath = recipeVM.Recipe.ImagePath,
                 id = recipeVM.Recipe.RecipeId
             }, transaction: txn);
             rowsEffected2 = await _connection.ExecuteAsync(sql2, new { id = recipeVM.Recipe.RecipeId }, transaction: txn);
@@ -305,7 +306,8 @@ namespace UsefulWebApps.Repository
                         Instructions,   
                         Notes,
                         UserId,
-                        UserName
+                        UserName,
+                        ImagePath
                     )
                     VALUES 
                     (
@@ -323,7 +325,8 @@ namespace UsefulWebApps.Repository
                         @instructions, 
                         @notes,
                         @userId,
-                        @userName
+                        @userName,
+                        @imagePath
                     )";
             rowsEffected1 = await _connection.ExecuteAsync(sql, new
             {
@@ -341,7 +344,8 @@ namespace UsefulWebApps.Repository
                 instructions = recipeVM.Recipe.Instructions,
                 notes = recipeVM.Recipe.Notes,
                 userId = recipeVM.Recipe.UserId,
-                userName = recipeVM.Recipe.UserName
+                userName = recipeVM.Recipe.UserName,
+                imagePath = recipeVM.Recipe.ImagePath
             }, transaction: txn);
 
             //need the id before adding to recipe_categories_join

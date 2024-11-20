@@ -1,4 +1,5 @@
-﻿using UsefulWebApps.Models.MyRecipes;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using UsefulWebApps.Models.MyRecipes;
 
 namespace UsefulWebApps.Models.ViewModels.MyRecipes
 {
@@ -9,7 +10,8 @@ namespace UsefulWebApps.Models.ViewModels.MyRecipes
         public List<RecipeCourses> RecipeCourses { get; set; }
         public List<RecipeCuisines> RecipeCuisines { get; set; }
         public List<RecipeDifficulties> RecipeDifficulties { get; set; }
-
+        [ValidateNever]
+        public IFormFile ImageFile { get; set; }
 
     }
 }

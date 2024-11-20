@@ -11,10 +11,12 @@ namespace UsefulWebApps.Controllers
     [AutoValidateAntiforgeryToken]
     public class MyRecipesController : Controller
     {
+        private IWebHostEnvironment Environment;
         private HtmlSanitizer sanitizer = new HtmlSanitizer();
         private readonly IUnitOfWork _unitOfWork;
-        public MyRecipesController(IUnitOfWork unitOfWork)
+        public MyRecipesController(IUnitOfWork unitOfWork, IWebHostEnvironment _environment)
         {
+            Environment = _environment;
             _unitOfWork = unitOfWork;
         }
 
@@ -289,6 +291,33 @@ namespace UsefulWebApps.Controllers
 
             if (ModelState.IsValid)
             {
+                string oldFilePathDb = recipeVM.Recipe.ImagePath;
+                Console.WriteLine(oldFilePathDb);
+                //remove old image if there and new image is not null
+                if (oldFilePathDb != null && recipeVM.ImageFile != null)
+                {
+                    string oldImageStoragePath = Path.Combine(this.Environment.WebRootPath, oldFilePathDb);
+                    if (System.IO.File.Exists(oldImageStoragePath))
+                    {
+                        System.IO.File.Delete(oldImageStoragePath);
+                    }
+                }
+                if (recipeVM.ImageFile != null)
+                {
+                    //generate a unique file name
+                    string fileName = $"{Guid.NewGuid()}-{Path.GetFileName(recipeVM.ImageFile.FileName)}";
+                    //get filepath for physical storage location
+                    string storageFilePath = Path.Combine(this.Environment.WebRootPath, "images/recipes/", fileName);
+                    //get filepath for database
+                    string filePathDb = Path.Combine("images/recipes/", Path.GetFileName(storageFilePath));
+                    //upload image -- copy image to wwwroot
+                    using (var stream = System.IO.File.Create(storageFilePath))
+                    {
+                        await recipeVM.ImageFile.CopyToAsync(stream);
+                    }
+                    //set database path in recipe model
+                    recipeVM.Recipe.ImagePath = filePathDb;
+                }
                 bool success = await _unitOfWork.Recipe.UpdateRecipe(recipeVM);
                 if (success)
                 {
@@ -376,6 +405,22 @@ namespace UsefulWebApps.Controllers
             TryValidateModel(recipeVM);
             if (ModelState.IsValid)
             {
+                if (recipeVM.ImageFile != null)
+                {
+                    //generate a unique file name
+                    string fileName = $"{Guid.NewGuid()}-{Path.GetFileName(recipeVM.ImageFile.FileName)}";
+                    //get filepath for physical storage location
+                    string storageFilePath = Path.Combine(this.Environment.WebRootPath, "images/recipes/", fileName);
+                    //get filepath for database
+                    string filePathDb = Path.Combine("images/recipes/", Path.GetFileName(storageFilePath));
+                    //upload image -- copy image to wwwroot
+                    using (var stream = System.IO.File.Create(storageFilePath))
+                    {
+                        await recipeVM.ImageFile.CopyToAsync(stream);
+                    }
+                    //set database path in recipe model
+                    recipeVM.Recipe.ImagePath = filePathDb;
+                }
                 bool success = await _unitOfWork.Recipe.AddRecipe(recipeVM);
                 if (success)
                 {
@@ -416,11 +461,20 @@ namespace UsefulWebApps.Controllers
 
         [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost, ActionName("DeleteRecipe")]
-        public async Task<IActionResult> DeleteRecipeFromDb(int? id)
+        public async Task<IActionResult> DeleteRecipeFromDb(int? id, string imagePath)
         {
             if (id == null || id == 0)
             {
                 return NotFound();
+            }
+            //remove image if there
+            if (imagePath != "")
+            {
+                string imageStoragePath = Path.Combine(this.Environment.WebRootPath, imagePath);
+                if (System.IO.File.Exists(imageStoragePath))
+                {
+                    System.IO.File.Delete(imageStoragePath);
+                }
             }
             bool success = await _unitOfWork.Recipe.DeleteRecipe(id);
             if (success) 
