@@ -468,7 +468,7 @@ namespace UsefulWebApps.Controllers
                 return NotFound();
             }
             //remove image if there
-            if (imagePath != "")
+            if (imagePath != null)
             {
                 string imageStoragePath = Path.Combine(this.Environment.WebRootPath, imagePath);
                 if (System.IO.File.Exists(imageStoragePath))
