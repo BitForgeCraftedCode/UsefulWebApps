@@ -13,9 +13,9 @@
         <p>To view your saved recipes click <a asp-controller="MyRecipes" asp-action="SavedRecipes">here</a></p>
     }
     
-    
+    <h4>Search: Title and Ingredients</h4>
     <form asp-controller="MyRecipes" asp-action="Index" id="search-form">
-        <div class="input-group mb-3">
+        <div class="input-group mb-3">  
             <input type="text" class="form-control" id="search-input" name="SearchString" asp-for="@Model.SearchString" />
             <input class="btn btn-outline-dark" type="submit" value="Search" />
             <input class="btn btn-outline-secondary" type="button" value="Clear" onclick="clearSearch()" />
