@@ -36,4 +36,11 @@
     <Folder Include="wwwroot\images\recipes\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\css\_myhomepage.scss">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

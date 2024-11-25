@@ -1,0 +1,17 @@
+﻿/*.carousel-inner {
+    height: 0;
+    padding-bottom: 25%;*/ /* this sets carousel aspect ratio (4:1 here) */
+/*}
+
+.carousel-item {
+    position: absolute !important;*/ /* Bootstrap is insistent */
+    /*top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.carousel-item img {
+    height: 100%;*/ /* Bootstrap handles width already */
+    /*object-fit: cover;*/ /* or 'contain' if you want stretch instead of crop */
+/*}*/
