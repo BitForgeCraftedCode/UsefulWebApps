@@ -1,4 +1,20 @@
-﻿// Your variable overrides can go here, e.g.:
+﻿@font-face {
+    font-family: 'alarm_clockregular';
+    src: url('../fonts/alarm_clock-webfont.woff2') format('woff2'), url('../fonts/alarm_clock-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+//my variables
+
+//variables for digital clock
+$alarmClockFont: 'alarm_clockregular';
+$widgetFontColor: #3BFE04;
+$widgetBgColor: rgba(0,0,0,0.7);
+$XL-font-size: 1.5rem;
+$XXL-font-size: 3rem;
+$border-radius-Xlarge: 20px;
+
+// Your variable overrides can go here, e.g.:
 // $h1-font-size: 3rem;
 $font-size-base: 1rem;
 $h1-font-size: $font-size-base * 2.5;
