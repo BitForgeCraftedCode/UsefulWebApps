@@ -1,5 +1,5 @@
 ﻿@{
-  
+
     ViewData["Title"] = "Custom Home Page";
 }
 
@@ -41,9 +41,34 @@
             </div>
         </div>
         <div class="col-lg-6 col-md-6 col-sm-12">
-            <div class="dateTime">
-                <div id="time" class="dateTime"></div>
-                <div id="date" class="dateTime"></div>
+            <div class="date-time">
+                <div id="time" class="date-time"></div>
+                <div id="date" class="date-time"></div>
+            </div>
+            <div class="shortcuts">
+                @{
+                    var chunks = Model.ShortCutsToShow.Chunk(4);
+
+                    for (int i = 0; i < chunks.Count(); i++) 
+                    {
+                        <div class="shortcuts__@i">
+                            <ul>
+                                @{
+                                    var chunk = chunks.ElementAt(i);
+                                    foreach(var icon in chunk)
+                                    {
+
+                                        <li>
+                                            <a href="#" target="_blank" rel="noopener noreferrer">
+                                                <img src="~/icons/@icon" class="logo" />
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    }
+                }
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 ﻿/*Styles for digital clock*/
 
-.dateTime {
+.date-time {
     position: absolute;
     top: 60%;
     right: 0;
@@ -13,10 +13,10 @@
     position: fixed;
     top: 60%;
     right: 0;
-    font-family: $alarmClockFont;
-    background-color: $widgetBgColor;
+    font-family: $alarm-clock-font;
+    background-color: $widget-bg-color;
     font-weight: bold;
-    color: $widgetFontColor;
+    color: $widget-font-color;
     font-size: $XXL-font-size;
     width: 100%;
     height: 60px;
@@ -31,11 +31,11 @@
 #date {
     position: fixed;
     margin-top: 60px;
-    font-family: $alarmClockFont;
-    background-color: $widgetBgColor;
+    font-family: $alarm-clock-font;
+    background-color: $widget-bg-color;
     text-transform: uppercase;
     font-weight: bold;
-    color: $widgetFontColor;
+    color: $widget-font-color;
     font-size: $XL-font-size;
     width: 100%;
     height: 90px;
@@ -47,7 +47,7 @@
 }
 
 @media screen and (min-width: 750px) {
-    .dateTime {
+    .date-time {
         top: 75px;
         right: 50px;
         width: 45%;
@@ -61,5 +61,90 @@
 
     #date {
         width: 45%;
+    }
+}
+
+.shortcuts {
+    position: absolute;
+    display: flex;
+    z-index: 1;
+    top: 250px;
+    right: 50px;
+ 
+    & a {
+        font-family: $alarm-clock-font;
+        text-transform: uppercase;
+        font-weight: bold;
+        color: $widget-font-color;
+    }
+
+    & ul {
+        background-color: $widget-bg-color;
+        list-style: none;
+        padding: 5px 5px 5px 0px;
+    }
+
+    &__0 ul {
+        padding: 5px;
+    }
+
+    & ul li {
+        padding: 2px;
+    }
+}
+
+.logo:hover {
+    animation: logoHover 1s linear;
+}
+
+@keyframes logoHover {
+    0% {
+        transform: rotate3d(.2, 0, 0, 12deg);
+    }
+
+    10% {
+        transform: rotate3d(.4, 0, 0, 24deg);
+    }
+
+    20% {
+        transform: rotate3d(.6, 0, 0, 36deg);
+    }
+
+    30% {
+        transform: rotate3d(.8, 0, 0, 48deg);
+    }
+
+    40% {
+        transform: rotate3d(1, 0, 0, 60deg);
+    }
+
+    50% {
+        transform: rotate3d(.8, 0, 0, 48deg);
+    }
+
+    60% {
+        transform: rotate3d(.6, 0, 0, 36deg);
+    }
+
+    70% {
+        transform: rotate3d(.4, 0, 0, 24deg);
+    }
+
+    80% {
+        transform: rotate3d(.2, 0, 0, 12deg);
+    }
+
+    90% {
+        transform: rotate3d(.2, 0, 0, 12deg);
+    }
+
+    100% {
+        transform: rotate3d(0, 0, 0, 0deg);
+    }
+}
+
+@media screen and (max-width: 750px) {
+    .shortcuts {
+        display: none;
     }
 }

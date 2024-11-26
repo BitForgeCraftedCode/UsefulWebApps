@@ -19,7 +19,21 @@ namespace UsefulWebApps.Controllers
             {
                 filesToShow.Add(Path.GetFileName(path));
             }
-            MyHomePageVM myHomePageVM = new() { FilesToShow = filesToShow };
+
+            IEnumerable<string> shortCutPaths = Directory.EnumerateFiles(Path.Combine(this.Environment.WebRootPath, "icons/"));
+
+            List<string> shortCutsToShow = new List<string>();
+            foreach (string path in shortCutPaths)
+            {
+                shortCutsToShow.Add(Path.GetFileName(path));
+            }
+
+
+            MyHomePageVM myHomePageVM = new() 
+            { 
+                FilesToShow = filesToShow,
+                ShortCutsToShow = shortCutsToShow
+            };
             return View(myHomePageVM);
         }
     }
