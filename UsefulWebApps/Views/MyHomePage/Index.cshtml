@@ -40,22 +40,24 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <div class="date-time">
-                <div id="time" class="date-time"></div>
-                <div id="date" class="date-time"></div>
+        <div class="col-lg-6 col-md-6 col-sm-12 pt-3">
+            <div class="d-flex justify-content-end pb-3">
+                <div class="date-time">
+                    <div id="time" class="date-time"></div>
+                    <div id="date" class="date-time"></div>
+                </div>
             </div>
-            <div class="shortcuts">
+            <div class="shortcuts d-flex justify-content-end">
                 @{
                     var chunks = Model.ShortCutsToShow.Chunk(4);
 
-                    for (int i = 0; i < chunks.Count(); i++) 
+                    for (int i = 0; i < chunks.Count(); i++)
                     {
                         <div class="shortcuts__@i">
                             <ul>
                                 @{
                                     var chunk = chunks.ElementAt(i);
-                                    foreach(var icon in chunk)
+                                    foreach (var icon in chunk)
                                     {
 
                                         <li>
@@ -70,9 +72,27 @@
                     }
                 }
             </div>
+            <div class="max-width-200 ms-auto">
+                <div>
+                    <a asp-controller="MyHomePage" asp-action="Index" class="btn btn-outline-dark w-100">Add/Edit Quick Links</a>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-center">Quote of the day</h3>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque neque lorem, tincidunt et sodales eget,
+                    vestibulum nec erat. Pellentesque aliquet egestas ipsum, ac posuere purus fermentum ac. Maecenas justo velit,
+                    euismod eu placerat quis, semper in tellus. Aliquam sed purus elementum quam euismod dapibus pharetra at erat.
+                    Vestibulum interdum nisl tortor, vitae lobortis nisl posuere in. Fusce eu elementum dui. Nam ipsum tellus,
+                    hendrerit non ligula ac, commodo porttitor odio. Donec egestas lorem sed nisi euismod pulvinar.
+                    Curabitur eu dui venenatis, bibendum tortor id, vulputate velit. Donec blandit iaculis aliquam.
+                    Integer sem magna, suscipit at tempus vel, consequat sed ipsum. Ut a tortor quis elit dictum hendrerit id eget risus.
+                    Quisque posuere purus ut ullamcorper sagittis.
+                </p>
+            </div>
+           
         </div>
     </div>
-    
 </div>
 
 
