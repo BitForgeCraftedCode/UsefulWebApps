@@ -47,7 +47,7 @@
                     <div id="date" class="date-time"></div>
                 </div>
             </div>
-            <div class="shortcuts d-flex justify-content-end">
+            <div id="shortcuts-desktop" class="shortcuts d-flex justify-content-end">
                 @{
                     var chunks = Model.ShortCutsToShow.Chunk(4);
 
@@ -72,7 +72,24 @@
                     }
                 }
             </div>
-            <div class="max-width-200 ms-auto">
+            <div id="shortcuts-mobile" class="shortcuts d-flex justify-content-center text-center">
+                <div class="shortcuts__0">
+                    <ul>
+                        @{
+                            foreach (var icon in Model.ShortCutsToShow)
+                            {
+                                <li>
+                                    <a href="#" target="_blank" rel="noopener noreferrer">
+                                        Link text here
+                                    </a>
+                                </li>
+                            }
+                        }
+                            
+                    </ul>
+                </div>                
+            </div>
+            <div id="shortcuts-btn-container" class="max-width-200 mx-auto pb-3">
                 <div>
                     <a asp-controller="MyHomePage" asp-action="Index" class="btn btn-outline-dark w-100">Add/Edit Quick Links</a>
                 </div>

@@ -84,6 +84,38 @@
     & ul li {
         padding: 2px;
     }
+
+    &__0 {
+        width: 90vw;
+        max-width: 350px;
+    }
+}
+
+#shortcuts-desktop {
+    display: none !important;
+}
+
+@media screen and (min-width: 1024px) {
+    .shortcuts {
+        &__0 {
+            width: auto;
+        }
+    }
+    #shortcuts-btn-container {
+        margin: 0px 0px 0px auto !important;
+    }
+    #shortcuts-desktop {
+        display: flex !important;
+    }
+    #shortcuts-mobile {
+        display: none !important;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+   
+
+    
 }
 
 .logo:hover {
@@ -133,12 +165,6 @@
 
     100% {
         transform: rotate3d(0, 0, 0, 0deg);
-    }
-}
-
-@media screen and (max-width: 750px) {
-    .shortcuts {
-        display: none !important;
     }
 }
 /*End Quick Links/ShortCuts*/
