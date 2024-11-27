@@ -12,7 +12,7 @@ namespace UsefulWebApps.Controllers
         }
         public IActionResult Index()
         {
-            IEnumerable<string> paths = Directory.EnumerateFiles(Path.Combine(this.Environment.WebRootPath, "images/customhomepage/cityskylines/"));
+            IEnumerable<string> paths = Directory.EnumerateFiles(Path.Combine(this.Environment.WebRootPath, "images/customhomepage/nature/"));
            
             List<string> filesToShow = new List<string>();
             foreach (string path in paths)
