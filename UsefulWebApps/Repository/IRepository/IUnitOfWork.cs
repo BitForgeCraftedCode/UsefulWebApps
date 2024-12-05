@@ -7,6 +7,7 @@
         IRecipeRepository Recipe { get; }
         IManageAccountDataRepository ManageAccountData { get; }
         INotesRepository Notes { get; }
+        IQuickLinksRepository QuickLinks { get; }
         //other repos here
     }
 }

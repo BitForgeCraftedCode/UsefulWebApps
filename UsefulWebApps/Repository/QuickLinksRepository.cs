@@ -1,6 +1,7 @@
 ﻿using UsefulWebApps.Models.MyHomePage;
 using UsefulWebApps.Repository.IRepository;
 using MySqlConnector;
+using Dapper;
 
 namespace UsefulWebApps.Repository
 {
@@ -13,5 +14,15 @@ namespace UsefulWebApps.Repository
             _connection = db;
         }
         //any QuickLinks sepecific database methods here
+        public async Task<List<QuickLinks>> GetQuickLinksForUser(string userId)
+        {
+            string sql = @"SELECT * FROM quick_links WHERE QuickLinkId IN (
+                SELECT QuickLInkId FROM user_quick_links WHERE UserId = @userId
+            );";
+
+            List<QuickLinks> usersQuickLinks = (List<QuickLinks>)await _connection.QueryAsync<QuickLinks>(sql, new { userId });
+            await _connection.CloseAsync();
+            return usersQuickLinks;
+        }
     }
 }

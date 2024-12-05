@@ -1,17 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using UsefulWebApps.Models.MyHomePage;
 using UsefulWebApps.Models.ViewModels.MyHomePage;
+using UsefulWebApps.Repository.IRepository;
 
 namespace UsefulWebApps.Controllers
 {
+    [Authorize(Roles = "StandardUser, Admin")]
+    [AutoValidateAntiforgeryToken]
     public class MyHomePageController : Controller
     {
         private IWebHostEnvironment Environment;
-        public MyHomePageController(IWebHostEnvironment _environment)
+        private readonly IUnitOfWork _unitOfWork;
+        public MyHomePageController(IWebHostEnvironment _environment, IUnitOfWork unitOfWork)
         {
             Environment = _environment;
+            _unitOfWork = unitOfWork;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -25,6 +32,10 @@ namespace UsefulWebApps.Controllers
             }
 
             //select quick links where UserId = current loged in UserId
+            List<QuickLinks> links = await _unitOfWork.QuickLinks.GetQuickLinksForUser(userId);
+            foreach (QuickLinks link in links) {
+                Console.WriteLine(link.URL);
+            }
 
             IEnumerable<string> shortCutPaths = Directory.EnumerateFiles(Path.Combine(this.Environment.WebRootPath, "icons/"));
 
