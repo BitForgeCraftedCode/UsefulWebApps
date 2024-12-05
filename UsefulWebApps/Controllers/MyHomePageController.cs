@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using UsefulWebApps.Models.ViewModels.MyHomePage;
 
 namespace UsefulWebApps.Controllers
@@ -12,6 +13,9 @@ namespace UsefulWebApps.Controllers
         }
         public IActionResult Index()
         {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+
             IEnumerable<string> paths = Directory.EnumerateFiles(Path.Combine(this.Environment.WebRootPath, "images/customhomepage/nature/"));
            
             List<string> filesToShow = new List<string>();
@@ -19,6 +23,8 @@ namespace UsefulWebApps.Controllers
             {
                 filesToShow.Add(Path.GetFileName(path));
             }
+
+            //select quick links where UserId = current loged in UserId
 
             IEnumerable<string> shortCutPaths = Directory.EnumerateFiles(Path.Combine(this.Environment.WebRootPath, "icons/"));
 

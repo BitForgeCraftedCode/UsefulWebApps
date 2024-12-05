@@ -8,14 +8,20 @@ CREATE TABLE `quick_links`(
 );
 
 CREATE TABLE `user_quick_links`(
-  `UserQuickLinksId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `UserQuickLinkId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `UserId` varchar(255) NOT NULL,
   `UserName` varchar(256) NOT NULL,
   `QuickLinkId` bigint unsigned NOT NULL,
-  PRIMARY KEY (`UserQuickLinksId`),
+  PRIMARY KEY (`UserQuickLinkId`),
   KEY `QuickLinkId` (`QuickLinkId`),
   CONSTRAINT `user_quick_links_ibfk_1` FOREIGN KEY (`QuickLinkId`) REFERENCES `quick_links` (`QuickLinkId`) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+SELECT QuickLInkId FROM user_quick_links WHERE UserId = "251d80ae-93a3-401c-9be9-1ef83e30d541";
+
+SELECT * FROM quick_links WHERE QuickLinkId IN (SELECT QuickLInkId FROM user_quick_links WHERE UserId = "251d80ae-93a3-401c-9be9-1ef83e30d541");
+
+SELECT * FROM quick_links WHERE QuickLinkId IN (SELECT QuickLInkId FROM user_quick_links WHERE UserId = "538fed59-838e-4041-b957-7566a480f11e");
 
 DELETE FROM quick_links WHERE QuickLinkId = 1;
 
@@ -57,7 +63,7 @@ INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/github.p
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/slack.png","https://slack.com/","Slack","Messaging Platform");
 
 
-INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",30);
+INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",1);
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",2);
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",3);
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",4);
@@ -86,3 +92,12 @@ INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-9
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",27);
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",28);
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",29);
+
+
+INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-838e-4041-b957-7566a480f11e","MightyDuck",6);
+INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-838e-4041-b957-7566a480f11e","MightyDuck",7);
+INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-838e-4041-b957-7566a480f11e","MightyDuck",8);
+INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-838e-4041-b957-7566a480f11e","MightyDuck",9);
+INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-838e-4041-b957-7566a480f11e","MightyDuck",10);
+INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-838e-4041-b957-7566a480f11e","MightyDuck",11);
+INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-838e-4041-b957-7566a480f11e","MightyDuck",12);
