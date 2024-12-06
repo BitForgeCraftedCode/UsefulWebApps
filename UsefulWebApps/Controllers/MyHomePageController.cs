@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Security.Claims;
 using UsefulWebApps.Models.MyHomePage;
 using UsefulWebApps.Models.ViewModels.MyHomePage;
@@ -42,9 +43,33 @@ namespace UsefulWebApps.Controllers
             return View(myHomePageVM);
         }
 
-        public IActionResult SelectQuickLinks() 
-        { 
-            return View();
+        public async Task<IActionResult> SelectQuickLinks() 
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            (
+                List<QuickLinks> userQuickLinks, 
+                List<QuickLinks> allQuickLinks
+            ) result = await _unitOfWork.QuickLinks.GetQuickLinksForEditDisplay(userId);
+
+            List<QuickLinks> userQuickLinks = result.userQuickLinks;
+            List<QuickLinks> allQuickLinks = result.allQuickLinks;
+
+
+            foreach (QuickLinks allql in allQuickLinks) 
+            {
+                if (userQuickLinks.Any(userql => userql.QuickLinkId == allql.QuickLinkId))
+                {
+                    allql.IsSelected = true;
+                }
+            }
+            SelectQuickLinksVM selectQuickLinksVM = new() 
+            { 
+                AllQuickLinks = allQuickLinks
+            };
+
+            return View(selectQuickLinksVM);
         }
     }
 }

@@ -25,6 +25,8 @@ SELECT * FROM quick_links WHERE QuickLinkId IN (SELECT QuickLInkId FROM user_qui
 
 DELETE FROM quick_links WHERE QuickLinkId = 1;
 
+DELETE FROM user_quick_links WHERE UserQuickLinkId = 1;
+
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/twitter.png","https://x.com/","X","Social Media");
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/pinterest.png","https://www.pinterest.com/","Pinterest","Social Media");
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/facebook.png","https://www.facebook.com/","Facebook","Social Media");

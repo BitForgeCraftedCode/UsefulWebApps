@@ -2,6 +2,7 @@
 using UsefulWebApps.Repository.IRepository;
 using MySqlConnector;
 using Dapper;
+using static Dapper.SqlMapper;
 
 namespace UsefulWebApps.Repository
 {
@@ -23,6 +24,23 @@ namespace UsefulWebApps.Repository
             List<QuickLinks> usersQuickLinks = (List<QuickLinks>)await _connection.QueryAsync<QuickLinks>(sql, new { userId });
             await _connection.CloseAsync();
             return usersQuickLinks;
+        }
+
+        public async Task<(
+            List<QuickLinks> userQuickLinks, 
+            List<QuickLinks> allQuickLinks
+            )> GetQuickLinksForEditDisplay(string userId) 
+        {
+            string sqlMult = @"
+                SELECT * FROM quick_links WHERE QuickLinkId IN (SELECT QuickLInkId FROM user_quick_links WHERE UserId = @userId);
+                SELECT * FROM quick_links;
+            ";
+
+            GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult, new { userId });
+            List<QuickLinks> userQuickLinks = (List<QuickLinks>)await gridReader.ReadAsync<QuickLinks>();
+            List<QuickLinks> allQuickLinks = (List<QuickLinks>)await gridReader.ReadAsync<QuickLinks>();
+
+            return (userQuickLinks, allQuickLinks);
         }
     }
 }

@@ -20,7 +20,9 @@ namespace UsefulWebApps.Models.MyHomePage
         public string Name { get; set; } = string.Empty;
 
         [Column("Category")]
-        public string Category {  get; set; } = string.Empty;   
+        public string Category {  get; set; } = string.Empty;
+        
+        public bool IsSelected { get; set; }
 
     }
 }

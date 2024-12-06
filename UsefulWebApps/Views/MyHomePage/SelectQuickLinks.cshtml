@@ -3,11 +3,33 @@
     ViewData["Title"] = "Select Quick Links";
 }
 
-@model UsefulWebApps.Models.ViewModels.MyHomePage.MyHomePageVM
-<div class="container-fluid pb-3">
-    <div class="row">
-       User pick quick links here
-    </div>
+@model UsefulWebApps.Models.ViewModels.MyHomePage.SelectQuickLinksVM
+<div class="max-width-700 mx-auto container pb-3">
+    <form>
+        <div>
+            <h3 class="mt-3 text-center">Quick Links</h3>
+            <p class="fs-7">Check the links you want on your home page.</p>
+            <ul class="list-group mt-3 choice-list">
+                @for (int i = 0; i < Model.AllQuickLinks.Count; i++)
+                {
+                    <li class="list-group-item list-group-item-action active">
+                        <input class="form-check-input me-1" type="checkbox" asp-for="@Model.AllQuickLinks[i].IsSelected" />
+                        <label class="form-check-label stretched-link" asp-for="@Model.AllQuickLinks[i].IsSelected">@Model.AllQuickLinks[i].Name</label>
+                        <input type="hidden" asp-for="@Model.AllQuickLinks[i].QuickLinkId" />
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="max-width-200 mx-auto">
+            <div>
+                <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Edit Quick Links</button>
+            </div>
+            <div>
+                <a asp-controller="MyHomePage" asp-action="Index" class="btn btn-outline-dark w-100">Back To Home Page</a>
+            </div>
+        </div>
+    </form>
+    
 </div>
 
 
