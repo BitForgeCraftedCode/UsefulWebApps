@@ -41,5 +41,10 @@ namespace UsefulWebApps.Controllers
             };
             return View(myHomePageVM);
         }
+
+        public IActionResult SelectQuickLinks() 
+        { 
+            return View();
+        }
     }
 }
