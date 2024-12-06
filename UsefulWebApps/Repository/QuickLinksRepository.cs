@@ -18,7 +18,7 @@ namespace UsefulWebApps.Repository
         {
             string sql = @"SELECT * FROM quick_links WHERE QuickLinkId IN (
                 SELECT QuickLInkId FROM user_quick_links WHERE UserId = @userId
-            );";
+            ) ORDER BY Category;";
 
             List<QuickLinks> usersQuickLinks = (List<QuickLinks>)await _connection.QueryAsync<QuickLinks>(sql, new { userId });
             await _connection.CloseAsync();
