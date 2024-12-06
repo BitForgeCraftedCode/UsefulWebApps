@@ -31,25 +31,13 @@ namespace UsefulWebApps.Controllers
                 filesToShow.Add(Path.GetFileName(path));
             }
 
-            //select quick links where UserId = current loged in UserId
-            List<QuickLinks> links = await _unitOfWork.QuickLinks.GetQuickLinksForUser(userId);
-            foreach (QuickLinks link in links) {
-                Console.WriteLine(link.URL);
-            }
-
-            IEnumerable<string> shortCutPaths = Directory.EnumerateFiles(Path.Combine(this.Environment.WebRootPath, "icons/"));
-
-            List<string> shortCutsToShow = new List<string>();
-            foreach (string path in shortCutPaths)
-            {
-                shortCutsToShow.Add(Path.GetFileName(path));
-            }
-
-
+            //get the users quick links
+            List<QuickLinks> userQuickLinks = await _unitOfWork.QuickLinks.GetQuickLinksForUser(userId);
+            
             MyHomePageVM myHomePageVM = new() 
             { 
                 FilesToShow = filesToShow,
-                ShortCutsToShow = shortCutsToShow
+                QuickLinksToDisplay = userQuickLinks
             };
             return View(myHomePageVM);
         }

@@ -49,7 +49,7 @@
             </div>
             <div id="shortcuts-desktop" class="shortcuts d-flex justify-content-end">
                 @{
-                    var chunks = Model.ShortCutsToShow.Chunk(4);
+                    var chunks = Model.QuickLinksToDisplay.Chunk(4);
 
                     for (int i = 0; i < chunks.Count(); i++)
                     {
@@ -57,12 +57,12 @@
                             <ul>
                                 @{
                                     var chunk = chunks.ElementAt(i);
-                                    foreach (var icon in chunk)
+                                    foreach (var shortCut in chunk)
                                     {
 
                                         <li>
-                                            <a href="#" target="_blank" rel="noopener noreferrer">
-                                                <img src="~/icons/@icon" class="logo" />
+                                            <a href="@shortCut.URL" target="_blank" rel="noopener noreferrer">
+                                                <img src="~/@shortCut.ImagePath" class="logo" alt="@shortCut.Name" />
                                             </a>
                                         </li>
                                     }
@@ -76,11 +76,11 @@
                 <div class="shortcuts__0">
                     <ul>
                         @{
-                            foreach (var icon in Model.ShortCutsToShow)
+                            foreach (var shortCuts in Model.QuickLinksToDisplay)
                             {
                                 <li>
-                                    <a href="#" target="_blank" rel="noopener noreferrer">
-                                        Link text here
+                                    <a href="@shortCuts.URL" target="_blank" rel="noopener noreferrer">
+                                        @shortCuts.Name
                                     </a>
                                 </li>
                             }
@@ -89,9 +89,9 @@
                     </ul>
                 </div>                
             </div>
-            <div id="shortcuts-btn-container" class="max-width-200 mx-auto pb-3">
+            <div id="shortcuts-btn-container" class="max-width-250 mx-auto pb-3">
                 <div>
-                    <a asp-controller="MyHomePage" asp-action="Index" class="btn btn-outline-dark w-100">Add/Edit Quick Links</a>
+                    <a asp-controller="MyHomePage" asp-action="Index" class="btn btn-outline-dark w-100">Select/Change Quick Links</a>
                 </div>
             </div>
             <div>
