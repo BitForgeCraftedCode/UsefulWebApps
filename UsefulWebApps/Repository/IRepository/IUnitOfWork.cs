@@ -8,6 +8,7 @@
         IManageAccountDataRepository ManageAccountData { get; }
         INotesRepository Notes { get; }
         IQuickLinksRepository QuickLinks { get; }
+        ISlideShowRepository SlideShow { get; }
         //other repos here
     }
 }

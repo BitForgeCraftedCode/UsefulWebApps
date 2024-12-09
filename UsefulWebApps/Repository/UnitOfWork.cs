@@ -15,6 +15,7 @@ namespace UsefulWebApps.Repository
         public IManageAccountDataRepository ManageAccountData { get; private set; }
         public INotesRepository Notes { get; private set; }
         public IQuickLinksRepository QuickLinks { get; private set; }
+        public ISlideShowRepository SlideShow { get; private set; }
         //other repos here
 
         public UnitOfWork(MySqlConnection db)
@@ -26,6 +27,7 @@ namespace UsefulWebApps.Repository
             ManageAccountData = new ManageAccountDataRepository(_connection);
             Notes = new NotesRepository(_connection);
             QuickLinks = new QuickLinksRepository(_connection);
+            SlideShow = new SlideShowRepository(_connection);
             //other repos here
         }
     }
