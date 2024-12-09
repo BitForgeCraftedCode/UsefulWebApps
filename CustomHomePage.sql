@@ -67,7 +67,7 @@ INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/github.p
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/slack.png","https://slack.com/","Slack","Messaging Platform");
 
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/bank-america.png","https://www.bankofamerica.com/","Bank Of America","Banking");
-INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/chase-bank.png","https://www.chase.com/","Chase Bank");
+INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/chase-bank.png","https://www.chase.com/","Chase Bank", "Banking");
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/ally-bank.png","https://www.ally.com/","Ally Bank","Banking");
 
 

@@ -34,7 +34,7 @@ namespace UsefulWebApps.Repository
         {
             string sqlMult = @"
                 SELECT * FROM quick_links WHERE QuickLinkId IN (SELECT QuickLInkId FROM user_quick_links WHERE UserId = @userId);
-                SELECT * FROM quick_links;
+                SELECT * FROM quick_links ORDER BY Category;
             ";
 
             GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult, new { userId });
