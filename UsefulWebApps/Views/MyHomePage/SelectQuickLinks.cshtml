@@ -5,7 +5,7 @@
 
 @model UsefulWebApps.Models.ViewModels.MyHomePage.SelectQuickLinksVM
 <div class="max-width-700 mx-auto container pb-3">
-    <form>
+    <form asp-controller="MyHomePage" asp-action="SelectQuickLinks" method="post">
         <div>
             <h3 class="mt-3 text-center">Quick Links</h3>
             <p class="fs-7">Check the links you want on your home page.</p>
@@ -16,6 +16,7 @@
                         <input class="form-check-input me-1" type="checkbox" asp-for="@Model.AllQuickLinks[i].IsSelected" />
                         <label class="form-check-label stretched-link" asp-for="@Model.AllQuickLinks[i].IsSelected">@Model.AllQuickLinks[i].Name</label>
                         <input type="hidden" asp-for="@Model.AllQuickLinks[i].QuickLinkId" />
+                        <input type="hidden" asp-for="@Model.AllQuickLinks[i].Name" />
                     </li>
                 }
             </ul>

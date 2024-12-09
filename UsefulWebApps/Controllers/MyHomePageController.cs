@@ -71,5 +71,29 @@ namespace UsefulWebApps.Controllers
 
             return View(selectQuickLinksVM);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SelectQuickLinks(SelectQuickLinksVM selectQuickLinksVM)
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string userName = currentUser.FindFirstValue(ClaimTypes.Name);
+
+            if (ModelState.IsValid) 
+            {
+                bool success = await _unitOfWork.QuickLinks.UpdateQuickLinks(userId, userName, selectQuickLinksVM);
+                if (success)
+                {
+                    TempData["success"] = "Quick links updated successfully";
+                }
+                else
+                {
+                    TempData["error"] = "Update quick link error. Please try again.";
+                }
+                return View(selectQuickLinksVM);
+            }
+            TempData["error"] = "Update quick link error. Please try again.";
+            return View(selectQuickLinksVM);
+        }
     }
 }

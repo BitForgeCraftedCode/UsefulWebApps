@@ -3,6 +3,7 @@ using UsefulWebApps.Repository.IRepository;
 using MySqlConnector;
 using Dapper;
 using static Dapper.SqlMapper;
+using UsefulWebApps.Models.ViewModels.MyHomePage;
 
 namespace UsefulWebApps.Repository
 {
@@ -41,6 +42,33 @@ namespace UsefulWebApps.Repository
             List<QuickLinks> allQuickLinks = (List<QuickLinks>)await gridReader.ReadAsync<QuickLinks>();
 
             return (userQuickLinks, allQuickLinks);
+        }
+
+        public async Task<bool> UpdateQuickLinks(string userId, string userName, SelectQuickLinksVM selectQuickLinksVM)
+        {
+            int rowsEffected1 = 0;
+            int rowsEffected2 = 0;
+            //make a checked quick links parameter list for sql INSERT
+            List<Object> checkedQuickLinksParams = new List<Object>();
+            foreach (QuickLinks ql in selectQuickLinksVM.AllQuickLinks)
+            {
+                if(ql.IsSelected == true)
+                {
+                    checkedQuickLinksParams.Add(
+                        new {userId = userId, userName = userName, quickLinkId = ql.QuickLinkId }    
+                    );
+                }
+            }
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            //delete all users links then add the new selection
+            string sql1 = @"DELETE FROM user_quick_links WHERE UserId = @userId"; //may return 0 if user has no links selected
+            string sql2 = @"INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES (@userId, @userName, @quickLinkId)";
+            rowsEffected1 = await _connection.ExecuteAsync(sql1, new { userId = userId}, transaction: txn); 
+            rowsEffected2 = await _connection.ExecuteAsync(sql2, checkedQuickLinksParams, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (rowsEffected1 + rowsEffected2 > 0 ? true : false);
         }
     }
 }

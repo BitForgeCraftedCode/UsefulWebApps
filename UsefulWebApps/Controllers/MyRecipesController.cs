@@ -292,7 +292,7 @@ namespace UsefulWebApps.Controllers
             if (ModelState.IsValid)
             {
                 string oldFilePathDb = recipeVM.Recipe.ImagePath;
-                Console.WriteLine(oldFilePathDb);
+               
                 //remove old image if there and new image is not null
                 if (oldFilePathDb != null && recipeVM.ImageFile != null)
                 {
