@@ -57,12 +57,18 @@ INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/etsy.png
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/netflix.png","https://www.netflix.com/","Netflix","Streaming Services");
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/hulu.png","https://www.hulu.com/","Hulu","Streaming Services");
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/youtube.png","https://www.youtube.com/","Youtube","Streaming Services");
+INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/disney-plus.png","https://www.disneyplus.com/","Disney Plus","Streaming Services");
 
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/weather.png","https://weather.com/","The Weather Channel","Weather");
+INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/open-weather.png","https://openweathermap.org/","Open Weather","Weather");
 
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/github.png","https://github.com/","Github","Developer Platform");
 
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/slack.png","https://slack.com/","Slack","Messaging Platform");
+
+INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/bank-america.png","https://www.bankofamerica.com/","Bank Of America","Banking");
+INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/chase-bank.png","https://www.chase.com/","Chase Bank");
+INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/ally-bank.png","https://www.ally.com/","Ally Bank","Banking");
 
 
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",1);
