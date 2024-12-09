@@ -70,7 +70,7 @@ INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/bank-ame
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/chase-bank.png","https://www.chase.com/","Chase Bank", "Banking");
 INSERT INTO quick_links (ImagePath, URL, Name, Category) VALUES ("icons/ally-bank.png","https://www.ally.com/","Ally Bank","Banking");
 
-
+/*dont insert into prod the ids will differ*/
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",1);
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",2);
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",3);
@@ -109,3 +109,114 @@ INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-8
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-838e-4041-b957-7566a480f11e","MightyDuck",10);
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-838e-4041-b957-7566a480f11e","MightyDuck",11);
 INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES ("538fed59-838e-4041-b957-7566a480f11e","MightyDuck",12);
+
+CREATE TABLE `slideshow_images` (
+  `SlideShowImageId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ImagePath` varchar(500) NOT NULL,
+  `FolderName` varchar(300) NOT NULL,
+  PRIMARY KEY (`SlideShowImageId`)
+);
+
+CREATE TABLE `user_slideshow_images`(
+  `UserSlideShowImageId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `UserId` varchar(255) NOT NULL,
+  `UserName` varchar(256) NOT NULL,
+  `SlideShowImageId` bigint unsigned NOT NULL,
+  PRIMARY KEY (`UserSlideShowImageId`),
+  KEY `SlideShowImageId` (`SlideShowImageId`),
+  CONSTRAINT `user_slideshow_images_ibfk_1` FOREIGN KEY (`SlideShowImageId`) REFERENCES `slideshow_images` (`SlideShowImageId`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",66);
+
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/blake-richard-verdoorn-20063-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/derrick-cooper-411726-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/dino-reichmuth-98982-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/johannes-plenio-629984-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/josep-castells-523198-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/layne-lawson-140382-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/martin-jernberg-253929-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/niko-photos-333391-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/ricardo-gomez-angel-404673-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/riccardo-chiarini-365677-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/sallie-michalsky-50718-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/sebastian-unrau-42537-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/sora-sagano-103742-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/trevor-cole-389921-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/veliko-karachiviev-517684-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/westboundary-photography-chris-gill-60180-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/wil-stewart-18242-unsplash.jpg","nature");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("nature/wp4.jpg","nature");
+
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/andrea-reiman-304108-unsplash.jpg","animals");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/david-dibert-51640-unsplash.jpg","animals");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/fezbot2000-318667-unsplash.jpg","animals");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/harald-hofer-214964-unsplash.jpg","animals");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/harm-weustink-247501-unsplash.jpg","animals");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/jamie-street-562280-unsplash.jpg","animals");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/janko-ferlic-659681-unsplash.jpg","animals");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/lisa-h-205626-unsplash.jpg","animals");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/photo-nic-co-uk-nic-224377-unsplash.jpg","animals");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/ray-hennessy-139970-unsplash.jpg","animals");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("animals/scott-walsh-315682-unsplash.jpg","animals");
+
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/adrian-schwarz-530523-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/bicad-media-39529-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/dominik-qn-45994-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/illia-cherednychenko-181621-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/jamie-street-136939-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/jesse-orrico-82919-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/jonathan-roger-494633-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/margaret-barley-42-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/pedro-kummel-25432-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/pedro-lastra-152876-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/pedro-lastra-159224-unsplash.jpg","cityskylines");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("cityskylines/zach-farmer-31340-unsplash.jpg","cityskylines");
+
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/david-clode-453251-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/david-clode-635942-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/david-clode-744107-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/david-di-veroli-3558-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/erin-simmons-382348-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/frank-mckenna-150516-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/irina-iriser-654436-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/ishan-seefromthesky-798062-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/james-carol-lee-642040-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/jeremy-bishop-93208-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/laura-college-286844-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/michal-mrozek-1238422-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/milos-prelevic-532780-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/wexor-tmg-26886-unsplash.jpg","ocean");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("ocean/zhan-zhang-1095746-unsplash.jpg","ocean");
+
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/alexander-andrews-520231-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/brett-ritchie-550788-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/bryan-goff-360297-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/clemente-ruiz-abenza-134559-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/federico-beccari-67272-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/jeremy-thomas-98201-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/jeremy-thomas-99326-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/nasa-45072-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/neven-krcmarek-152344-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/nick-owuor-astro_nic-757202-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/robson-hatsukami-morgan-296510-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/ryan-hutton-37733-unsplash.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/wp1.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/wp2.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/wp3.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/wp5.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/wp6.jpg","space");
+
+/*dont insert into prod the ids will differ*/
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",66);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",67);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",68);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",69);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",70);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",71);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",72);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",73);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",74);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",75);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",76);
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",77);

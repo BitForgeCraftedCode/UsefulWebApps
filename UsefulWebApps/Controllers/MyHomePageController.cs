@@ -24,14 +24,14 @@ namespace UsefulWebApps.Controllers
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            IEnumerable<string> paths = Directory.EnumerateFiles(Path.Combine(this.Environment.WebRootPath, "images/customhomepage/nature/"));
+            IEnumerable<string> paths = Directory.EnumerateFiles(Path.Combine(this.Environment.WebRootPath, "images/customhomepage/space/"));
            
             List<string> filesToShow = new List<string>();
             foreach (string path in paths)
             {
                 filesToShow.Add(Path.GetFileName(path));
             }
-
+            
             //get the users quick links
             List<QuickLinks> userQuickLinks = await _unitOfWork.QuickLinks.GetQuickLinksForUser(userId);
             
