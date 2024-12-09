@@ -4,7 +4,8 @@ namespace UsefulWebApps.Models.ViewModels.MyHomePage
 {
     public class MyHomePageVM
     {
-        public List<string> FilesToShow { get; set; }
+        public List<SlideShowImages> SlideShowImagesToDisplay { get; set; }
+        public List<string> DefaultSlideShowImagesToDisplay { get; set; }
         public List<QuickLinks> QuickLinksToDisplay { get; set; }
     }
 }

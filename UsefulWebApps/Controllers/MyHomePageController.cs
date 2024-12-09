@@ -24,6 +24,9 @@ namespace UsefulWebApps.Controllers
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            //get users slideshow choice
+            List<SlideShowImages> userSlideShowImages = await _unitOfWork.SlideShow.GetSlideShowImagesForUser(userId);
+            //if user doesnt have a choice the space images will be displayed
             IEnumerable<string> paths = Directory.EnumerateFiles(Path.Combine(this.Environment.WebRootPath, "images/customhomepage/space/"));
            
             List<string> filesToShow = new List<string>();
@@ -37,7 +40,8 @@ namespace UsefulWebApps.Controllers
             
             MyHomePageVM myHomePageVM = new() 
             { 
-                FilesToShow = filesToShow,
+                SlideShowImagesToDisplay = userSlideShowImages,
+                DefaultSlideShowImagesToDisplay = filesToShow,
                 QuickLinksToDisplay = userQuickLinks
             };
             return View(myHomePageVM);

@@ -7,33 +7,66 @@
 <div class="container-fluid pb-3">
     <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-12 pt-3">
-            <div id="carouselFade" class="carousel carousel-dark slide carousel-fade" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    @for(int i = 0; i < Model.FilesToShow.Count; i++)
-                    {
-                        if(i==0)
+            @if (Model.SlideShowImagesToDisplay.Count > 0)
+            {
+                <div id="carouselFade" class="carousel carousel-dark slide carousel-fade" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < Model.SlideShowImagesToDisplay.Count; i++)
                         {
-                            <div class="carousel-item active" data-bs-interval="5000">
-                                <img src="~/images/customhomepage/space/@Model.FilesToShow.ElementAt(i)" class="d-block w-100">
-                            </div>
+                            if (i == 0)
+                            {
+                                <div class="carousel-item active" data-bs-interval="5000">
+                                    <img src="~/images/customhomepage/@Model.SlideShowImagesToDisplay.ElementAt(i).ImagePath" class="d-block w-100">
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="carousel-item" data-bs-interval="5000">
+                                    <img src="~/images/customhomepage/@Model.SlideShowImagesToDisplay.ElementAt(i).ImagePath" class="d-block w-100">
+                                </div>
+                            }
                         }
-                        else
-                        {
-                            <div class="carousel-item" data-bs-interval="5000">
-                                <img src="~/images/customhomepage/space/@Model.FilesToShow.ElementAt(i)" class="d-block w-100">
-                            </div>
-                        }
-                    }
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselFade" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselFade" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselFade" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselFade" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
+            }
+            else
+            {
+                <div id="carouselFade" class="carousel carousel-dark slide carousel-fade" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < Model.DefaultSlideShowImagesToDisplay.Count; i++)
+                        {
+                            if (i == 0)
+                            {
+                                <div class="carousel-item active" data-bs-interval="5000">
+                                    <img src="~/images/customhomepage/space/@Model.DefaultSlideShowImagesToDisplay.ElementAt(i)" class="d-block w-100">
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="carousel-item" data-bs-interval="5000">
+                                    <img src="~/images/customhomepage/space/@Model.DefaultSlideShowImagesToDisplay.ElementAt(i)" class="d-block w-100">
+                                </div>
+                            }
+                        }
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselFade" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselFade" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            }
             <div class="max-width-200 mx-auto pt-3">
                 <div>
                     <a asp-controller="MyHomePage" asp-action="Index" class="btn btn-outline-dark w-100">Change Slide Show</a>
