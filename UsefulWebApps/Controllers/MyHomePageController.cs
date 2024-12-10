@@ -99,5 +99,10 @@ namespace UsefulWebApps.Controllers
             TempData["error"] = "Update quick link error. Please try again.";
             return View(selectQuickLinksVM);
         }
+
+        public IActionResult SelectSlideShow()
+        {
+            return View();
+        }
     }
 }
