@@ -6,5 +6,6 @@ namespace UsefulWebApps.Repository.IRepository
     {
         //any SlideShow specific database methods here
         Task<List<SlideShowImages>> GetSlideShowImagesForUser(string userId);
+        Task<(SlideShowFolder userSlideShowFolder, List<SlideShowFolder> allSlideShowFolders)> GetSlideShowFoldersEditDisplay(string userId);
     }
 }

@@ -100,9 +100,27 @@ namespace UsefulWebApps.Controllers
             return View(selectQuickLinksVM);
         }
 
-        public IActionResult SelectSlideShow()
+        public async Task<IActionResult> SelectSlideShow()
         {
-            return View();
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            (SlideShowFolder userSlideShowFolder, List<SlideShowFolder> allSlideShowFolders) result = await _unitOfWork.SlideShow.GetSlideShowFoldersEditDisplay(userId);
+            SlideShowFolder userSlideShowFolder = result.userSlideShowFolder;
+            List<SlideShowFolder> allSlideShowFolders = result.allSlideShowFolders;
+            //will be null if user has never picked a slideshow folder
+            if (userSlideShowFolder != null)
+            {
+                foreach (SlideShowFolder slideShowFolder in allSlideShowFolders)
+                {
+                    if (slideShowFolder.FolderName == userSlideShowFolder.FolderName)
+                    {
+                        slideShowFolder.IsSelected = true;
+                    }
+                }
+            }
+            
+            SelectSlideShowVM selectSlideShowVM = new() { SlideShowFolders = allSlideShowFolders };
+            return View(selectSlideShowVM);
         }
     }
 }

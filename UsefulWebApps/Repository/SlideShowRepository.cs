@@ -2,6 +2,7 @@
 using MySqlConnector;
 using UsefulWebApps.Models.MyHomePage;
 using UsefulWebApps.Repository.IRepository;
+using static Dapper.SqlMapper;
 
 namespace UsefulWebApps.Repository
 {
@@ -23,6 +24,24 @@ namespace UsefulWebApps.Repository
             List<SlideShowImages> userSlideShowImages = (List<SlideShowImages>)await _connection.QueryAsync<SlideShowImages>(sql, new { userId });
             await _connection.CloseAsync();
             return userSlideShowImages;
+        }
+
+        public async Task<(
+           SlideShowFolder userSlideShowFolder,
+           List<SlideShowFolder> allSlideShowFolders
+           )> GetSlideShowFoldersEditDisplay(string userId)
+        {
+            string sqlMult = @"
+                SELECT DISTINCT FolderName FROM slideshow_images WHERE SlideShowImageId IN (SELECT SlideShowImageId FROM user_slideshow_images WHERE UserId = @userId);
+                SELECT DISTINCT FolderName FROM slideshow_images;
+            ";
+
+            GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult, new { userId });
+            //will be null if user has never picked a slideshow folder
+            SlideShowFolder? userSlideShowFolder = await gridReader.ReadSingleOrDefaultAsync<SlideShowFolder>();
+            List<SlideShowFolder> allSlideShowFolders = (List<SlideShowFolder>)await gridReader.ReadAsync<SlideShowFolder>();
+
+            return (userSlideShowFolder, allSlideShowFolders);
         }
     }
 }
