@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Security.Claims;
 using UsefulWebApps.Models.MyHomePage;
 using UsefulWebApps.Models.ViewModels.MyHomePage;
@@ -94,10 +93,10 @@ namespace UsefulWebApps.Controllers
                 {
                     TempData["error"] = "Update quick link error. Please try again.";
                 }
-                return View(selectQuickLinksVM);
+                return RedirectToAction("Index");
             }
             TempData["error"] = "Update quick link error. Please try again.";
-            return View(selectQuickLinksVM);
+            return RedirectToAction("Index");
         }
         
         public async Task<IActionResult> SelectSlideShow()
