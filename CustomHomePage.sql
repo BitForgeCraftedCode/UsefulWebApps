@@ -223,3 +223,5 @@ INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("
 
 SELECT DISTINCT FolderName FROM slideshow_images WHERE SlideShowImageId IN (SELECT SlideShowImageId from user_slideshow_images WHERE UserId = "251d80ae-93a3-401c-9be9-1ef83e30d541");
 SELECT DISTINCT FolderName FROM slideshow_images;
+
+INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty") SELECT SlideShowImageId FROM slideshow_images WHERE FolderName = "nature";

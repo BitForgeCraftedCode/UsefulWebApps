@@ -12,8 +12,10 @@
                 @for(int i = 0; i < Model.SlideShowFolders.Count; i++)
                 {
                     <li class="list-group-item list-group-item-action active">
-                        <input class="form-check-input me-1 tags-ck-box" type="checkbox" asp-for="@Model.SlideShowFolders[i].IsSelected" />
-                        <label class="form-check-label stretched-link" asp-for="@Model.SlideShowFolders[i].IsSelected">@Model.SlideShowFolders[i].FolderName</label>
+                        <input class="form-check-input me-1" type="radio" asp-for="SelectedSlideShowFolder.FolderName" value="@Model.SlideShowFolders[i].FolderName" checked="@(Model.SlideShowFolders[i].IsSelected == true ? "checked" : null)" />
+                        @Model.SlideShowFolders[i].FolderName
+                        <input type="hidden" asp-for="@Model.SlideShowFolders[i].FolderName" />
+                        <input type="hidden" asp-for="@Model.SlideShowFolders[i].IsSelected" />
                     </li>
                 }
             </ul>

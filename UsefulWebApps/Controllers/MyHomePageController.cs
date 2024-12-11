@@ -99,7 +99,7 @@ namespace UsefulWebApps.Controllers
             TempData["error"] = "Update quick link error. Please try again.";
             return View(selectQuickLinksVM);
         }
-
+        
         public async Task<IActionResult> SelectSlideShow()
         {
             ClaimsPrincipal currentUser = this.User;
@@ -121,6 +121,28 @@ namespace UsefulWebApps.Controllers
             
             SelectSlideShowVM selectSlideShowVM = new() { SlideShowFolders = allSlideShowFolders };
             return View(selectSlideShowVM);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SelectSlideShow(SelectSlideShowVM selectSlideShowVM)
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (ModelState.IsValid)
+            {
+                bool success = await _unitOfWork.SlideShow.UpdateSlideShow(userId, selectSlideShowVM);
+                if (success)
+                {
+                    TempData["success"] = "Slideshow updated successfully";
+                }
+                else
+                {
+                    TempData["error"] = "Update slideshow error. Please try again.";
+                }
+                return RedirectToAction("Index");
+            }
+            TempData["error"] = "Update slideshow error. Please try again.";
+            return RedirectToAction("Index");
         }
     }
 }
