@@ -19,6 +19,7 @@
                     </li>
                 }
             </ul>
+            <span asp-validation-for="SelectedSlideShowFolder.FolderName" class="text-danger"></span>
         </div>
         <div class="max-width-200 mx-auto">
             <div>
@@ -34,5 +35,7 @@
 
 
 @section Scripts {
-    
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
 }
