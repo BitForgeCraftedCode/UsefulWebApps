@@ -36,12 +36,16 @@ namespace UsefulWebApps.Controllers
             
             //get the users quick links
             List<QuickLinks> userQuickLinks = await _unitOfWork.QuickLinks.GetQuickLinksForUser(userId);
+
+            //get a random quote
+            Quotes randomQuote = await _unitOfWork.Quotes.GetRandomRow();
             
             MyHomePageVM myHomePageVM = new() 
             { 
                 SlideShowImagesToDisplay = userSlideShowImages,
                 DefaultSlideShowImagesToDisplay = filesToShow,
-                QuickLinksToDisplay = userQuickLinks
+                QuickLinksToDisplay = userQuickLinks,
+                RandomQuote = randomQuote
             };
             return View(myHomePageVM);
         }

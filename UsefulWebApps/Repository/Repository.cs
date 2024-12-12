@@ -44,6 +44,15 @@ namespace UsefulWebApps.Repository
             return singleDbRow;
         }
 
+        public async Task<T> GetRandomRow()
+        {
+            string tableName = GetTableName();
+            string sql = $"SELECT * FROM {tableName} ORDER BY RAND() LIMIT 1;";
+            T singleDbRow = await _connection.QuerySingleAsync<T>(sql);
+            await _connection.CloseAsync();
+            return singleDbRow;
+        }
+
         public async Task<bool> Add(T entity)
         {
             int rowsEffected = 0;
