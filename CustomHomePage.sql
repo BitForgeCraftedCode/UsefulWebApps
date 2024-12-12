@@ -225,3 +225,11 @@ SELECT DISTINCT FolderName FROM slideshow_images WHERE SlideShowImageId IN (SELE
 SELECT DISTINCT FolderName FROM slideshow_images;
 
 INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty") SELECT SlideShowImageId FROM slideshow_images WHERE FolderName = "nature";
+
+
+CREATE TABLE `quotes` (
+  `QuoteId` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `Quote` varchar(500) NOT NULL,
+  `Author` varchar(100) NULL,
+  PRIMARY KEY (`QuoteId`)
+);
