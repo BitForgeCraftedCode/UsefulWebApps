@@ -1,13 +1,13 @@
 ﻿@{
-    ViewData["Title"] = "Create Quote";
+    ViewData["Title"] = "Edit Quote";
 }
 
 @model UsefulWebApps.Models.MyHomePage.Quotes
 
 <div class="max-width-550 mx-auto container pb-3">
-    <h1 class="display-3 mt-3 text-center">Create Quote</h1>
-    <form method="post" id="createQuoteForm">
-       
+    <h1 class="display-3 mt-3 text-center">Edit Quote</h1>
+    <form method="post" id="editQuoteForm">
+        <input type="hidden" asp-for="QuoteId"/>
         <h3 class="mt-3 text-center">Author</h3>
         <div class="form-floating mb-3">
             <input asp-for="Author" type="text" class="form-control ignore" placeholder="Quote Author" minlength="0" maxlength="100" />
@@ -27,7 +27,7 @@
 
         <div class="max-width-200 mx-auto">
             <div>
-                <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Create Quote</button>
+                <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Edit Quote</button>
             </div>
             <div>
                 <a asp-controller="MyHomePage" asp-action="Index" class="btn btn-outline-dark w-100">Back To Home Page</a>
@@ -41,7 +41,7 @@
         <partial name="_ValidationScriptsPartial" />
     }
     <script type="text/javascript">
-        $("#createQuoteForm").validate({
+        $("#editQuoteForm").validate({
             ignore: ".ignore"
         });
     </script>

@@ -152,8 +152,7 @@ namespace UsefulWebApps.Controllers
 
         public IActionResult CreateQuote()
         {
-            Quotes quote = new Quotes();
-            return View(quote);
+            return View();
         }
 
         [HttpPost]
@@ -175,6 +174,16 @@ namespace UsefulWebApps.Controllers
             }
             TempData["error"] = "Add quote error. Please try again.";
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> EditQuote(int? id) 
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            Quotes quote = await _unitOfWork.Quotes.GetById(id);
+            return View(quote);
         }
     }
 }

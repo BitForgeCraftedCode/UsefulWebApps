@@ -133,9 +133,14 @@
                     <notes html-notes-content="@Model.RandomQuote.Quote" class="card-text" style="white-space: pre-line"></notes><br />
                     @Model.RandomQuote.Author
                 </div>
-                <div class="max-width-200 mx-auto pt-3">
-                    <div>
-                        <a asp-controller="MyHomePage" asp-action="CreateQuote" class="btn btn-outline-dark w-100">Add a Quote</a>
+                <div class="max-width-350 mx-auto pt-3">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-12 pb-3">
+                            <a asp-controller="MyHomePage" asp-action="CreateQuote" class="btn btn-outline-dark w-100">Add a Quote</a>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <a asp-controller="MyHomePage" asp-action="EditQuote" asp-route-id="@Model.RandomQuote.QuoteId" class="btn btn-outline-dark w-100">Edit Quote</a>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -38,7 +38,8 @@ namespace UsefulWebApps.Repository
             string tableName = GetTableName();
             string keyColumn = GetKeyColumnName();
             string keyProperty = GetKeyPropertyName();
-            string sql = $"SELECT * FROM {tableName} WHERE {keyColumn} = @{keyProperty}";
+            //string sql = $"SELECT * FROM {tableName} WHERE {keyColumn} = @{keyProperty}";
+            string sql = $"SELECT * FROM {tableName} WHERE {keyColumn} = @id";
             T singleDbRow = await _connection.QuerySingleAsync<T>(sql, new { id });
             await _connection.CloseAsync();
             return singleDbRow;
