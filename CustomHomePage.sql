@@ -233,3 +233,10 @@ CREATE TABLE `quotes` (
   `Author` varchar(100) NULL,
   PRIMARY KEY (`QuoteId`)
 );
+
+INSERT INTO quotes (Quote, Author) VALUES ("Out of every one hundred men, ten shouldn't even be there, eighty are just targets, nine are the real fighters, and we are lucky to have them, for they make the battle. Ah, but the one, one is a warrior...", "Heraclitus");
+INSERT INTO quotes (Quote) VALUES ("The human brain isn't designed to keep us happy. It's designed to keep us alive!!");
+INSERT INTO quotes (Quote) VALUES ("THOSE WHO ARE IGNORANT AND ASLEEP ARE THOSE WHO HAVE CHOSEN TO STAY THAT WAY BECAUSE THEY ALLOW THE COMFORT OF DECEPTION TO MAKE THEM THINK IT'S SAFER!");
+INSERT INTO quotes (Quote) VALUES ("Seek progress, not perfection. As someone who has extremely high standards for myself, I have to repeat this daily.");
+INSERT INTO quotes (Quote) VALUES ("You have a limited amount of energy and time in any given day - and you get to choose where you place that energy. Think of it like chips at a roulette table. When I feel angry thoughts about a news article, hear an opinion I disagree with, come across an asshole driving on the freeway... all of these things take energy, my chips, which are an extremely limited resource. Place your chips wisely. I stop myself many times a day from using mine now, and I'm much happier.");
+INSERT INTO quotes (Quote) VALUES ("A jack of all trades is a master of none, but oftentimes better than a master of one.");
