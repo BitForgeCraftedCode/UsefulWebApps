@@ -185,5 +185,24 @@ namespace UsefulWebApps.Controllers
             Quotes quote = await _unitOfWork.Quotes.GetById(id);
             return View(quote);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> EditQuote(Quotes obj)
+        {
+            obj.Quote = sanitizer.Sanitize(obj.Quote);
+            if (ModelState.IsValid) 
+            { 
+                bool success = await _unitOfWork.Quotes.Update(obj);
+                if (success)
+                {
+                    TempData["success"] = "Quote edited successfully.";
+                    return RedirectToAction("Index");
+                }
+                TempData["error"] = "Edit quote error. Try again.";
+                return RedirectToAction("index");
+            }
+            TempData["error"] = "Edit quote error. Try again.";
+            return RedirectToAction("index");
+        }
     }
 }
