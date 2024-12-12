@@ -147,5 +147,10 @@ namespace UsefulWebApps.Controllers
             TempData["error"] = "Update slideshow error. Please try again.";
             return RedirectToAction("Index");
         }
+
+        public IActionResult CreateQuote()
+        {
+            return View();
+        }
     }
 }

@@ -11,7 +11,7 @@ namespace UsefulWebApps.Models.MyHomePage
         public int QuoteId { get; set; }
 
         [Column("Quote")]
-        [StringLength(500, MinimumLength = 3, ErrorMessage = "Please enter at least 3 characters.")]
+        [StringLength(500, MinimumLength = 10, ErrorMessage = "Please enter at least 3 characters.")]
         [Required(ErrorMessage = "Quote is required.")]
         public string Quote {  get; set; } = string.Empty;
 

@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Create Quote";
+}
+
+@model UsefulWebApps.Models.MyHomePage.Quotes
+
+<div class="max-width-550 mx-auto container pb-3">
+    <h1 class="display-3 mt-3 text-center">Create Quote</h1>
+    <form method="post">
+       
+        <h3 class="mt-3 text-center">Author</h3>
+        <div class="form-floating mb-3">
+            <input asp-for="Author" type="text" class="form-control" placeholder="Quote Author" minlength="0" maxlength="100" />
+            <label asp-for="Author">Quote Author</label>
+        </div>
+        <p>
+            The below note input allow basic HTML.
+            Click <a asp-action="Directions" asp-controller="Home" target="_blank">here</a> for more detail.
+        </p>
+
+        <h3 class="mt-3 text-center">Quote</h3>
+        <div class="form-floating">
+            <textarea asp-for="Quote" class="form-control textarea-input" minlength="10" maxlength="500" required placeholder="Quote"></textarea>
+            <label asp-for="Quote">Quote</label>
+            <span asp-validation-for="Quote" class="text-danger"></span>
+        </div>
+
+        <div class="max-width-200 mx-auto">
+            <div>
+                <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Create Quote</button>
+            </div>
+            <div>
+                <a asp-controller="MyHomePage" asp-action="Index" class="btn btn-outline-dark w-100">Back To Home Page</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
