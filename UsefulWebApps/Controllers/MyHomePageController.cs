@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Ganss.Xss;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using UsefulWebApps.Models.MyHomePage;
@@ -11,6 +12,7 @@ namespace UsefulWebApps.Controllers
     [AutoValidateAntiforgeryToken]
     public class MyHomePageController : Controller
     {
+        private HtmlSanitizer sanitizer = new HtmlSanitizer();
         private IWebHostEnvironment Environment;
         private readonly IUnitOfWork _unitOfWork;
         public MyHomePageController(IWebHostEnvironment _environment, IUnitOfWork unitOfWork)
@@ -150,7 +152,29 @@ namespace UsefulWebApps.Controllers
 
         public IActionResult CreateQuote()
         {
-            return View();
+            Quotes quote = new Quotes();
+            return View(quote);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateQuote(Quotes obj)
+        {
+            obj.Quote = sanitizer.Sanitize(obj.Quote);
+            if (ModelState.IsValid) 
+            {
+                bool success = await _unitOfWork.Quotes.Add(obj);
+                if (success)
+                {
+                    TempData["success"] = "Quote added successfully";
+                }
+                else
+                {
+                    TempData["error"] = "Add quote error. Please try again.";
+                }
+                return RedirectToAction("Index");
+            }
+            TempData["error"] = "Add quote error. Please try again.";
+            return RedirectToAction("Index");
         }
     }
 }
