@@ -9,6 +9,7 @@
         INotesRepository Notes { get; }
         IQuickLinksRepository QuickLinks { get; }
         ISlideShowRepository SlideShow { get; }
+        IQuotesRepository Quotes { get; }
         //other repos here
     }
 }
