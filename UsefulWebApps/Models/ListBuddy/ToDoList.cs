@@ -22,5 +22,10 @@ namespace UsefulWebApps.Models.ListBuddy
         [Column("UserId")]
         [Required]
         public string UserId { get; set; } = string.Empty;
+
+        [Column("ListTitle")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Please Enter At Least 3 Characters.")]
+        [Required(ErrorMessage = "List Title Is Required.")]
+        public string ListTitle { get; set; } = string.Empty;
     }
 }

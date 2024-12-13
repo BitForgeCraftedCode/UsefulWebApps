@@ -41,3 +41,7 @@ INSERT INTO to_do_list (ToDoItem, Complete, UserId, ListTitle) VALUES ("gift for
 INSERT INTO to_do_list (ToDoItem, Complete, UserId, ListTitle) VALUES ("change generator oil", False, "251d80ae-93a3-401c-9be9-1ef83e30d541", "House Work");
 INSERT INTO to_do_list (ToDoItem, Complete, UserId, ListTitle) VALUES ("paint bathroom", False, "251d80ae-93a3-401c-9be9-1ef83e30d541", "House Work");
 INSERT INTO to_do_list (ToDoItem, Complete, UserId, ListTitle) VALUES ("build shoe rack", False, "251d80ae-93a3-401c-9be9-1ef83e30d541", "House Work");
+
+INSERT INTO to_do_list (ToDoItem, Complete, UserId, ListTitle) VALUES ("Laundry", False, "538fed59-838e-4041-b957-7566a480f11e", "Chores");
+INSERT INTO to_do_list (ToDoItem, Complete, UserId, ListTitle) VALUES ("Cook Dinner", False, "538fed59-838e-4041-b957-7566a480f11e", "Chores");
+INSERT INTO to_do_list (ToDoItem, Complete, UserId, ListTitle) VALUES ("Take Audrey to Dr", False, "538fed59-838e-4041-b957-7566a480f11e", "Chores");
