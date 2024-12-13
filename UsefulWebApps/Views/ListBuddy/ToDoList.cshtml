@@ -22,6 +22,7 @@
     <form method="post" class="max-width-550" id="add-to-do-item">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->
+            <input asp-for="ToDoList.ListTitle" hidden />
             <input asp-for="ToDoList.Complete" hidden />
             <input asp-for="ToDoList.UserId" hidden />
             <input asp-for="ToDoList.ToDoItem" type="text" class="form-control" placeholder="New Item" minlength="3" maxlength="100" />

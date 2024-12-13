@@ -44,16 +44,17 @@ namespace UsefulWebApps.Repository
             int rowsEffected = 0;
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
-            string sql = "INSERT INTO to_do_list (ToDoItem, Complete, UserId) VALUES (@toDoItem, @complete, @userId)";
+            string sql = "INSERT INTO to_do_list (ToDoItem, Complete, UserId, ListTitle) VALUES (@toDoItem, @complete, @userId, @listTitle)";
             rowsEffected = await _connection.ExecuteAsync(sql, new 
             { 
                 toDoItem = toDoList.ToDoItem,
                 complete = toDoList.Complete,
-                userId = toDoList.UserId
+                userId = toDoList.UserId,
+                listTitle = toDoList.ListTitle,
             }, transaction: txn);
             //get all list items for userId
-            string sql2 = "SELECT * FROM to_do_list WHERE UserId = @userId";
-            List<ToDoList> allDbRows = (List<ToDoList>)await _connection.QueryAsync<ToDoList>(sql2, new { userId = toDoList.UserId }, transaction: txn);
+            string sql2 = "SELECT * FROM to_do_list WHERE UserId = @userId AND ListTitle = @listTitle";
+            List<ToDoList> allDbRows = (List<ToDoList>)await _connection.QueryAsync<ToDoList>(sql2, new { userId = toDoList.UserId, listTitle = toDoList.ListTitle }, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return allDbRows;
