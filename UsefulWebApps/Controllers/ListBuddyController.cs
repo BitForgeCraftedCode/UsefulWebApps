@@ -173,6 +173,7 @@ namespace UsefulWebApps.Controllers
                 ToDoList = new ToDoList
                 {
                     UserId = userId,
+                    ListTitle = listTitle
                 }
             };
             return PartialView("_ToDoListPartial", toDoListVM);
@@ -190,6 +191,7 @@ namespace UsefulWebApps.Controllers
                     ToDoList = new ToDoList
                     {
                         UserId = toDoList.UserId,
+                        ListTitle= toDoList.ListTitle
                     }
                 };
                 return PartialView("_ToDoListPartial", toDoListVM);
@@ -248,10 +250,10 @@ namespace UsefulWebApps.Controllers
                 {
                     TempData["error"] = "Update to do item error. Try again.";
                 }
-                return RedirectToAction("ToDoList");
+                return RedirectToAction("ToDoList", new { list = obj.ListTitle });
             }
             TempData["error"] = "Update to do item error. Try again.";
-            return RedirectToAction("ToDoList");
+            return RedirectToAction("MyToDoLists");
         }
 
         #endregion

@@ -10,6 +10,7 @@
         <div class="input-group mb-3 mt-3">
             <input asp-for="Id" hidden />
             <input asp-for="Complete" hidden />
+            <input asp-for="ListTitle" hidden />
             <input asp-for="ToDoItem" type="text" class="form-control" placeholder="New Item" />
             <input asp-for="UserId" hidden />
             <button class="btn btn-outline-dark" type="submit">Edit Item</button>
@@ -18,7 +19,7 @@
             <span asp-validation-for="ToDoItem" class="text-danger"></span>
         </div>
         <div>
-            <a asp-controller="ListBuddy" asp-action="ToDoList" class="btn btn-outline-dark">Back to List</a>
+            <a asp-controller="ListBuddy" asp-action="ToDoList" asp-route-list="@Model.ListTitle" class="btn btn-outline-dark">Back to List</a>
         </div>
     </form>
 </div>
