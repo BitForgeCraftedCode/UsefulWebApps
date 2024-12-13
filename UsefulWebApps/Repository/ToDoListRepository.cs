@@ -14,7 +14,7 @@ namespace UsefulWebApps.Repository
         }
 
         //any ToDoList model specific database methods here
-        public async Task<List<ToDoList>> ToDoListToggleComplete(int? id, string userId)
+        public async Task<List<ToDoList>> ToDoListToggleComplete(int? id, string userId, string listTitle)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
@@ -32,8 +32,8 @@ namespace UsefulWebApps.Repository
             }
             await _connection.ExecuteAsync(sql2, new { id }, transaction: txn);
             //get all list items for userId
-            string sql3 = "SELECT * FROM to_do_list WHERE UserId = @userId";
-            List<ToDoList> allDbRows = (List<ToDoList>)await _connection.QueryAsync<ToDoList>(sql3, new { userId }, transaction: txn);
+            string sql3 = "SELECT * FROM to_do_list WHERE UserId = @userId AND ListTitle = @listTitle";
+            List<ToDoList> allDbRows = (List<ToDoList>)await _connection.QueryAsync<ToDoList>(sql3, new { userId, listTitle }, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return allDbRows;

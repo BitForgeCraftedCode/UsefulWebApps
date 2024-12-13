@@ -158,15 +158,15 @@ namespace UsefulWebApps.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> ToDoListToggleComplete(int? id)
+        public async Task<IActionResult> ToDoListToggleComplete(int? id, string listTitle)
         {
-            if (id == null || id == 0)
+            if (id == null || id == 0 || listTitle == "" || listTitle == null)
             {
                 return NotFound();
             }
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<ToDoList> listItems = await _unitOfWork.ToDoList.ToDoListToggleComplete(id, userId);
+            List<ToDoList> listItems = await _unitOfWork.ToDoList.ToDoListToggleComplete(id, userId, listTitle);
             ToDoListVM toDoListVM = new()
             {
                 ToDoListItems = listItems,

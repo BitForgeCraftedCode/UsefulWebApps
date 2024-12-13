@@ -6,7 +6,7 @@
             <span class="fw-bold to-do-list-item @(obj.Complete == true ? "line-through" : "")">@obj.ToDoItem</span>
             <div>
                 <div class="to-do-list-mark-complete">
-                    <button type="button" class="btn btn-dark btn-sm" onclick="toggleComplete(@obj.Id)">Complete</button>
+                    <button type="button" class="btn btn-dark btn-sm" onclick="toggleComplete(@obj.Id, '@obj.ListTitle')">Complete</button>
                 </div>
 
                 <div class="to-do-list-edit">

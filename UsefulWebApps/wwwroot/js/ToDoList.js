@@ -93,9 +93,10 @@ function deleteToDo(deleteId) {
         }
     });
 }
-function toggleComplete(toggleId) {
+function toggleComplete(toggleId, title) {
     var formData = {
-        id: toggleId
+        id: toggleId,
+        listTitle: title
     };
     $.ajax({
         url: "/ListBuddy/ToDoListToggleComplete",
