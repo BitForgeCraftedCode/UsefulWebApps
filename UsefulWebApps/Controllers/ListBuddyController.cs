@@ -128,11 +128,16 @@ namespace UsefulWebApps.Controllers
 
         #region To Do List
 
-        public IActionResult MyToDoLists() 
+        public async Task<IActionResult> MyToDoLists() 
         {
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            return View(); 
+            List<string> myToDoLists = await _unitOfWork.ToDoList.GetMyToDoLists(userId);
+            MyToDoListsVM myToDoListsVM = new()
+            {
+                MyToDoLists = myToDoLists,
+            };
+            return View(myToDoListsVM); 
         }
         public async Task<IActionResult> ToDoList()
         {

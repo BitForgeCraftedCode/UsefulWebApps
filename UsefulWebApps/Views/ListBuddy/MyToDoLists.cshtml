@@ -2,10 +2,15 @@
     ViewData["Title"] = "My To Do Lists";
 }
 
+@model UsefulWebApps.Models.ViewModels.ListBuddy.MyToDoListsVM
+
 <div class="text-center container pb-3">
     <h1 class="display-3 mt-3">My To Do Lists</h1>
     <div class="list-group max-width-200 mx-auto">
-
+        @foreach(string list in Model.MyToDoLists)
+        {
+            <a asp-controller="ListBuddy" asp-action="ToDoList" asp-route-list="@list" class="list-group-item list-group-item-action">@list</a>
+        }
     </div>
     <div class="max-width-250 mx-auto mt-3">
         <a asp-controller="ListBuddy" asp-action="ToDoList" class="btn btn-outline-dark w-100">Add New To Do List</a>

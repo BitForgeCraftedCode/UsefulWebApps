@@ -58,5 +58,14 @@ namespace UsefulWebApps.Repository
             await _connection.CloseAsync();
             return allDbRows;
         }
+
+        public async Task<List<string>> GetMyToDoLists(string userId)
+        {
+            string sql = @"SELECT DISTINCT ListTitle FROM to_do_list WHERE UserId = @userId";
+            List<string> myToDoLists = (List<string>)await _connection.QueryAsync<string>(sql, new { userId });
+            await _connection.CloseAsync();
+            return myToDoLists;
+
+        }
     }
 }
