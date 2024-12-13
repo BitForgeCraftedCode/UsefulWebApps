@@ -8,5 +8,6 @@ namespace UsefulWebApps.Repository.IRepository
         Task<List<ToDoList>> ToDoListToggleComplete(int? id, string userId);
         Task<List<ToDoList>> ToDoListAdd(ToDoList toDoList);
         Task<List<string>> GetMyToDoLists(string userId);
+        Task<List<ToDoList>> GetAllItemsInList(string userId, string list);
     }
 }

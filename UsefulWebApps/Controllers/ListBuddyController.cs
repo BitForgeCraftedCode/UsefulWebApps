@@ -139,11 +139,12 @@ namespace UsefulWebApps.Controllers
             };
             return View(myToDoListsVM); 
         }
-        public async Task<IActionResult> ToDoList()
+
+        public async Task<IActionResult> ToDoList(string list)
         {
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<ToDoList> listItems = (List<ToDoList>)await _unitOfWork.ToDoList.GetAllWhere("UserId", userId);
+            List<ToDoList> listItems = await _unitOfWork.ToDoList.GetAllItemsInList(userId, list);
             ToDoListVM toDoListVM = new()
             {
                 ToDoListItems = listItems,
@@ -154,7 +155,7 @@ namespace UsefulWebApps.Controllers
             };
             return View(toDoListVM);
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> ToDoListToggleComplete(int? id)
         {
