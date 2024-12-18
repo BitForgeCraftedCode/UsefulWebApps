@@ -75,5 +75,14 @@ namespace UsefulWebApps.Repository
             await _connection.CloseAsync();
             return toDoList;
         }
+
+        public async Task<bool> DeleteAllItemsInList(string userId, string list)
+        {
+            int rowsEffected = 0;
+            string sql = @"DELETE FROM to_do_list WHERE UserID = @userId AND ListTitle = @list";
+            rowsEffected = await _connection.ExecuteAsync(sql, new { userId, list });
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
     }
 }

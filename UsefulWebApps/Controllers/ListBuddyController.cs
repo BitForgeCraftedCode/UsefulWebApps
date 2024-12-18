@@ -218,12 +218,13 @@ namespace UsefulWebApps.Controllers
 
         [HttpPost]
         [Route("/ListBuddy/ToDoListDeleteAll", Name = "deleteAllToDoList")]
-        public async Task<IActionResult> ToDoListDeleteAll()
+        public async Task<IActionResult> ToDoListDeleteAll(ToDoList toDoList)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _unitOfWork.ToDoList.DeleteAllWhere("UserId", userId);
-            return RedirectToAction("ToDoList");
+            toDoList.ToDoItem = "dummy item";
+            ModelState.Clear();
+            TryValidateModel(toDoList);
+            await _unitOfWork.ToDoList.DeleteAllItemsInList(toDoList.UserId, toDoList.ListTitle);
+            return RedirectToAction("MyToDoLists");
         }
 
         public async Task<IActionResult> ToDoListEdit(int? id)

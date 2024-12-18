@@ -31,6 +31,10 @@
         <div class="mb-3" id="new-to-do-error"></div>
     </form>
     <form method="post" asp-route="deleteAllToDoList" class="max-width-175 mx-auto" id="delete-all-to-do">
+        <input asp-for="ToDoList.ListTitle" hidden />
+        <input asp-for="ToDoList.Complete" hidden />
+        <input asp-for="ToDoList.UserId" hidden />
+        <input asp-for="ToDoList.ToDoItem" hidden />
         <div>
             <button type="submit" class="btn btn-danger mb-3 w-100">Delete All</button>
         </div>

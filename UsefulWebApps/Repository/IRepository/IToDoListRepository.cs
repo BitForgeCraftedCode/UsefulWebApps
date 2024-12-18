@@ -9,5 +9,6 @@ namespace UsefulWebApps.Repository.IRepository
         Task<List<ToDoList>> ToDoListAdd(ToDoList toDoList);
         Task<List<string>> GetMyToDoLists(string userId);
         Task<List<ToDoList>> GetAllItemsInList(string userId, string list);
+        Task<bool> DeleteAllItemsInList(string userId, string list);
     }
 }
