@@ -258,7 +258,20 @@ namespace UsefulWebApps.Controllers
             toDoList.ToDoItem = "dummy item";
             ModelState.Clear();
             TryValidateModel(toDoList);
-            await _unitOfWork.ToDoList.DeleteAllItemsInList(toDoList.UserId, toDoList.ListTitle);
+            if (ModelState.IsValid) 
+            {
+                bool success = await _unitOfWork.ToDoList.DeleteAllItemsInList(toDoList.UserId, toDoList.ListTitle);
+                if (success)
+                {
+                    TempData["success"] = "To do list deleted successfully.";
+                }
+                else
+                {
+                    TempData["error"] = "Delete to do list error. Try again.";
+                }
+                return RedirectToAction("MyToDoLists");
+            }
+            TempData["error"] = "Delete to do list error. Try again.";
             return RedirectToAction("MyToDoLists");
         }
 
