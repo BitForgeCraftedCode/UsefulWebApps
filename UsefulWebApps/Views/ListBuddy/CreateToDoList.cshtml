@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Create To Do List";
+}
+
+@model UsefulWebApps.Models.ListBuddy.ToDoList
+
+<div class="text-center max-width-550 mx-auto container pb-3">
+    <h1 class="display-3 mt-3">New To Do List</h1>
+    <form method="post" class="max-width-550">
+        <div class="form-floating mb-3">
+            <!--Complete default value is False-->
+            <input asp-for="Complete" hidden />
+            <input asp-for="UserId" hidden />
+            <input asp-for="ListTitle" type="text" class="form-control" placeholder="List Title" minlength="3" maxlength="100" />
+            <label asp-for="ListTitle">List Title</label>
+            <span asp-validation-for="ListTitle" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="ToDoItem" type="text" class="form-control" placeholder="New Item" minlength="3" maxlength="100" />
+            <label asp-for="ToDoItem">New Item</label>
+            <span asp-validation-for="ToDoItem" class="text-danger"></span>
+        </div>
+        <div class="max-width-200 mx-auto">
+            <div>
+                <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Create New List</button>
+            </div>
+            <div>
+                <a asp-controller="ListBuddy" asp-action="MyToDoLists" class="btn btn-outline-dark w-100">Back To My Lists</a>
+            </div>
+        </div>
+      
+    </form>
+    
+
+</div>
+<!--Partial View scripts-->
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

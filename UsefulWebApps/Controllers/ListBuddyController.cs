@@ -179,8 +179,43 @@ namespace UsefulWebApps.Controllers
             return PartialView("_ToDoListPartial", toDoListVM);
         }
 
+        public IActionResult CreateToDoList()
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            ToDoList toDoList = new ToDoList
+            {
+                UserId = userId
+            };
+
+            return View(toDoList);
+        }
+        //create a new ToDoList
         [HttpPost]
-        public async Task<IActionResult> ToDoListCreate(ToDoList toDoList)
+        public async Task<IActionResult> CreateToDoList(ToDoList toDoList)
+        {
+
+            if (ModelState.IsValid) 
+            {
+                bool success = await _unitOfWork.ToDoList.Add(toDoList);
+                if (success)
+                {
+                    TempData["success"] = "To do list created successfully.";
+                    return RedirectToAction("ToDoList", new { list = toDoList.ListTitle });
+                }
+                else
+                {
+                    TempData["error"] = "Create to do list error. Try again.";
+                    return RedirectToAction("MyToDoLists");
+                }
+            }
+            TempData["error"] = "Create to do list error. Try again.";
+            return RedirectToAction("MyToDoLists");
+        }
+
+        //add new item to already existing ToDoList
+        [HttpPost]
+        public async Task<IActionResult> ToDoListAddItem(ToDoList toDoList)
         {
             if (ModelState.IsValid)
             {

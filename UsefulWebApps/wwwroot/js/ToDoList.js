@@ -42,7 +42,7 @@ $("#add-to-do-item").validate({
     submitHandler: function (form) {
         var formData = $(form).serialize();
         $.ajax({
-            url: "/ListBuddy/ToDoListCreate",
+            url: "/ListBuddy/ToDoListAddItem",
             type: "POST",
             data: formData,
             dataType: "html",
