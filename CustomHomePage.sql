@@ -207,6 +207,45 @@ INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/wp3.jpg","sp
 INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/wp5.jpg","space");
 INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/wp6.jpg","space");
 
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-1995-49-f-full_jpg.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-1998-18-a-large_web.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2016-15-a-large_web.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2002-11-b-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2005-02-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2007-37-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-1998-12-b-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2001-25-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2002-01-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2002-25-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2000-14-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2009-07-b-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-1998-21-b-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2002-11-c-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2003-22-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2001-21-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2007-35-b-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2006-13-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2007-34-b-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2007-16-h-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-1995-45-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2007-09-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-1999-20-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-1995-01-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2008-34-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2002-15-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-1999-12-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2006-14-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2003-01-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2016-13-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2011-11-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2005-12-b-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2007-16-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2005-37-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2010-13-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs-2006-01-a-1280_wallpaper.jpg","space");
+INSERT INTO slideshow_images (ImagePath, FolderName) VALUES ("space/hs1.jpg","space");
+
+
 /*dont insert into prod the ids will differ*/
 INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",66);
 INSERT INTO user_slideshow_images (UserId, UserName, SlideShowImageId) VALUES ("251d80ae-93a3-401c-9be9-1ef83e30d541","BeefCakeTheMighty",67);
