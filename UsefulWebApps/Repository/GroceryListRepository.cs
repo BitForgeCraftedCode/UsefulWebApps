@@ -19,8 +19,8 @@ namespace UsefulWebApps.Repository
         public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemsAndCategories(string column, string value)
         {
             string query = $@"
-                    SELECT * FROM grocery_list WHERE {column} = @Parameter;
-                    SELECT * FROM grocery_categories ORDER BY Category;
+                    SELECT * FROM grocery_list WHERE {column} = @Parameter ORDER BY Category ASC, GroceryItem ASC;
+                    SELECT * FROM grocery_categories ORDER BY Category ASC;
                 ";
             GridReader gridReader = await _connection.QueryMultipleAsync(query, new { Parameter = value});
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
@@ -33,7 +33,7 @@ namespace UsefulWebApps.Repository
         {
             string query = @"
                 SELECT * FROM grocery_list WHERE Id = @id;
-                SELECT * FROM grocery_categories;
+                SELECT * FROM grocery_categories ORDER BY Category ASC;
             ";
             GridReader gridReader = await _connection.QueryMultipleAsync(query, new { id });
             GroceryList groceryListItem = await gridReader.ReadFirstAsync<GroceryList>();
@@ -59,8 +59,8 @@ namespace UsefulWebApps.Repository
             }
             await _connection.ExecuteAsync(sql2, new { id }, transaction: txn);
             string sql3 = $@"
-                SELECT * FROM grocery_list WHERE UserId = @Parameter;
-                SELECT * FROM grocery_categories;
+                SELECT * FROM grocery_list WHERE UserId = @Parameter ORDER BY Category ASC, GroceryItem ASC;
+                SELECT * FROM grocery_categories ORDER BY Category ASC;
             ";
             GridReader gridReader = await _connection.QueryMultipleAsync(sql3, new { Parameter = userId }, transaction: txn);
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
@@ -83,8 +83,8 @@ namespace UsefulWebApps.Repository
                 userId = groceryList.UserId
             }, transaction: txn);
             string sql2 = $@"
-                SELECT * FROM grocery_list WHERE UserId = @Parameter;
-                SELECT * FROM grocery_categories;
+                SELECT * FROM grocery_list WHERE UserId = @Parameter ORDER BY Category ASC, GroceryItem ASC;
+                SELECT * FROM grocery_categories ORDER BY Category ASC;
             ";
             GridReader gridReader = await _connection.QueryMultipleAsync(sql2, new { Parameter = groceryList.UserId }, transaction: txn);
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
