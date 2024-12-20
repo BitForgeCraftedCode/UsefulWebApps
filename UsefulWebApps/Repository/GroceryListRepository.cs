@@ -20,7 +20,7 @@ namespace UsefulWebApps.Repository
         {
             string query = $@"
                     SELECT * FROM grocery_list WHERE {column} = @Parameter;
-                    SELECT * FROM grocery_categories;
+                    SELECT * FROM grocery_categories ORDER BY Category;
                 ";
             GridReader gridReader = await _connection.QueryMultipleAsync(query, new { Parameter = value});
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
