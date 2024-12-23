@@ -4,8 +4,8 @@
     <section id="section-@listOfGroceryLists[0].Category">
         <h2 class="display-6">@listOfGroceryLists[0].Category</h2>
         <div class="max-width-175 mx-auto">
-            <select class="form-select mb-2" onchange="sortCategory(this.value, `@listOfGroceryLists[0].Category`, `@listOfGroceryLists[0].UserId`)">
-                <option selected value="">Sort Order</option>
+            <select class="form-select form-select-sm mb-2" onchange="sortCategory(this.value, `@listOfGroceryLists[0].Category`, `@listOfGroceryLists[0].UserId`)">
+                <option selected value="">Sort Order - @listOfGroceryLists[0].SortOrder</option>
                 @for (int i = 1; i <= Model.UserSortedGroceryCategories.Count; i++)
                 {
                     <option value="@i">@i</option>
