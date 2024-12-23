@@ -13,6 +13,8 @@ ALTER TABLE grocery_list ADD UserId varchar(255) NOT NULL;
 
 ALTER TABLE grocery_list MODIFY Id bigint UNSIGNED NOT NULL AUTO_INCREMENT; 
 
+ALTER TABLE grocery_list ADD SortOrder int unsigned NOT NULL DEFAULT 1;
+
 CREATE TABLE grocery_categories (
 	Id int NOT NULL AUTO_INCREMENT,
     Category varchar(50) NOT NULL,
@@ -55,3 +57,13 @@ INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId) VALUES ("Pape
 DELETE FROM usefulwebapps.grocery_list WHERE Id >= 1;
 
 ALTER TABLE usefulwebapps.grocery_list AUTO_INCREMENT = 1;
+
+UPDATE grocery_list SET SortOrder = 2 WHERE Category = 'Produce' AND UserId = "251d80ae-93a3-401c-9be9-1ef83e30d541";
+
+UPDATE grocery_list SET SortOrder = 3 WHERE Category = 'Deli';
+
+UPDATE grocery_list SET SortOrder = 1 WHERE Category = 'Meat';
+
+SELECT * FROM grocery_list WHERE UserId = "251d80ae-93a3-401c-9be9-1ef83e30d541" ORDER BY SortOrder ASC, Category ASC, GroceryItem ASC;
+
+SELECT DISTINCT Category, SortOrder FROM grocery_list WHERE UserId = "251d80ae-93a3-401c-9be9-1ef83e30d541" ORDER BY SortOrder ASC, Category ASC;

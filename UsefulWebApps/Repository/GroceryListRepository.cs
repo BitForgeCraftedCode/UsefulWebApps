@@ -16,17 +16,19 @@ namespace UsefulWebApps.Repository
         //any GroceryList model specific database methods here
 
         //return multiple types with a tuple https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-tuples 
-        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemsAndCategories(string column, string value)
+        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GetGroceryListItemsAndCategories(string column, string value)
         {
             string query = $@"
-                    SELECT * FROM grocery_list WHERE {column} = @Parameter ORDER BY Category ASC, GroceryItem ASC;
+                    SELECT * FROM grocery_list WHERE {column} = @Parameter ORDER BY SortOrder ASC, Category ASC, GroceryItem ASC;
                     SELECT * FROM grocery_categories ORDER BY Category ASC;
+                    SELECT DISTINCT Category, SortOrder FROM grocery_list WHERE {column} = @Parameter ORDER BY SortOrder ASC, Category ASC; 
                 ";
             GridReader gridReader = await _connection.QueryMultipleAsync(query, new { Parameter = value});
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
+            List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
             await _connection.CloseAsync();
-            return (groceryListItems, groceryCategoriesEnum);
+            return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
         }
 
         public async Task<(GroceryList groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemAndCategoriesAtId(int? id)
@@ -42,7 +44,7 @@ namespace UsefulWebApps.Repository
             return (groceryListItem, groceryCategoriesEnum);
         }
 
-        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GroceryListToggleComplete(int? id, string userId)
+        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GroceryListToggleComplete(int? id, string userId)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
@@ -59,18 +61,40 @@ namespace UsefulWebApps.Repository
             }
             await _connection.ExecuteAsync(sql2, new { id }, transaction: txn);
             string sql3 = $@"
-                SELECT * FROM grocery_list WHERE UserId = @Parameter ORDER BY Category ASC, GroceryItem ASC;
+                SELECT * FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC, GroceryItem ASC;
                 SELECT * FROM grocery_categories ORDER BY Category ASC;
+                SELECT DISTINCT Category, SortOrder FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC; 
             ";
             GridReader gridReader = await _connection.QueryMultipleAsync(sql3, new { Parameter = userId }, transaction: txn);
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
+            List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
             await txn.CommitAsync();
             await _connection.CloseAsync();
-            return (groceryListItems, groceryCategoriesEnum);
+            return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
         }
 
-        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GroceryListAdd(GroceryList groceryList)
+        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GroceryListSortCategories(int sortOrder, string category, string userId)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            string sql = "UPDATE grocery_list SET SortOrder = @sortOrder WHERE Category = @category AND UserId = @userId";
+            await _connection.ExecuteAsync(sql, new { sortOrder, category, userId }, transaction: txn);
+            string sql2 = $@"
+                SELECT * FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC, GroceryItem ASC;
+                SELECT * FROM grocery_categories ORDER BY Category ASC;
+                SELECT DISTINCT Category, SortOrder FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC; 
+            ";
+            GridReader gridReader = await _connection.QueryMultipleAsync(sql2, new { Parameter = userId }, transaction: txn);
+            List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
+            IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
+            List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
+        }
+
+        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GroceryListAdd(GroceryList groceryList)
         {
             await _connection.OpenAsync();
             MySqlTransaction txn = await _connection.BeginTransactionAsync();
@@ -83,15 +107,17 @@ namespace UsefulWebApps.Repository
                 userId = groceryList.UserId
             }, transaction: txn);
             string sql2 = $@"
-                SELECT * FROM grocery_list WHERE UserId = @Parameter ORDER BY Category ASC, GroceryItem ASC;
+                SELECT * FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC, GroceryItem ASC;
                 SELECT * FROM grocery_categories ORDER BY Category ASC;
+                SELECT DISTINCT Category, SortOrder FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC; 
             ";
             GridReader gridReader = await _connection.QueryMultipleAsync(sql2, new { Parameter = groceryList.UserId }, transaction: txn);
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
+            List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
             await txn.CommitAsync();
             await _connection.CloseAsync();
-            return (groceryListItems, groceryCategoriesEnum);
+            return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
         }
     }
 }

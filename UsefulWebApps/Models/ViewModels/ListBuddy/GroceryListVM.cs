@@ -9,5 +9,6 @@ namespace UsefulWebApps.Models.ViewModels.ListBuddy
         public GroceryList GroceryList { get; set; }
         public IEnumerable<SelectListItem> GroceryCategoriesList { get; set; }
         public List<List<GroceryList>> FilteredGroceryListItems { get; set; }
+        public List<UserGroceryCategories> UserSortedGroceryCategories { get; set; }
     }
 }

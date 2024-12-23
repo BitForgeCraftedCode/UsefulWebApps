@@ -3,6 +3,15 @@
 {
     <section id="section-@listOfGroceryLists[0].Category">
         <h2 class="display-6">@listOfGroceryLists[0].Category</h2>
+        <div class="max-width-175 mx-auto">
+            <select class="form-select mb-2" onchange="sortCategory(this.value, `@listOfGroceryLists[0].Category`, `@listOfGroceryLists[0].UserId`)">
+                <option selected value="">Sort Order</option>
+                @for (int i = 1; i <= Model.UserSortedGroceryCategories.Count; i++)
+                {
+                    <option value="@i">@i</option>
+                }
+            </select>
+        </div>  
         <ul class="list-group" id="ul-@listOfGroceryLists[0].Category">
             @foreach (GroceryList grocerylist in listOfGroceryLists)
             {

@@ -27,5 +27,9 @@ namespace UsefulWebApps.Models.ListBuddy
         [Column("UserId")]
         [Required]
         public string UserId { get; set; } = string.Empty;
+
+        [Column("SortOrder")]
+        [Required]
+        public int SortOrder { get; set; } = 1;
     }
 }

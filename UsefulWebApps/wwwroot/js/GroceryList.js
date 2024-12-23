@@ -77,6 +77,37 @@ function toggleComplete(toggleId, userID) {
     });
 }
 
+function sortCategory(sortOrder, category, userId) {
+    
+    if (sortOrder == "") {
+        toastr.error("Please Select A Sort Order");
+        return;
+    }
+    var formData = {
+        sortOrder = sortOrder,
+        category = category,
+        userId = userId
+    };
+    $.ajax({
+        url: "/ListBuddy/GroceryListSortCategories",
+        type: "POST",
+        headers: {
+            RequestVerificationToken:
+                $("#RequestVerificationToken")[0].value
+        },
+        data: formData,
+        dataType: "html",
+        success: function (response) {
+            $("#grocery-list-container").empty();
+            $("#grocery-list-container").append(response);
+        },
+        error: function (request, status, error) {
+            console.log(request.responseText);
+            toastr.error("Sort Error. Please Try Again.");
+        }
+    });
+}
+
 $("#add-grocery-list-item").validate({
     rules: {
         //GroceryList.GroceryItem is just the name of the html element

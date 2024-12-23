@@ -309,7 +309,7 @@ namespace UsefulWebApps.Controllers
 
         #region Grocery List
 
-        private static GroceryListVM FormatGroceryListForDisplay(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, string userId)
+        private static GroceryListVM FormatGroceryListForDisplay(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories, string userId)
         {
             //for UI display we need a list of grocery items for each category
             //A list of lists where each individual list will contain the all items in a specific category
@@ -326,9 +326,9 @@ namespace UsefulWebApps.Controllers
             //filter out the List of lists
             //for each category filter out the grocery list items in that category to their own list 
             //add each new list to the filteredGroceryList variable
-            foreach (SelectListItem glistCategory in groceryListCategories)
+            foreach (UserGroceryCategories glistCategory in userGroceryCategories)
             {
-                List<GroceryList> filter = groceryListItems.Where(x => x.Category == glistCategory.Text).ToList();
+                List<GroceryList> filter = groceryListItems.Where(x => x.Category == glistCategory.Category).ToList();
                 //https://stackoverflow.com/questions/1191919/what-does-linq-return-when-the-results-are-empty
                 //Empty enum returned if nothing in category found
                 if (filter.Count > 0)
@@ -344,7 +344,8 @@ namespace UsefulWebApps.Controllers
                     UserId = userId,
                 },
                 GroceryCategoriesList = groceryListCategories,
-                FilteredGroceryListItems = filteredGroceryListItems
+                FilteredGroceryListItems = filteredGroceryListItems,
+                UserSortedGroceryCategories = userGroceryCategories
             };
             return groceryListVM;
         }
@@ -353,9 +354,9 @@ namespace UsefulWebApps.Controllers
         {
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories("UserId", userId);
+            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories("UserId", userId);
 
-            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, userId);
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, userId);
 
             return View(groceryListVM);
         }
@@ -367,9 +368,18 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
-            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GroceryListToggleComplete(id, userId);
+            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GroceryListToggleComplete(id, userId);
 
-            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, userId);
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, userId);
+
+            return PartialView("_GroceryListPartial", groceryListVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GroceryListSortCategories(int sortOrder, string category, string userId)
+        {
+            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GroceryListSortCategories(sortOrder, category, userId);
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, userId);
 
             return PartialView("_GroceryListPartial", groceryListVM);
         }
@@ -449,8 +459,8 @@ namespace UsefulWebApps.Controllers
             TryValidateModel(groceryListVM.GroceryList);
             if (ModelState.IsValid)
             {
-                (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GroceryListAdd(groceryListVM.GroceryList);
-                GroceryListVM newGroceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, groceryListVM.GroceryList.UserId);
+                (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GroceryListAdd(groceryListVM.GroceryList);
+                GroceryListVM newGroceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, groceryListVM.GroceryList.UserId);
                 return PartialView("_GroceryListPartial", newGroceryListVM);
             }
             return StatusCode(400);
