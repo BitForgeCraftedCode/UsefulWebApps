@@ -417,7 +417,7 @@ namespace UsefulWebApps.Controllers
 
             if (ModelState.IsValid)
             {
-                bool success = await _unitOfWork.GroceryList.Update(groceryList);
+                bool success = await _unitOfWork.GroceryList.GroceryListUpdate(groceryList);
                 if (success) 
                 {
                     TempData["success"] = "Grocery item updated successfully.";

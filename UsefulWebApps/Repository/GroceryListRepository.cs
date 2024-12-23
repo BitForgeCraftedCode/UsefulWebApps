@@ -105,7 +105,6 @@ namespace UsefulWebApps.Repository
             {
                 sortOrder = 1; 
             }
-            Console.WriteLine("sort order " + sortOrder);
             string sql1 = "INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId, SortOrder) VALUES (@groceryItem, @category, @complete, @userId, @sortOrder)";
             await _connection.ExecuteAsync(sql1, new
             {
@@ -127,6 +126,33 @@ namespace UsefulWebApps.Repository
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
+        }
+
+        public async Task<bool> GroceryListUpdate(GroceryList groceryList)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            int rowsEffected = 0;
+            //before update get the sort order of the category if no category yet set sort order to 1
+            string sql = "SELECT SortOrder FROM grocery_list WHERE Category = @category AND UserId = @userId";
+            int? sortOrder = await _connection.QueryFirstOrDefaultAsync<int?>(sql, new { category = groceryList.Category, userId = groceryList.UserId }, transaction: txn);
+            if (sortOrder == null)
+            {
+                sortOrder = 1;
+            }
+            string sql1 = "UPDATE grocery_list SET GroceryItem = @groceryItem, Category = @category, Complete = @complete, UserId = @userId, SortOrder = @sortOrder WHERE Id = @id";
+            rowsEffected = await _connection.ExecuteAsync(sql1, new 
+            { 
+                groceryItem = groceryList.GroceryItem,
+                category = groceryList.Category,
+                complete = groceryList.Complete,
+                userId = groceryList.UserId,
+                sortOrder = sortOrder,
+                id = groceryList.Id
+            }, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
         }
     }
 }
