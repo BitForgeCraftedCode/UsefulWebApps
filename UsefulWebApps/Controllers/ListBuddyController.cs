@@ -477,15 +477,19 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveUserGroceryList(string userId)
+        public async Task<JsonResult> SaveUserGroceryList(string userId)
         {
             if (userId == null || userId == "")
             {
-                return NotFound();
+                return Json("error userId was null");
             }
             //jquery ajax handles the toast
-            await _unitOfWork.GroceryList.SaveUserGroceryList(userId);
-            return RedirectToAction("GroceryList");
+            bool success = await _unitOfWork.GroceryList.SaveUserGroceryList(userId);
+            if (!success)
+            {
+                return Json("failed to save list");
+            }
+            return Json("success");
         }
 
         #endregion

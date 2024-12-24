@@ -89,12 +89,11 @@ function saveUserList(userID) {
                 $("#RequestVerificationToken")[0].value
         },
         data: formData,
-        dataType: "html",
-        success: function (response) {
+        dataType: "json",
+        success: function (response, status) {
             toastr.success("Grocery list saved successfully.");
         },
         error: function (request, status, error) {
-            console.log(request.responseText);
             toastr.error("Save Grocery List Error. Please Try Again.");
         }
     });

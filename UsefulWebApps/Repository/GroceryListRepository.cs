@@ -163,7 +163,7 @@ namespace UsefulWebApps.Repository
             string sql = "DELETE FROM grocery_list_usersaved WHERE UserId = @userId";
             await _connection.ExecuteAsync(sql, new { userId }, transaction: txn);
             string sql1 = "INSERT INTO grocery_list_usersaved (GroceryItem, Category, Complete, UserId, SortOrder) SELECT GroceryItem, Category, Complete, UserId, SortOrder FROM grocery_list WHERE UserId = @userId";
-            rowsEffected = await _connection.ExecuteAsync(sql1, new { userId }, transaction: txn);
+            rowsEffected = await _connection.ExecuteAsync(sql1, userId , transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
