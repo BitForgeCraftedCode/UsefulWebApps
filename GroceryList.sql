@@ -1,5 +1,15 @@
 DROP TABLE grocery_list;
 
+CREATE TABLE `grocery_list_usersaved` (
+  `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `GroceryItem` varchar(100) NOT NULL,
+  `Category` varchar(50) NOT NULL,
+  `Complete` BOOLEAN NOT NULL,
+  `UserId` varchar(255) NOT NULL,
+  `SortOrder` int unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`Id`)
+);
+
 CREATE TABLE `grocery_list` (
   `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `GroceryItem` varchar(100) NOT NULL,

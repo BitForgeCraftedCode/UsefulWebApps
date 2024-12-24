@@ -476,6 +476,18 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("GroceryList");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SaveUserGroceryList(string userId)
+        {
+            if (userId == null || userId == "")
+            {
+                return NotFound();
+            }
+            //jquery ajax handles the toast
+            await _unitOfWork.GroceryList.SaveUserGroceryList(userId);
+            return RedirectToAction("GroceryList");
+        }
+
         #endregion
     }
 }

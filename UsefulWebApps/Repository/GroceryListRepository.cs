@@ -154,5 +154,19 @@ namespace UsefulWebApps.Repository
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
+
+        public async Task<bool> SaveUserGroceryList(string userId)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            int rowsEffected = 0;
+            string sql = "DELETE FROM grocery_list_usersaved WHERE UserId = @userId";
+            await _connection.ExecuteAsync(sql, new { userId }, transaction: txn);
+            string sql1 = "INSERT INTO grocery_list_usersaved (GroceryItem, Category, Complete, UserId, SortOrder) SELECT GroceryItem, Category, Complete, UserId, SortOrder FROM grocery_list WHERE UserId = @userId";
+            rowsEffected = await _connection.ExecuteAsync(sql1, new { userId }, transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
     }
 }

@@ -29,15 +29,26 @@
         <div class="mb-2 mt-2" id="new-grocery-item-error"></div>
     </form>
 
-    <form method="post" asp-route="deleteAllGroceryList" class="max-width-175 mx-auto" id="delete-all-grocery-list">
-        <div>
-            <button type="submit" class="btn btn-danger mb-3 w-100">Delete All</button>
+    <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-6 max-width-250 mx-auto">
+            <form method="post" asp-route="deleteAllGroceryList" id="delete-all-grocery-list">
+                <div>
+                    <button type="submit" class="btn btn-danger mb-3 w-100">Delete All</button>
+                </div>
+            </form>
+            <div>
+                <a asp-controller="ListBuddy" asp-action="Index" class="btn btn-outline-dark mb-3 w-100">List Buddy Home</a>
+            </div>
         </div>
-        <div>
-            <a asp-controller="ListBuddy" asp-action="Index" class="btn btn-outline-dark w-100">List Buddy Home</a>
+        <div class="col-sm-12 col-md-6 col-lg-6 max-width-250 mx-auto">
+            <div>
+                <button type="button" onclick="saveUserList(`@Model.GroceryList.UserId`)" class="btn btn-primary mb-3 w-100">Save List</button>
+            </div>
+            <div>
+                <a asp-controller="ListBuddy" asp-action="Index" class="btn btn-outline-dark mb-3 w-100">Use Saved List</a>
+            </div>
         </div>
-    </form>
-
+    </div>
 </div>
 <!--Partial View scripts-->
 @section Scripts {
