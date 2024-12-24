@@ -512,6 +512,12 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("GroceryList");
         }
 
+        public IActionResult ShareGroceryList(string userId) 
+        {
+            Console.WriteLine(userId);
+            return View();  
+        }
+
         #endregion
     }
 }
