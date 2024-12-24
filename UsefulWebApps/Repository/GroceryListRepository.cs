@@ -163,7 +163,32 @@ namespace UsefulWebApps.Repository
             string sql = "DELETE FROM grocery_list_usersaved WHERE UserId = @userId";
             await _connection.ExecuteAsync(sql, new { userId }, transaction: txn);
             string sql1 = "INSERT INTO grocery_list_usersaved (GroceryItem, Category, Complete, UserId, SortOrder) SELECT GroceryItem, Category, Complete, UserId, SortOrder FROM grocery_list WHERE UserId = @userId";
-            rowsEffected = await _connection.ExecuteAsync(sql1, userId , transaction: txn);
+            rowsEffected = await _connection.ExecuteAsync(sql1, new { userId } , transaction: txn);
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
+
+        public async Task<bool> UseSavedGroceryList(string userId)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            int rowsEffected = 0;
+            //check there is a saved list
+            string sql1 = "SELECT COUNT(Id) FROM grocery_list_usersaved WHERE UserId = @userId";
+            int savedListRows =  await _connection.QuerySingleAsync<int>(sql1, new { userId }, transaction: txn);
+            if (savedListRows == 0) 
+            {
+                await txn.RollbackAsync();
+                await _connection.CloseAsync();
+                return rowsEffected > 0 ? true : false;
+            }
+            //delete current list
+            string sql2 = "DELETE FROM grocery_list WHERE UserId = @userId";
+            await _connection.ExecuteAsync(sql2, new { userId }, transaction: txn);
+            //insert saved list as current
+            string sql3 = "INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId, SortOrder) SELECT GroceryItem, Category, Complete, UserId, SortOrder FROM grocery_list_usersaved WHERE UserId = @userId";
+            rowsEffected = await _connection.ExecuteAsync(sql3, new { userId }, transaction: txn);
             await txn.CommitAsync();
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;

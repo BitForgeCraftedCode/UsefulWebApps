@@ -492,6 +492,26 @@ namespace UsefulWebApps.Controllers
             return Json("success");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UseSavedGroceryList(string userId)
+        {
+            if (ModelState.IsValid) 
+            {
+                bool success = await _unitOfWork.GroceryList.UseSavedGroceryList(userId);
+                if (success)
+                {
+                    TempData["success"] = "Grocery template loaded successfully.";
+                }
+                else
+                {
+                    TempData["error"] = "You currently don't have a saved list. Save one first.";
+                }
+                return RedirectToAction("GroceryList");
+            }
+            TempData["error"] = "Use grocery template error. Please try again.";
+            return RedirectToAction("GroceryList");
+        }
+
         #endregion
     }
 }

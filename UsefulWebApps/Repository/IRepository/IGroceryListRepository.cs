@@ -12,5 +12,6 @@ namespace UsefulWebApps.Repository.IRepository
         Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GroceryListSortCategories(int sortOrder, string category, string userId);
         Task<bool> GroceryListUpdate(GroceryList groceryList);
         Task<bool> SaveUserGroceryList(string userId);
+        Task<bool> UseSavedGroceryList(string userId);
     }
 }

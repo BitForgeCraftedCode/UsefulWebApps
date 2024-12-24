@@ -44,12 +44,14 @@
             <div>
                 <button type="button" onclick="saveUserList(`@Model.GroceryList.UserId`)" class="btn btn-primary mb-3 w-100">Save List</button>
             </div>
-            <div>
-                <a asp-controller="ListBuddy" asp-action="Index" class="btn btn-outline-dark mb-3 w-100">Use Saved List</a>
-            </div>
+            <form method="post" asp-controller="ListBuddy" asp-action="UseSavedGroceryList" asp-route-userId="@Model.GroceryList.UserId" id="use-saved-grocery-list">
+                <div>
+                    <button class="btn btn-outline-dark mb-3 w-100">Use Saved List</button>
+                </div>
+            </form>
         </div>
         <p>
-            You can save a grocery list as a template to your account. 
+            You can save a grocery list as a template to your account.<br/>
             Note: Using a saved list will delete your current list items and saving a new list template will delete the old one.
         </p>
     </div>

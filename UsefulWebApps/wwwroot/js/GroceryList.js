@@ -12,6 +12,20 @@
     }
 });
 
+$("#use-saved-grocery-list").validate({
+    submitHandler: function (form) {
+        //ask to confirm using saved list
+        toastConfirmUseSavedList().then(useSavedConfirm => {
+            if (useSavedConfirm == true) {
+                form.submit();
+            }
+            else {
+                toastr.success("Saved list not loaded");
+            }
+        });
+    }
+});
+
 function validateDeleteGroceryItem(deleteId, category) {
     //ask to confirm delete
     toastConfirm().then(deleteConfirm => {
