@@ -42,3 +42,22 @@ function toastConfirmUseSavedList() {
         });
     });
 }
+
+function toastConfirmSaveList() {
+    return new Promise((resolve, reject) => {
+        toastr.warning("Are you sure you want to save a new list template?<br/><br/><button class='btn' id='saveYes'>Yes</button><br/><br/><button class='btn' id='saveNo'>No</button>", 'Save New List Confirm', {
+            closeButton: false,
+            allowHtml: true,
+            timeOut: 0,
+            extendedTimeOut: 0,
+            onShown: function (toast) {
+                $("#saveYes").on("click", function () {
+                    resolve(true)
+                });
+                $("#saveNo").on("click", function () {
+                    resolve(false)
+                });
+            }
+        });
+    });
+}

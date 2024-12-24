@@ -92,6 +92,17 @@ function toggleComplete(toggleId, userID) {
 }
 
 function saveUserList(userID) {
+    //ask to confirm saving a list
+    toastConfirmSaveList().then(savedListConfirm => {
+        if (savedListConfirm == true) {
+            saveUserListSubmit(userID);
+        }
+        else {
+            toastr.success("List not saved");
+        }
+    });
+}
+function saveUserListSubmit(userID) {
     formData = {
         userId = userID
     };
