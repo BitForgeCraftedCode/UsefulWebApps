@@ -13,5 +13,6 @@ namespace UsefulWebApps.Repository.IRepository
         Task<bool> GroceryListUpdate(GroceryList groceryList);
         Task<bool> SaveUserGroceryList(string userId);
         Task<bool> UseSavedGroceryList(string userId);
+        Task<bool> ShareGroceryList(string userId, string friendUserId);
     }
 }

@@ -25,6 +25,8 @@ ALTER TABLE grocery_list MODIFY Id bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE grocery_list ADD SortOrder int unsigned NOT NULL DEFAULT 1;
 
+ALTER TABLE grocery_list ADD ShareUserId varchar(255);
+
 CREATE TABLE grocery_categories (
 	Id int NOT NULL AUTO_INCREMENT,
     Category varchar(50) NOT NULL,

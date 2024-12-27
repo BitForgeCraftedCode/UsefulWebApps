@@ -193,5 +193,34 @@ namespace UsefulWebApps.Repository
             await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
+
+        public async Task<bool> ShareGroceryList(string userId, string friendUserId)
+        {
+            await _connection.OpenAsync();
+            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+            int rowsEffected = 0;
+            //check if friend has a saved list
+            string sql1 = "SELECT COUNT(Id) FROM grocery_list WHERE UserId = @friendUserId";
+            int savedListRows = await _connection.QuerySingleAsync<int>(sql1, new { friendUserId }, transaction: txn);
+            if (savedListRows == 0)
+            {
+                await txn.RollbackAsync();
+                await _connection.CloseAsync();
+                return rowsEffected > 0 ? true : false;
+            }
+            //add user's id to ShareUserId col of friend's list
+            string sql = "UPDATE grocery_list SET ShareUserId = @userId WHERE UserId = @friendUserId";
+            await _connection.ExecuteAsync(sql, new { userId, friendUserId }, transaction: txn);
+            //delete user's grocery list
+            string sql2 = "DELETE FROM grocery_list WHERE UserId = @userId";
+            await _connection.ExecuteAsync(sql2, new { userId }, transaction: txn);  
+            //insert friends list into users -- NOTE UserId here is ShareUserId from friend list
+            string sql3 = "INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId, SortOrder) SELECT GroceryItem, Category, Complete, ShareUserId, SortOrder FROM grocery_list WHERE UserId = @friendUserId";
+            rowsEffected = await _connection.ExecuteAsync(sql3, new { friendUserId }, transaction: txn);
+            //commit txn and close connection
+            await txn.CommitAsync();
+            await _connection.CloseAsync();
+            return rowsEffected > 0 ? true : false;
+        }
     }
 }

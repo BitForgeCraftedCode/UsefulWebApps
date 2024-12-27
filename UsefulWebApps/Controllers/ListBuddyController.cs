@@ -537,8 +537,16 @@ namespace UsefulWebApps.Controllers
                 TempData["error"] = "Share list error. Please try again.";
                 return View();
             };
-
-            return View();
+            bool success = await _unitOfWork.GroceryList.ShareGroceryList(shareGroceryListVM.UserId, friend.Id);
+            if (success)
+            {
+                TempData["success"] = "Grocery list shared.";
+            }
+            else
+            {
+                TempData["error"] = "Share list error. Please try again.";
+            }
+            return RedirectToAction("GroceryList");
         }
 
         #endregion
