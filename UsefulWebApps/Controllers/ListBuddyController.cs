@@ -534,7 +534,7 @@ namespace UsefulWebApps.Controllers
             
             if (friend == null)
             {
-                TempData["error"] = "Share list error. Please try again.";
+                TempData["error"] = "Share list error. Please try again. Make sure you have the correct user name and email.";
                 return View();
             };
             bool success = await _unitOfWork.GroceryList.ShareGroceryList(shareGroceryListVM.UserId, friend.Id);
@@ -544,7 +544,7 @@ namespace UsefulWebApps.Controllers
             }
             else
             {
-                TempData["error"] = "Share list error. Please try again.";
+                TempData["error"] = "Share list error. Please try again. Make sure your friend has a list.";
             }
             return RedirectToAction("GroceryList");
         }
