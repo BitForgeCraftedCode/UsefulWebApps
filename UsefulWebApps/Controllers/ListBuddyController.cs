@@ -6,6 +6,7 @@ using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.ViewModels.ListBuddy;
 using UsefulWebApps.Repository.IRepository;
 using Ganss.Xss;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace UsefulWebApps.Controllers
@@ -14,11 +15,15 @@ namespace UsefulWebApps.Controllers
     [AutoValidateAntiforgeryToken]
     public class ListBuddyController : Controller
     {
+        private readonly UserManager<IdentityUser> _userManager;
+
         private HtmlSanitizer sanitizer = new HtmlSanitizer();
         private readonly IUnitOfWork _unitOfWork;
 
-        public ListBuddyController(IUnitOfWork unitOfWork)
+        public ListBuddyController(UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork)
         {
+            _userManager = userManager;
+
             _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
@@ -514,8 +519,26 @@ namespace UsefulWebApps.Controllers
 
         public IActionResult ShareGroceryList(string userId) 
         {
-            Console.WriteLine(userId);
-            return View();  
+            ShareGroceryListVM shareGroceryListVM = new()
+            {
+                UserId = userId
+            };
+            return View(shareGroceryListVM);  
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ShareGroceryList(ShareGroceryListVM shareGroceryListVM)
+        {
+            if (!ModelState.IsValid) { return View(); }
+            IdentityUser friend = await _userManager.FindByEmailAsync(shareGroceryListVM.Friend.Email.Trim());
+            
+            if (friend == null)
+            {
+                TempData["error"] = "Share list error. Please try again.";
+                return View();
+            };
+
+            return View();
         }
 
         #endregion
