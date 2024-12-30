@@ -2,7 +2,24 @@
     ViewData["Title"] = "Weather";
 }
 
-<div class="text-center">
+<div class="text-center max-width-550 mx-auto">
     <h1 class="display-3 mt-3">Weather</h1>
     <p>Powered by: <a href="https://openweathermap.org/">https://openweathermap.org/</a></p>
+    <form>
+        <div class="form-floating mb-3" >
+            <input type="text" class="form-control" id="cityInput" placeholder="City"/>
+            <label for="cityInput">City</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="stateInput" placeholder="State" />
+            <label for="stateInput">State</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-route-country="country" type="text" class="form-control" id="countryInput" placeholder="Country" />
+            <label for="countryInput">Country</label>
+        </div>
+        <div class="max-width-175 mx-auto">
+            <button type="submit" asp-controller="Weather" asp-action="GetWeather" class="btn btn-primary mb-3 w-100">Get Weather</button>
+        </div>
+    </form>
 </div>
