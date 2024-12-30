@@ -8,6 +8,7 @@ using Ganss.Xss;
 
 namespace UsefulWebApps.Controllers
 {
+    [Authorize(Roles = "StandardUser, Admin")]
     [AutoValidateAntiforgeryToken]
     public class MyRecipesController : Controller
     {
@@ -70,7 +71,6 @@ namespace UsefulWebApps.Controllers
             return View(RecipePageVM);
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
         public async Task<IActionResult> SavedRecipes()
         {
             ClaimsPrincipal currentUser = this.User;
@@ -87,7 +87,6 @@ namespace UsefulWebApps.Controllers
             return View(savedRecipesVM);
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost]
         [Route("/MyRecipes/PostComment", Name = "postComment")]
         public async Task<IActionResult> PostComment(RecipeComment recipeComment)
@@ -112,7 +111,6 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost]
         [Route("/MyRecipes/UserSavedRecipe", Name = "userSavedRecipe")]
         public async Task<IActionResult> UserSavedRecipe(RecipeUserSaved recipeUserSaved)
@@ -136,7 +134,6 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost]
         [Route("/MyRecipes/DeleteUserSavedRecipe", Name = "deleteUserSavedRecipe")]
         public async Task<IActionResult> DeleteUserSavedRecipe(int? id)
@@ -159,7 +156,6 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("SavedRecipes");
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
         public async Task<IActionResult> EditRecipe(int? id)
         {
             if (id == null || id == 0)
@@ -252,7 +248,6 @@ namespace UsefulWebApps.Controllers
             return View(recipeVM);
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost]
         public async Task<IActionResult> EditRecipe(RecipeVM recipeVM)
         {
@@ -334,7 +329,6 @@ namespace UsefulWebApps.Controllers
             return View(recipeVM);
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
         public async Task<IActionResult> CreateRecipe()
         {
             ClaimsPrincipal currentUser = this.User;
@@ -367,7 +361,6 @@ namespace UsefulWebApps.Controllers
             return View(recipeVM);
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateRecipe(RecipeVM recipeVM)
         {
@@ -436,7 +429,6 @@ namespace UsefulWebApps.Controllers
             return View(recipeVM);
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
         public async Task<IActionResult> DeleteRecipe(int? id)
         {
             if (id == null || id == 0)
@@ -459,7 +451,6 @@ namespace UsefulWebApps.Controllers
             return View(recipe);
         }
 
-        [Authorize(Roles = "StandardUser, Admin")]
         [HttpPost, ActionName("DeleteRecipe")]
         public async Task<IActionResult> DeleteRecipeFromDb(int? id, string imagePath)
         {
