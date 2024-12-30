@@ -22,20 +22,23 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="ListBuddy" asp-action="Index">List Buddy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="MyRecipes" asp-action="Index">My Recipes</a>
-                        </li>
+                        @if (User.IsInRole("Admin") || User.IsInRole("StandardUser"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="ListBuddy" asp-action="Index">List Buddy</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="MyRecipes" asp-action="Index">My Recipes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="MyHomePage" asp-action="Index">Custom Home Page</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Weather" asp-action="Index">Weather</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="ArtWork" asp-action="Index">Artwork</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="MyHomePage" asp-action="Index">Custom Home Page</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Weather" asp-action="Index">Weather</a>
                         </li>
                         @if (User.IsInRole("Admin"))
                         {
