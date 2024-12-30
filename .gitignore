@@ -6,6 +6,7 @@
 PW_SeedAccounts.txt
 
 appsettings_TEMP.json
+appsettings.Production.json
 
 # User-specific files
 *.rsuser
