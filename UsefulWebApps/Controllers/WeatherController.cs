@@ -51,7 +51,7 @@ namespace UsefulWebApps.Controllers
             string lon = location[0].Longitude.ToString();  
             jsonCurrentWeather = await client.GetStringAsync($"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units=imperial&appid={apiKey}");
             CurrentWeatherJSON currentWeather = JsonSerializer.Deserialize<CurrentWeatherJSON>(jsonCurrentWeather);
-            Console.WriteLine(currentWeather.Main.temp);
+            
             CurrentWeatherVM currentWeatherVM = new() 
             { 
                 LocationJSON = location[0],
@@ -75,36 +75,72 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> AddLocations(Locations locationObj)
         {
-            Console.WriteLine(ModelState.IsValid);
-            //get location lat and lon
-            string jsonLocation = string.Empty;
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            if (locationObj.Country.ToUpper() == "US" && locationObj.State.ToUpper() != "NA")
+            if (ModelState.IsValid)
             {
-                jsonLocation = await client.GetStringAsync($"http://api.openweathermap.org/geo/1.0/direct?q={locationObj.City},{locationObj.State},{locationObj.Country}&limit=1&appid={apiKey}");
+                //get location lat and lon
+                string jsonLocation = string.Empty;
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                if (locationObj.Country.ToUpper() == "US" && locationObj.State.ToUpper() != "NA")
+                {
+                    try
+                    {
+                        jsonLocation = await client.GetStringAsync($"http://api.openweathermap.org/geo/1.0/direct?q={locationObj.City},{locationObj.State},{locationObj.Country}&limit=1&appid={apiKey}");
+                    }
+                    catch(Exception e)
+                    {
+                        TempData["error"] = $"Sorry the api returned an error. {e.Message}";
+                        return View();
+                    }
+                }
+                else if (locationObj.Country.ToUpper() != "US" && locationObj.State.ToUpper() == "NA")
+                {
+                    try
+                    {
+                        jsonLocation = await client.GetStringAsync($"http://api.openweathermap.org/geo/1.0/direct?q={locationObj.City},{locationObj.Country}&limit=1&appid={apiKey}");
+                    }
+                    catch (Exception e)
+                    {
+                        TempData["error"] = $"Sorry the api returned an error. {e.Message}";
+                        return View();
+                    }
+                }
+                else
+                {
+                    TempData["error"] = "Sorry that was an invalid input";
+                    return View();
+                }
+                //always a list of lenght 1 -- limit 1 on api call above
+                List<LocationJSON> locationList = JsonSerializer.Deserialize<List<LocationJSON>>(jsonLocation);
+                //if nothing in list the api didnt find the location.
+                if (locationList.Count == 0)
+                {
+                    TempData["error"] = "Sorry the api could not find that location";
+                    return View();
+                }
+                Locations location = new()
+                {
+                    City = locationList[0].Name,
+                    Latitude = locationList[0].Latitude,
+                    Longitude = locationList[0].Longitude,
+                    Country = locationList[0].Country,
+                    State = locationList[0].State,
+                    UserId = locationObj.UserId,
+                    IsDefault = locationObj.IsDefault,
+                };
+                //add location to data base
+                bool success = await _unitOfWork.Locations.Add(location);
+                if (success) 
+                {
+                    TempData["success"] = "Location Added successfully.";
+                    return RedirectToAction("Index");
+                }
+                TempData["error"] = "Add location error. Try again.";
+                return RedirectToAction("Index");
             }
-            else
-            {
-                jsonLocation = await client.GetStringAsync($"http://api.openweathermap.org/geo/1.0/direct?q={locationObj.City},{locationObj.Country}&limit=1&appid={apiKey}");
-            }
-            //always a list of lenght 1 -- limit 1 on api call above
-            List<LocationJSON> locationList = JsonSerializer.Deserialize<List<LocationJSON>>(jsonLocation);
-            //LocationJSON location = locationList[0];
-            Locations location = new() 
-            {
-                City = locationList[0].Name,
-                Latitude = locationList[0].Latitude,
-                Longitude = locationList[0].Longitude,
-                Country = locationList[0].Country,
-                State = locationList[0].State,
-                UserId = locationObj.UserId,
-                IsDefault = locationObj.IsDefault,
-            };
-            bool success = await _unitOfWork.Locations.Add(location);
-            Console.WriteLine("success " + success);
-            return View();
-            
+            TempData["error"] = "Add location error. Try again.";
+            return RedirectToAction("Index");
+
         }
     }
 }

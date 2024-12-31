@@ -8,10 +8,15 @@
     <h1 class="display-3 mt-3">Add Weather Locations</h1>
     <p>Powered by: <a href="https://openweathermap.org/" target="_blank">https://openweathermap.org/</a></p>
     <p>Add some locations to your account profile.</p>
-    <p>
-        Use <a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" target="_blank">ISO 3166 country codes</a><br />
-        If in the US don't put periods or spaces between state abbreviations.<br />
+    <p class="text-start">
+        For the country use <a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" target="_blank">ISO 3166 country codes.</a>
+        If in the US don't put periods or spaces between state abbreviations.
         For example use NJ not N.J. For country use US not U.S.
+    </p>
+    <p class="text-start">
+        Note: You may have to experiment a bit to get the correct location. 
+        Sometimes city names are not found. For example, for some reason, the API wouldn't find Parker CO 
+        so I used Centennial CO -- a town or two north.
     </p>
     <form method="post" id="getWeatherForm">
         <input type="hidden" asp-for="Latitude" />
