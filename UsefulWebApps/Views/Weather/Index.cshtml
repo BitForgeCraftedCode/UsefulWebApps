@@ -2,10 +2,20 @@
     ViewData["Title"] = "Weather";
 }
 
+@model UsefulWebApps.Models.ViewModels.Weather.LocationsVM
+
 <div class="text-center max-width-550 mx-auto">
     <h1 class="display-3 mt-3">Weather</h1>
     <p>Powered by: <a href="https://openweathermap.org/" target="_blank">https://openweathermap.org/</a></p>
-    
-    <p>To get started add some <a asp-controller="Weather" asp-action="AddLocations">locations</a> to your account.</p>
-    
+    <div class="list-group max-width-250 mx-auto">
+        @foreach(var location in Model.Locations)
+        {
+            <a asp-controller="Weather" asp-action="Index" class="list-group-item list-group-item-action">@location.City</a>
+        }
+    </div>
+    <div class="max-width-250 mx-auto mt-3">
+        <div>
+            <a asp-controller="Weather" asp-action="AddLocations" class="btn w-100">Add Locations</a>
+        </div>
+    </div>    
 </div>

@@ -22,9 +22,13 @@ namespace UsefulWebApps.Controllers
         {
             _unitOfWork = unitOfWork;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            List<Locations> locations = (List<Locations>)await _unitOfWork.Locations.GetAllWhere("UserId", userId);
+            LocationsVM locationsVM = new() { Locations = locations };
+            return View(locationsVM);
         }
 
         [HttpPost]
