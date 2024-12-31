@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Weather Locations";
+}
+
+@model UsefulWebApps.Models.Weather.Locations
+
+<div class="text-center max-width-550 mx-auto">
+    <h1 class="display-3 mt-3">Add Weather Locations</h1>
+    <p>Powered by: <a href="https://openweathermap.org/" target="_blank">https://openweathermap.org/</a></p>
+    <p>Add some locations to your account profile.</p>
+    <p>
+        Use <a href="https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes" target="_blank">ISO 3166 country codes</a><br />
+        If in the US don't put periods or spaces between state abbreviations.<br />
+        For example use NJ not N.J. For country use US not U.S.
+    </p>
+    <form method="post" id="getWeatherForm">
+        <input type="hidden" asp-for="Latitude" />
+        <input type="hidden" asp-for="Longitude" />
+        <input type="hidden" asp-for="Zip" />
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="IsDefault" />
+        <div class="form-floating mb-3">
+            <input type="text" asp-for="City" class="form-control" placeholder="City" />
+            <label asp-for="City">City</label>
+            <span asp-validation-for="City" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" asp-for="State" class="form-control ignore" placeholder="State" minlenght="0" maxlength="2" />
+            <label asp-for="State">State - USA only</label>
+            <span asp-validation-for="State" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" asp-for="Country" class="form-control" placeholder="Country" maxlength="2" />
+            <label asp-for="Country">Country</label>
+            <span asp-validation-for="Country" class="text-danger"></span>
+        </div>
+        <div class="max-width-175 mx-auto">
+            <button type="submit" class="btn btn-primary mb-3 w-100">Add Location</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

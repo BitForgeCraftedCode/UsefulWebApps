@@ -17,6 +17,7 @@ namespace UsefulWebApps.Repository
         public IQuickLinksRepository QuickLinks { get; private set; }
         public ISlideShowRepository SlideShow { get; private set; }
         public IQuotesRepository Quotes { get; private set; }
+        public ILocationsRepository Locations { get; private set; }
         //other repos here
 
         public UnitOfWork(MySqlConnection db)
@@ -30,6 +31,7 @@ namespace UsefulWebApps.Repository
             QuickLinks = new QuickLinksRepository(_connection);
             SlideShow = new SlideShowRepository(_connection);
             Quotes = new QuotesRepository(_connection);
+            Locations = new LocationsRepository(_connection);
             //other repos here
         }
     }

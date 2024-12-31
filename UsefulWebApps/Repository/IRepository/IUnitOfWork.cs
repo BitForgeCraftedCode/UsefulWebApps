@@ -10,6 +10,7 @@
         IQuickLinksRepository QuickLinks { get; }
         ISlideShowRepository SlideShow { get; }
         IQuotesRepository Quotes { get; }
+        ILocationsRepository Locations { get; }
         //other repos here
     }
 }
