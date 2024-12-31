@@ -31,40 +31,6 @@ namespace UsefulWebApps.Controllers
             return View(locationsVM);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Index(Locations locationObj)
-        {
-            //get location lat and lon
-            string jsonLocation = string.Empty;
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            if (locationObj.Country.ToUpper() == "US" && locationObj.State.ToUpper() != "NA")
-            {
-                jsonLocation = await client.GetStringAsync($"http://api.openweathermap.org/geo/1.0/direct?q={locationObj.City},{locationObj.State},{locationObj.Country}&limit=1&appid={apiKey}");
-            }
-            else
-            {
-                jsonLocation = await client.GetStringAsync($"http://api.openweathermap.org/geo/1.0/direct?q={locationObj.City},{locationObj.Country}&limit=1&appid={apiKey}");
-            }
-            List<LocationJSON> location = JsonSerializer.Deserialize<List<LocationJSON>>(jsonLocation);
-            //get weather for lat and lon
-            string jsonCurrentWeather = string.Empty;
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            string lat = location[0].Latitude.ToString();
-            string lon = location[0].Longitude.ToString();  
-            jsonCurrentWeather = await client.GetStringAsync($"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units=imperial&appid={apiKey}");
-            CurrentWeatherJSON currentWeather = JsonSerializer.Deserialize<CurrentWeatherJSON>(jsonCurrentWeather);
-            
-            CurrentWeatherVM currentWeatherVM = new() 
-            { 
-                LocationJSON = location[0],
-                CurrentWeatherJSON = currentWeather 
-            };
-            
-            return PartialView("_CurrentWeatherPartial", currentWeatherVM);
-        }
-
         public IActionResult AddLocations()
         {
             ClaimsPrincipal currentUser = this.User;
@@ -144,7 +110,38 @@ namespace UsefulWebApps.Controllers
             }
             TempData["error"] = "Add location error. Try again.";
             return RedirectToAction("Index");
+        }
 
+        public async Task<IActionResult> Weather(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            Locations location = await _unitOfWork.Locations.GetById(id);
+            //get weather for lat and lon
+            string jsonCurrentWeather = string.Empty;
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            try
+            {
+                jsonCurrentWeather = await client.GetStringAsync($"https://api.openweathermap.org/data/2.5/weather?lat={location.Latitude}&lon={location.Longitude}&units=imperial&appid={apiKey}");
+            }
+            catch (Exception e) 
+            {
+                TempData["error"] = $"Sorry the api returned an error. {e.Message}";
+                return RedirectToAction("Index");
+            }
+            
+            CurrentWeatherJSON currentWeather = JsonSerializer.Deserialize<CurrentWeatherJSON>(jsonCurrentWeather);
+
+            CurrentWeatherVM currentWeatherVM = new()
+            {
+                Location = location,
+                CurrentWeatherJSON = currentWeather
+            };
+
+            return View(currentWeatherVM);
         }
     }
 }

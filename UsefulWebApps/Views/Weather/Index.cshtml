@@ -10,7 +10,7 @@
     <div class="list-group max-width-250 mx-auto">
         @foreach(var location in Model.Locations)
         {
-            <a asp-controller="Weather" asp-action="Index" class="list-group-item list-group-item-action">@location.City</a>
+            <a asp-controller="Weather" asp-action="Weather" asp-route-id="@location.Id" class="list-group-item list-group-item-action">@location.City</a>
         }
     </div>
     <div class="max-width-250 mx-auto mt-3">

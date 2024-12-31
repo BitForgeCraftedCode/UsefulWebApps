@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Weather";
+}
+
+@model UsefulWebApps.Models.ViewModels.Weather.CurrentWeatherVM
+
+<div class="text-center max-width-550 mx-auto">
+    <h1 class="display-3 mt-3">Weather</h1>
+    <p>Powered by: <a href="https://openweathermap.org/" target="_blank">https://openweathermap.org/</a></p>
+    <p>@Model.CurrentWeatherJSON.Main.temp</p>
+</div>
