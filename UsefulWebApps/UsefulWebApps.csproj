@@ -43,4 +43,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Helpers\Weather\APIKEY.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
