@@ -148,7 +148,7 @@ namespace UsefulWebApps.Controllers
                 return RedirectToAction("Index");
             }
             ForecastWeatherJSON forecastWeather = JsonSerializer.Deserialize<ForecastWeatherJSON>(jsonForecast);
-            Console.WriteLine(forecastWeather);
+            
             CurrentWeatherVM currentWeatherVM = new()
             {
                 Location = location,
