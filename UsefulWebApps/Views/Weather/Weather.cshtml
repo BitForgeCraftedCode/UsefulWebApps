@@ -1,11 +1,67 @@
-﻿@{
+﻿@using UsefulWebApps.Helpers.Weather
+@{
     ViewData["Title"] = "Weather";
 }
 
 @model UsefulWebApps.Models.ViewModels.Weather.CurrentWeatherVM
 
-<div class="text-center max-width-550 mx-auto">
+<div class="container text-center max-width-550 mx-auto pb-3">
     <h1 class="display-3 mt-3">Weather</h1>
     <p>Powered by: <a href="https://openweathermap.org/" target="_blank">https://openweathermap.org/</a></p>
-    <p>@Model.CurrentWeatherJSON.Main.temp</p>
+    <div class="text-start">
+        <div>
+            <h3 class="text-center text-decoration-underline">@Model.Location.City</h3>
+            <p><strong>Latitude:</strong> @string.Format("{0:0.0000}", Model.Location.Latitude)</p>
+            <p><strong>Longitude:</strong> @string.Format("{0:0.0000}", Model.Location.Longitude)</p>
+            <p><strong>Country:</strong> @Model.Location.Country</p>
+            <p><strong>State:</strong> @Model.Location.State</p>
+        </div>
+        <div>
+            <h3 class="text-center text-decoration-underline">Current Conditions</h3>
+            <p><strong>Temperture:</strong> @Model.CurrentWeatherJSON.Main.temp &#176; F</p>
+            <p><strong>Temperature Feels Like:</strong> @Model.CurrentWeatherJSON.Main.feels_like &#176; F</p>
+            <p><strong>Minimal Currently Observed Temperature:</strong> @Model.CurrentWeatherJSON.Main.temp_min &#176; F</p>
+            <p><strong>Maximal Currently Observed Temperature:</strong> @Model.CurrentWeatherJSON.Main.temp_max &#176; F</p>
+            <p>
+                At the Earth’s surface the air pressure of the atmosphere is usually within the range 980 to 1030 hPa.
+                In general, a rising barometer means improving weather. In general, a falling barometer means worsening weather.<br/>
+                one hPa = one millibar = one thousandth of a “bar”
+            </p>
+            <p><strong>Pressure Sea Level hPa:</strong> @Model.CurrentWeatherJSON.Main.pressure hPa</p>
+            <p><strong>Humidity:</strong> @Model.CurrentWeatherJSON.Main.humidity %</p>
+            <p>The maximum value of the visibility is 10 km or 10000 m or about 6.2137 miles</p>
+            <p><strong>Visibility:</strong> @string.Format("{0:0.0000}", UnitConversions.MetersToMiles(Model.CurrentWeatherJSON.Visibility)) miles</p>
+            <p><strong>Wind Speed:</strong> @Model.CurrentWeatherJSON.Wind.speed miles/hr</p>
+            <p><strong>Wind Gusts:</strong> @Model.CurrentWeatherJSON.Wind.gust miles/hr</p>
+            <p><strong>Cloud Cover:</strong> @Model.CurrentWeatherJSON.Clouds.all %</p>
+            <p>
+                The first and the most important thing to remember: wind direction is always determined
+                by where the wind is blowing FROM, not where it is blowing towards.
+                Meteorological wind direction is defined as the direction from which it originates.
+                For example, a northerly wind blows from the north to the south. Wind direction is measured in degrees clockwise from due north.
+                Hence, a wind coming from the south has a wind direction of 180 degrees; one from the east is 90 degrees.
+            </p>
+            <p><strong>Wind Direction:</strong> @Model.CurrentWeatherJSON.Wind.deg degrees</p>
+            <p><strong>Wind Cardinal Direction:</strong> @UnitConversions.WindDegToDir(Model.CurrentWeatherJSON.Wind.deg)</p>
+            
+
+            @if(Model.CurrentWeatherJSON.Rain != null)
+            {
+                <p><strong>Rain Volume Last Hour:</strong> @string.Format("{0:0.0000}", UnitConversions.mmToInch(Model.CurrentWeatherJSON.Rain.hr1)) inches</p>
+                <p><strong>Rain Volume Last 3 Hours:</strong> @string.Format("{0:0.0000}", UnitConversions.mmToInch(Model.CurrentWeatherJSON.Rain.hr3)) inches</p>
+            }
+            @if (Model.CurrentWeatherJSON.Snow != null)
+            {
+                <p><strong>Snow Volume Last Hour:</strong> @string.Format("{0:0.0000}", UnitConversions.mmToInch(Model.CurrentWeatherJSON.Snow.hr1)) inches</p>
+                <p><strong>Snow Volume Last 3 Hours:</strong> @string.Format("{0:0.0000}", UnitConversions.mmToInch(Model.CurrentWeatherJSON.Snow.hr3)) inches</p>
+            }
+            <p>Note: Time is converted to local time. So if your chosen location is far away from your location times will appear incorrectly.</p>
+            <p><strong>Time Of Data Calculation:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.CurrentWeatherJSON.UnixTimeStamp, true)</p>
+            <p><strong>Sunrise:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.CurrentWeatherJSON.SunRiseSetUnixStamp.sunrise, true)</p>
+            <p><strong>Sunset:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.CurrentWeatherJSON.SunRiseSetUnixStamp.sunset, true)</p>
+            <p><strong>City:</strong> @Model.CurrentWeatherJSON.Name</p>
+            <p><strong>Latitude:</strong> @string.Format("{0:0.0000}", Model.CurrentWeatherJSON.Coord.lat)</p>
+            <p><strong>Longitude:</strong> @string.Format("{0:0.0000}", Model.CurrentWeatherJSON.Coord.lon)</p>
+        </div>
+    </div>
 </div>
