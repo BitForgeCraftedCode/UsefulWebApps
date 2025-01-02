@@ -63,5 +63,51 @@
             <p><strong>Latitude:</strong> @string.Format("{0:0.0000}", Model.CurrentWeatherJSON.Coord.lat)</p>
             <p><strong>Longitude:</strong> @string.Format("{0:0.0000}", Model.CurrentWeatherJSON.Coord.lon)</p>
         </div>
+        <div class="text-center">
+            <h3 class="text-decoration-underline">5 Day 3 Hour Forecast</h3>
+            <hr class="border border-primary border-3 opacity-75">
+            @foreach (UsefulWebApps.Models.Weather.ForecastRecord forecastRecord in Model.ForecastWeatherJSON.Forecast)
+            {
+                List<UsefulWebApps.Models.Weather.WeatherRecord> wther = forecastRecord.Weather;
+                <h4>@UnitConversions.UnixTimeStampToDateTime(forecastRecord.TimeDataForecastedUNIX_UTC, false).DayOfWeek <br/> @UnitConversions.UnixTimeStampToDateTime(forecastRecord.TimeDataForecastedUNIX_UTC, false)</h4>
+             
+                foreach (UsefulWebApps.Models.Weather.WeatherRecord weather in wther)
+                {
+                    <p><strong>Conditions:</strong> @weather.description</p>
+                    string iconURL = $"https://openweathermap.org/img/wn/{weather.icon}@2x.png";
+                    <div>
+                        <img src="@iconURL" />
+                    </div>
+                    
+                }
+                <p><strong>Probability of Precipitation:</strong> @forecastRecord.ProbabilityPrecipitation</p>
+                if(forecastRecord.Rain != null)
+                {
+                    <p><strong>Rain Volume Last 3 Hours:</strong> @string.Format("{0:0.0000}", UnitConversions.mmToInch(forecastRecord.Rain.hr3))</p>
+                }
+                if(forecastRecord.Snow != null)
+                {
+                    <p><strong>Snow Volume Last 3 Hours:</strong> @string.Format("{0:0.0000}", UnitConversions.mmToInch(forecastRecord.Snow.hr3))</p>
+                }
+                <p><strong>Temperture:</strong> @forecastRecord.Main.temp &#176; F</p>
+                
+                <p><strong>Pressure Sea Level hPa:</strong> @forecastRecord.Main.pressure</p>
+                <p><strong>Pressure Ground Level hPa:</strong> @forecastRecord.Main.grnd_level</p>
+                <p><strong>Humidity:</strong> @forecastRecord.Main.humidity %</p>
+                <p><strong>Visibility:</strong> @string.Format("{0:0.0000}", UnitConversions.MetersToMiles(forecastRecord.Visibility)) miles</p>
+                <p><strong>Wind Speed:</strong> @forecastRecord.Wind.speed miles/hr</p>
+                <p><strong>Wind Direction:</strong> @forecastRecord.Wind.deg degrees</p>
+                <p><strong>Wind Cardinal Direction:</strong> @UnitConversions.WindDegToDir(forecastRecord.Wind.deg)</p>
+                <p><strong>Wind Gusts:</strong> @forecastRecord.Wind.gust miles/hr</p>
+                <p><strong>Cloud Cover:</strong> @forecastRecord.Clouds.all %</p>
+
+                <p><strong>City:</strong> @Model.ForecastWeatherJSON.City.name</p>
+                <p><strong>Population:</strong> @string.Format("{0:n0}", Model.ForecastWeatherJSON.City.population)</p>
+                <p><strong>Sunrise:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.ForecastWeatherJSON.City.sunrise, true)</p>
+                <p><strong>Sunset:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.ForecastWeatherJSON.City.sunset, true)</p>
+
+                <hr class="border border-primary border-3 opacity-75">
+            }
+        </div>
     </div>
 </div>

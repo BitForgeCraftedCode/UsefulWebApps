@@ -132,13 +132,28 @@ namespace UsefulWebApps.Controllers
                 TempData["error"] = $"Sorry the api returned an error. {e.Message}";
                 return RedirectToAction("Index");
             }
-            
-            CurrentWeatherJSON currentWeather = JsonSerializer.Deserialize<CurrentWeatherJSON>(jsonCurrentWeather);
 
+            CurrentWeatherJSON currentWeather = JsonSerializer.Deserialize<CurrentWeatherJSON>(jsonCurrentWeather);
+            //get forecast for lat and lon
+            string jsonForecast = string.Empty;
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            try
+            {
+                jsonForecast = await client.GetStringAsync($"https://api.openweathermap.org/data/2.5/forecast?lat={location.Latitude}&lon={location.Longitude}&units=imperial&appid={apiKey}");
+            }
+            catch (Exception e) 
+            {
+                TempData["error"] = $"Sorry the api returned an error. {e.Message}";
+                return RedirectToAction("Index");
+            }
+            ForecastWeatherJSON forecastWeather = JsonSerializer.Deserialize<ForecastWeatherJSON>(jsonForecast);
+            Console.WriteLine(forecastWeather);
             CurrentWeatherVM currentWeatherVM = new()
             {
                 Location = location,
-                CurrentWeatherJSON = currentWeather
+                CurrentWeatherJSON = currentWeather,
+                ForecastWeatherJSON = forecastWeather
             };
 
             return View(currentWeatherVM);

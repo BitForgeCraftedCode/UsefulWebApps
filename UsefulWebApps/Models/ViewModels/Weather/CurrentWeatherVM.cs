@@ -6,5 +6,6 @@ namespace UsefulWebApps.Models.ViewModels.Weather
     {
         public Locations Location { get; set; }
         public CurrentWeatherJSON CurrentWeatherJSON { get; set; }
+        public ForecastWeatherJSON ForecastWeatherJSON { get; set; }
     }
 }
