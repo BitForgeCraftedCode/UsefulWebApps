@@ -4,13 +4,17 @@
 
 @model UsefulWebApps.Models.ViewModels.Weather.LocationsVM
 
-<div class="text-center max-width-550 mx-auto">
+<div class="text-center max-width-550 mx-auto container pb-3">
     <h1 class="display-3 mt-3">Weather</h1>
     <p>Powered by: <a href="https://openweathermap.org/" target="_blank">https://openweathermap.org/</a></p>
-    <div class="list-group max-width-250 mx-auto">
+    <div class="list-group max-width-350 mx-auto">
         @foreach(var location in Model.Locations)
         {
-            <a asp-controller="Weather" asp-action="Weather" asp-route-id="@location.Id" class="list-group-item list-group-item-action">@location.City</a>
+            <a asp-controller="Weather" asp-action="Weather" asp-route-id="@location.Id" class="list-group-item list-group-item-action">@location.City - @location.State - @location.Country</a>
+            <form method="post" asp-controller="Weather" asp-action="DeleteLocation" class="delete-location">
+                <input type="hidden" asp-for="@location.Id" name="id" />
+                <button type="submit" class="btn btn-outline-danger btn-sm">Remove Location</button>
+            </form>
         }
     </div>
     <div class="max-width-250 mx-auto mt-3">
@@ -19,3 +23,28 @@
         </div>
     </div>    
 </div>
+
+@section Scripts
+{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <script>
+        //have to loop through each form and submit "this" one that is clicked
+        $(".delete-location").each(function () {
+            $(this).validate({
+                submitHandler: function (form) {
+                    //ask to confirm delete
+                    toastConfirm().then(deleteConfirm => {
+                        if (deleteConfirm == true) {
+                            form.submit();
+                        }
+                        else {
+                            toastr.success("Location has NOT been deleted");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

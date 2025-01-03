@@ -158,5 +158,26 @@ namespace UsefulWebApps.Controllers
 
             return View(currentWeatherVM);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteLocation(int? id)
+        {
+            if (!ModelState.IsValid) 
+            {
+                TempData["error"] = "Delete location error. Try again.";
+                return RedirectToAction("Index");
+            }
+            bool success = await _unitOfWork.Locations.Delete(id);
+            if (success)
+            {
+                TempData["success"] = "Location deleted successfully.";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                TempData["error"] = "Delete location error. Try again.";
+                return RedirectToAction("Index");
+            }
+        }
     }
 }
