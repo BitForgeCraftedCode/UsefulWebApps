@@ -56,9 +56,9 @@
                 <p><strong>Snow Volume Last 3 Hours:</strong> @string.Format("{0:0.0000}", UnitConversions.mmToInch(Model.CurrentWeatherJSON.Snow.hr3)) inches</p>
             }
             <p>Note: Time is converted to local time. So if your chosen location is far away from your location times will appear incorrectly.</p>
-            <p><strong>Time Of Data Calculation:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.CurrentWeatherJSON.UnixTimeStamp, true)</p>
-            <p><strong>Sunrise:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.CurrentWeatherJSON.SunRiseSetUnixStamp.sunrise, true)</p>
-            <p><strong>Sunset:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.CurrentWeatherJSON.SunRiseSetUnixStamp.sunset, true)</p>
+            <p><strong>Time Of Data Calculation:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.CurrentWeatherJSON.UnixTimeStamp, true) - @Model.CurrentWeatherJSON.UnixTimeStamp</p>
+            <p><strong>Sunrise:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.CurrentWeatherJSON.SunRiseSetUnixStamp.sunrise, true) - @Model.CurrentWeatherJSON.SunRiseSetUnixStamp.sunrise</p>
+            <p><strong>Sunset:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.CurrentWeatherJSON.SunRiseSetUnixStamp.sunset, true) - @Model.CurrentWeatherJSON.SunRiseSetUnixStamp.sunset</p>
             <p><strong>City:</strong> @Model.CurrentWeatherJSON.Name</p>
             <p><strong>Latitude:</strong> @string.Format("{0:0.0000}", Model.CurrentWeatherJSON.Coord.lat)</p>
             <p><strong>Longitude:</strong> @string.Format("{0:0.0000}", Model.CurrentWeatherJSON.Coord.lon)</p>
@@ -69,7 +69,7 @@
             @foreach (UsefulWebApps.Models.Weather.ForecastRecord forecastRecord in Model.ForecastWeatherJSON.Forecast)
             {
                 List<UsefulWebApps.Models.Weather.WeatherRecord> wther = forecastRecord.Weather;
-                <h4>@UnitConversions.UnixTimeStampToDateTime(forecastRecord.TimeDataForecastedUNIX_UTC, false).DayOfWeek <br/> @UnitConversions.UnixTimeStampToDateTime(forecastRecord.TimeDataForecastedUNIX_UTC, false)</h4>
+                <h4>@UnitConversions.UnixTimeStampToDateTime(forecastRecord.TimeDataForecastedUNIX_UTC, false).DayOfWeek <br /> @UnitConversions.UnixTimeStampToDateTime(forecastRecord.TimeDataForecastedUNIX_UTC, false) - @forecastRecord.TimeDataForecastedUNIX_UTC</h4>
              
                 foreach (UsefulWebApps.Models.Weather.WeatherRecord weather in wther)
                 {
@@ -103,8 +103,8 @@
 
                 <p><strong>City:</strong> @Model.ForecastWeatherJSON.City.name</p>
                 <p><strong>Population:</strong> @string.Format("{0:n0}", Model.ForecastWeatherJSON.City.population)</p>
-                <p><strong>Sunrise:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.ForecastWeatherJSON.City.sunrise, true)</p>
-                <p><strong>Sunset:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.ForecastWeatherJSON.City.sunset, true)</p>
+                <p><strong>Sunrise:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.ForecastWeatherJSON.City.sunrise, true) - @Model.ForecastWeatherJSON.City.sunrise</p>
+                <p><strong>Sunset:</strong> @UnitConversions.UnixTimeStampToDateTime(Model.ForecastWeatherJSON.City.sunset, true) - @Model.ForecastWeatherJSON.City.sunset</p>
 
                 <hr class="border border-primary border-3 opacity-75">
             }
