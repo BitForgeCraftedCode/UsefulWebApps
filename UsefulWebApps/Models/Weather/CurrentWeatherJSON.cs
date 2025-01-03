@@ -2,6 +2,7 @@
 
 namespace UsefulWebApps.Models.Weather
 {
+    //timezone is the Shift in seconds from UTC
     public record class CurrentWeatherJSON(
         [property: JsonPropertyName("coord")] coordRecord Coord,
         [property: JsonPropertyName("weather")] List<WeatherRecord> Weather,
@@ -14,7 +15,8 @@ namespace UsefulWebApps.Models.Weather
         [property: JsonPropertyName("snow")] RainRecord Snow,
         [property: JsonPropertyName("dt")] long UnixTimeStamp,
         [property: JsonPropertyName("sys")] SunRiseSetUnixStampRecord SunRiseSetUnixStamp,
-        [property: JsonPropertyName("name")] string Name);
+        [property: JsonPropertyName("name")] string Name,
+        [property: JsonPropertyName("timezone")] long TimeZone);
 
     public record class coordRecord(double lon, double lat);
     public record class WeatherRecord(string main, string description, string icon);

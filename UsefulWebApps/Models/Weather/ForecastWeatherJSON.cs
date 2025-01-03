@@ -28,5 +28,6 @@ namespace UsefulWebApps.Models.Weather
 
     //Part of the day (n - night, d - day)
     public record class PartOfDayRecord(string pod);
-    public record class CityRecord(string name, coordRecord coord, string country, uint population, long sunrise, long sunset);
+    //timezone is the Shift in seconds from UTC
+    public record class CityRecord(string name, coordRecord coord, string country, uint population, long timezone, long sunrise, long sunset);
 }
