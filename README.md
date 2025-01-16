@@ -52,7 +52,10 @@ The plan will be to have a development database with dummy users and data. Then 
 ## Transfer files from Ubuntu server to Windows
 
 1. I use Windows Subsystem for Linux so open Ubuntu terminal
-2. scp user@hostIP:/home/beefcake/UseFulWebAppsSqlDumps/usefulwebapps_2024_11_01.sql /mnt/c/Users/arogala/Documents/SqlDumpFromServer
+2. scp user@hostIP:/home/beefcake/UseFulWebAppsSqlDumps/usefulwebapps_2024_11_01.sql /mnt/c/Users/arogala/Documents/SqlDumpFromServer -- better off with rsync below
+	* rsync -av user@hostIp:/home/beefcake/UseFulWebAppsSqlDumps/useful_2025_01_16_prod.sql /mnt/c/Users/arogala/Documents/SqlDumpFromServer
+	* sync images on server to dev location
+	* rsync -av user@hostIp:/var/www/thedotnetwizard.com/html/wwwroot/images/ /mnt/c/Users/arogala/Documents/GitHub/UsefulWebApps/UsefulWebApps/wwwroot/images/
 3. SCP (secure copy) works like this
 	* scp [OPTION] [user@]SRC_HOST:]file1 [user@]DEST_HOST:]file2
 4. Don't need host IP if host is local PC
