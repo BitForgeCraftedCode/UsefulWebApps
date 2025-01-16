@@ -6,13 +6,13 @@ The Repository and Unit of Work Pattern is implemented in the application to sep
 
 The application is hosted on an Ubuntu 24.04 server and placed behind a reverse proxy Nginx server. I followed the documentation [here](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-8.0&tabs=linux-ubuntu) and [here](https://www.digitalocean.com/community/tutorials/how-to-deploy-an-asp-net-core-application-with-mysql-server-using-nginx-on-ubuntu-18-04). The publish profile is set up to be self contained so no need to install dot net on the server. 
 
-The vision or purpose of this app is to be an open source self hosted family organizer application. For now it is just a recipe and list application but future plans are to add weather, family calendar, family chat, a website aggregator, and maybe a customized (per user) home page. Maybe add an email server to support a better login system and other fun things. 
+The vision or purpose of this app is to be an open source self hosted family organizer application. For now it is just a recipe, list, and weather application but future plans are to add, family calendar, family chat, a website aggregator, and maybe a customized (per user) home page. Maybe add an email server to support a better login system and other fun things. 
 
 ## Build Directions local development
 
 1. Install and configure MySQL Community Server Version 8.0.37 was used for my development on PC.
 2. Clone and build the app with Visual Studio.
-3. Seed the Database with the SQL dump file in the repository.
+3. Seed the Database with the SQL dump file in the repository -- this is now really outdated and will no longer work (Too many data table changes behind). Thinking of a better way to do this. 
 4. Run
 
 ## Back up and restore Windows
