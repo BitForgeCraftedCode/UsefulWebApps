@@ -31,7 +31,7 @@ Future plans include:
 
 1. Install **MySQL Community Server** (v8.0.37 used in development).  
 2. Clone the repository and build the project with **Visual Studio**.  
-3. **Database seeding**: The plan will be to have a development database with dummy users and data. Then you can login as admin change and change the PW before hosting. Then backup data base and host with new PW.
+3. **Database seeding**: The plan is to provide a development MySQL dump with dummy users and data. You can log in using the provided admin password, then update it before backing up the database and hosting it on your own server.
 4. Run the application locally to test functionality. 
 
 ---
@@ -65,7 +65,7 @@ rsync -av * user@hostIP:/var/www/thedotnetwizard.com/html
 ```
 sudo systemctl start kestrel-usefulwebapps.service
 ```
-> Optionally, reboot the server after updates.
+> Optionally, instead of restarting the service. Reboot the server after updates; the service will restart on boot.
 
 ## Running the App on Ubuntu
 
