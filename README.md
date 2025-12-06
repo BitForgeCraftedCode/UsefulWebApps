@@ -1,62 +1,109 @@
-# Usefulweb apps
+# UsefulWebApps
 
-Usefulweb apps is an Asp.Net Core MVC application with a MySQL server database. User logins are managed with [Identity Core](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-8.0&tabs=visual-studio) and [Entity Framework Core](https://learn.microsoft.com/en-us/ef/core/) to connect to the database. All other data objects are mapped with [Dapper](https://github.com/DapperLib/Dapper) 
+**UsefulWebApps** is an **ASP.NET Core MVC** application with a **MySQL database** backend.
 
-The Repository and Unit of Work Pattern is implemented in the application to separate data access logic from business/controller class logic.
+- **User authentication** is handled via [ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity?view=aspnetcore-8.0&tabs=visual-studio) with [Entity Framework Core](https://learn.microsoft.com/en-us/ef/core/) for database access.  
+- **Other data objects** are mapped using [Dapper](https://github.com/DapperLib/Dapper).  
+- The app implements the **Repository and Unit of Work pattern** to separate data access logic from controllers and business logic.  
 
-The application is hosted on an Ubuntu 24.04 server and placed behind a reverse proxy Nginx server. I followed the documentation [here](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-8.0&tabs=linux-ubuntu) and [here](https://www.digitalocean.com/community/tutorials/how-to-deploy-an-asp-net-core-application-with-mysql-server-using-nginx-on-ubuntu-18-04). The publish profile is set up to be self contained so no need to install dot net on the server. 
+The application is hosted on an **Ubuntu 24.04 server** behind an **Nginx reverse proxy**. The deployment is **self-contained**, so no .NET runtime installation is required on the server. Useful setup documentation [here](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/linux-nginx?view=aspnetcore-8.0&tabs=linux-ubuntu) and [here](https://www.digitalocean.com/community/tutorials/how-to-deploy-an-asp-net-core-application-with-mysql-server-using-nginx-on-ubuntu-18-04). 
 
-The vision or purpose of this app is to be an open source self hosted family organizer application. For now it is just a recipe, list, and weather application but future plans are to add, family calendar, family chat, a website aggregator, and maybe a customized (per user) home page. Maybe add an email server to support a better login system and other fun things. 
+## Purpose
 
-## Build Directions local development
+The goal of **UsefulWebApps** is to provide an open-source, self-hosted **family organizer** application.
+Current functionality includes:
 
-1. Install and configure MySQL Community Server Version 8.0.37 was used for my development on PC.
-2. Clone and build the app with Visual Studio.
-3. Seed the Database with the SQL dump file in the repository -- this is now really outdated and will no longer work (Too many data table changes behind). Thinking of a better way to do this. 
-4. Run
+- Recipes management
+- Lists
+- Weather
+- User-customized home pages
 
-## Back up and restore Windows
+Future plans include:
 
-1. To back-up/restore use Windows command prompt not power shell
-2. First open command promp in C:\Program Files\MySQL\MySQL Server 8.0\bin
-3. To back-up: mysqldump -u root -p usefulwebapps > C:\MySQLBackup\usefulwebapps_2024_09_03.sql
-4. To restore run: mysql -u root -p usefulwebapps < C:\MySQLBackup\usefulwebapps_2024_09_03.sql
+- Family calendar
+- Family chat
+- Website aggregator
+- Optional email server for enhanced login and notifications
 
-The plan will be to have a development database with dummy users and data. Then you can login as admin change and change the PW before hosting. Then backup data base and host with new PW.
+---
 
-## Transfer publish files to Ubuntu server
+## Local Development Setup
 
-1. First shut down the Kestrel server (the app)
-2. login to Ubuntu server cd /etc/systemd/system
-3. sudo systemctl stop kestrel-usefulwebapps.service
-4. On the local pc I use Windows Subsystem for Linux
-5. Open Ubuntu terminal on local pc in publish root folder then run this
-6. scp -r * user@hostIP:/var/www/thedotnetwizard.com/html -- better off with rsync below
-	* rsync -av * user@hostIP:/var/www/thedotnetwizard.com/html
-7. After transefer complete restart the service 
-8. sudo systemctl start kestrel-usefulwebapps.service
-9. you could also just reboot the server and now may be a good time to update it.
+1. Install **MySQL Community Server** (v8.0.37 used in development).  
+2. Clone the repository and build the project with **Visual Studio**.  
+3. **Database seeding**: The plan will be to have a development database with dummy users and data. Then you can login as admin change and change the PW before hosting. Then backup data base and host with new PW.
+4. Run the application locally to test functionality. 
 
-## To run the app on Ubuntu server
+---
+## Backup and Restore on Windows
 
-1. Go to /var/www/thedotnetwizard.com/html and type ./UsefulWebApps
+1. Open **Command Prompt** (not PowerShell) in MySql Server bin
+```
+cd C:\Program Files\MySQL\MySQL Server 8.0\bin
+```
+2. **Backup**
+```
+mysqldump -u root -p usefulwebapps > C:\MySQLBackup\usefulwebapps_YYYY_MM_DD.sql
+```
+3. **Restore**
+```
+mysql -u root -p usefulwebapps < C:\MySQLBackup\usefulwebapps_YYYY_MM_DD.sql
+```
 
-## Back up and restore from Ubuntu server
+## Deploying to Ubuntu Server
+
+1. Login to the Ubuntu server and shut down the Kestrel service
+```
+cd /etc/systemd/system
+sudo systemctl stop kestrel-usefulwebapps.service
+```
+2. Transfer publish files from Windows using rsync via Windows Subsystem for Linux (WSL). Open Ubuntu terminal in publish root folder then run the below rsync command.
+```
+rsync -av * user@hostIP:/var/www/thedotnetwizard.com/html
+```
+3. Restart the service
+```
+sudo systemctl start kestrel-usefulwebapps.service
+```
+> Optionally, reboot the server after updates.
+
+## Running the App on Ubuntu
+
+```
+cd /var/www/thedotnetwizard.com/html
+./UsefulWebApps
+```
+
+## Backup and Restore on Ubuntu
 
 1. Navigate to folder with backups
-2. sudo mysqldump usefulwebapps > backupfilename.sql
-	* This will dump the usefulwebapps database in the backup folder
-3. sudo mysql usefulwebapps < backupfilename.sql
-	* This will restore the usefulwebapps database with the backup file.
+2. **Backup**
+```
+sudo mysqldump usefulwebapps > usefulwebapps_YYYY_MM_DD.sql
+```
+3. **Restore**
+```
+sudo mysql usefulwebapps < usefulwebapps_YYYY_MM_DD.sql
+```
+
 	
-## Transfer files from Ubuntu server to Windows
+## Transfer Database or Images from Ubuntu to Windows
 
-1. I use Windows Subsystem for Linux so open Ubuntu terminal
-2. scp user@hostIP:/home/beefcake/UseFulWebAppsSqlDumps/usefulwebapps_2024_11_01.sql /mnt/c/Users/arogala/Documents/SqlDumpFromServer -- better off with rsync below
-	* rsync -av user@hostIp:/home/beefcake/UseFulWebAppsSqlDumps/useful_2025_01_16_prod.sql /mnt/c/Users/arogala/Documents/SqlDumpFromServer
-	* sync images on server to dev location
-	* rsync -av user@hostIp:/var/www/thedotnetwizard.com/html/wwwroot/images/ /mnt/c/Users/arogala/Documents/GitHub/UsefulWebApps/UsefulWebApps/wwwroot/images/
-3. SCP (secure copy) works like this
-	* scp [OPTION] [user@]SRC_HOST:]file1 [user@]DEST_HOST:]file2
-4. Don't need host IP if host is local PC
+1. Open WSL / Ubuntu terminal on Windows
+2. Transfer database dump
+```
+rsync -av user@hostIp:/home/beefcake/UseFulWebAppsSqlDumps/usefulwebapps_YYYY_MM_DD.sql /mnt/c/Users/arogala/Documents/SqlDumpFromServer
+```
+3. Sync images from server to local development folder
+```
+rsync -av user@hostIp:/var/www/thedotnetwizard.com/html/wwwroot/images/ /mnt/c/Users/arogala/Documents/GitHub/UsefulWebApps/UsefulWebApps/wwwroot/images/
+```
 
+
+## 🪪 License
+
+**UsefulWebApps** is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+You are free to use, modify, and distribute this software under the terms of the AGPL. If you modify and publicly distribute the software — including via a hosted service — you must make your source code available under the same license.
+
+[License v3.0 (AGPL-3.0)](LICENSE.md)
