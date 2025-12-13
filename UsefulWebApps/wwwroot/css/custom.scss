@@ -91,6 +91,39 @@ body {
     margin-bottom: 60px;
 }
 
+/*Calendar*/
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    max-width: 800px;
+    margin: auto;
+}
+
+.day-box {
+    padding: 4px;
+    border: 1px solid #ccc;
+    min-height: 80px;
+}
+
+.other-month {
+    color: #888;
+    background-color: #f8f8f8;
+}
+
+.today {
+    background-color: #ffe680 !important;
+    border: 1px solid #ffd000;
+    font-weight: bold;
+}
+
+.dow-header {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 8px;
+}
+/*End Calendar*/
+
 /*Custom scrollbar*/
 ::-webkit-scrollbar {
     width: .75em;
