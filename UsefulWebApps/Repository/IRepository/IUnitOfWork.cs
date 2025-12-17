@@ -11,6 +11,7 @@
         ISlideShowRepository SlideShow { get; }
         IQuotesRepository Quotes { get; }
         ILocationsRepository Locations { get; }
+        ICalendarEventsRepository CalendarEvents { get; }
         //other repos here
     }
 }

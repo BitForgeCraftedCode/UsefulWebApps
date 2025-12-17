@@ -18,6 +18,7 @@ namespace UsefulWebApps.Repository
         public ISlideShowRepository SlideShow { get; private set; }
         public IQuotesRepository Quotes { get; private set; }
         public ILocationsRepository Locations { get; private set; }
+        public ICalendarEventsRepository CalendarEvents { get; private set; }
         //other repos here
 
         public UnitOfWork(MySqlConnection db)
@@ -32,6 +33,7 @@ namespace UsefulWebApps.Repository
             SlideShow = new SlideShowRepository(_connection);
             Quotes = new QuotesRepository(_connection);
             Locations = new LocationsRepository(_connection);
+            CalendarEvents = new CalendarEventsRepository(_connection);
             //other repos here
         }
     }
