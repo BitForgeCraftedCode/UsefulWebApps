@@ -34,6 +34,12 @@
 
         <div class="@css">
             <div>@day.Date.Day</div>
+            @foreach (var ev in day.Events)
+            {
+                <div class="calendar-event">
+                    @ev.Title
+                </div>
+            }
         </div>
     }
     

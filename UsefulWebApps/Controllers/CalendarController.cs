@@ -3,6 +3,7 @@ using Ganss.Xss;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
+using Ical.Net.Evaluation;
 using Ical.Net.Serialization.DataTypes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ namespace UsefulWebApps.Controllers
         {
             _unitOfWork = unitOfWork;
         }
-        public IActionResult Index(int? year, int? month)
+        public async Task<IActionResult> Index(int? year, int? month)
         {
             DateTime firstOfMonth = new DateTime(
                 year ?? DateTime.Today.Year,
@@ -33,8 +34,101 @@ namespace UsefulWebApps.Controllers
                 1);
 
             CalendarMonthVM vm = BuildCalendarMonth(firstOfMonth);
+            await LoadEventsForMonth(vm);
             return View(vm);
         }
+
+        private async Task LoadEventsForMonth(CalendarMonthVM vm)
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            //[ rangeStart , rangeEnd )
+            //inclusive start, exclusive end
+            //TakeWhileBefore method is exclusive
+            DateTime rangeStart = vm.Days.First().Date.Date;
+            DateTime rangeEnd = vm.Days.Last().Date.Date.AddDays(1);
+
+            //need better SQL method to pull events for currentUser -- this pulls all
+            List<CalendarEvents> events = (List<CalendarEvents>)await _unitOfWork.CalendarEvents.GetAll();
+            ExpandAndAttachEvents(vm, events, rangeStart, rangeEnd);
+        }
+
+        private void ExpandAndAttachEvents(
+            CalendarMonthVM vm,
+            List<CalendarEvents> events,
+            DateTime rangeStart,
+            DateTime rangeEnd)
+        {
+            foreach (CalendarEvents ev in events)
+            {
+                if (string.IsNullOrEmpty(ev.RRule))
+                {
+                    AttachSingleEvent(vm, ev);
+                }
+                else
+                {
+                    AttachRecurringEvent(vm, ev, rangeStart, rangeEnd);
+                }
+            }
+        }
+
+        private void AttachSingleEvent(CalendarMonthVM vm, CalendarEvents ev)
+        {
+            foreach (CalendarDayVM day in vm.Days)
+            {
+                if (day.Date.Date >= ev.StartDate.Date && day.Date.Date <= ev.EndDate.Date)
+                {
+                    day.Events.Add(ev);
+                }
+            }
+        }
+
+        private void AttachRecurringEvent(
+            CalendarMonthVM vm,
+            CalendarEvents ev,
+            DateTime rangeStart,
+            DateTime rangeEnd)
+        {
+            // Build iCal event
+            CalendarEvent calEvent = new CalendarEvent
+            {
+                DtStart = new CalDateTime(ev.StartDate),
+                DtEnd = new CalDateTime(ev.EndDate),
+                Summary = ev.Title
+            };
+
+            // Attach RRULE
+            if (!string.IsNullOrWhiteSpace(ev.RRule))
+            {
+                calEvent.RecurrenceRules.Add(
+                    new RecurrencePattern(ev.RRule)
+                );
+            }
+
+            // Generate occurrences starting at rangeStart
+            IEnumerable<Occurrence> occurrences = calEvent.GetOccurrences().TakeWhileBefore(new CalDateTime(rangeEnd));
+            
+            // Filter to visible range
+            foreach (Occurrence occurrence in occurrences)
+            {
+                DateTime occurrenceDate =
+                     occurrence.Period.StartTime.Value.Date;
+
+                if (occurrenceDate < rangeStart || occurrenceDate > rangeEnd)
+                    continue;
+
+                // Match calendar day
+                CalendarDayVM dayVm = vm.Days.FirstOrDefault(d =>
+                    d.Date.Date == occurrenceDate.Date);
+
+                if (dayVm != null)
+                {
+                    dayVm.Events.Add(ev);
+                }
+            }
+        }
+
 
         public IActionResult CreateEvent()
         {
