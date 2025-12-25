@@ -129,6 +129,92 @@ namespace UsefulWebApps.Controllers
         }
 
 
+        public async Task<IActionResult> EditEvent(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            CalendarEvents calendarEvent = await _unitOfWork.CalendarEvents.GetById(id);
+            CalendarEventsVM calendarEventVM;
+            if (string.IsNullOrEmpty(calendarEvent.RRule))
+            {
+                calendarEventVM = new()
+                {
+                    Event = calendarEvent,
+                    IsPrivateEvent = string.IsNullOrEmpty(calendarEvent.UserId) ? false : true,
+                    IsRecurring = string.IsNullOrEmpty(calendarEvent.RRule) ? false : true,
+                };
+            }
+            else
+            {
+                RecurrencePattern pattern = GetRecurrencePattern(calendarEvent);
+                calendarEventVM = new()
+                {
+                    Event = calendarEvent,
+                    IsPrivateEvent = string.IsNullOrEmpty(calendarEvent.UserId) ? false : true,
+                    IsRecurring = string.IsNullOrEmpty(calendarEvent.RRule) ? false : true,
+                    Frequency = GetFrequencyFromPattern(pattern),
+                    Interval = pattern.Interval,
+                    DaysOfWeek = pattern.Frequency == FrequencyType.Weekly ? GetDayOfWeekFromPattern(pattern) : string.Empty,
+                    RecurrenceEndDate = pattern.Until?.Value
+
+                };
+            }
+            return View(calendarEventVM);
+        }
+
+        private RecurrencePattern GetRecurrencePattern(CalendarEvents calendarEvent)
+        {
+            // --- Serialize only RRULE ---
+            RecurrencePatternSerializer serializer = new RecurrencePatternSerializer();
+            RecurrencePattern pattern;
+            using (TextReader tr = new StringReader(calendarEvent.RRule))
+            {
+                pattern = (RecurrencePattern)serializer.Deserialize(tr);
+            }
+            return pattern;
+        }
+
+        private string GetDayOfWeekFromPattern(RecurrencePattern pattern)
+        {
+           
+            DayOfWeek dayOfWeek = DayOfWeek.Monday;
+            foreach(var day in pattern.ByDay)
+            {
+                if (day != null) 
+                { 
+                    dayOfWeek = day.DayOfWeek;
+                }
+            }
+
+            string dayString = dayOfWeek switch 
+            { 
+                DayOfWeek.Monday => "Monday",
+                DayOfWeek.Tuesday => "Tuesday",
+                DayOfWeek.Wednesday => "Wednesday",
+                DayOfWeek.Thursday => "Thursday",
+                DayOfWeek.Friday => "Friday",
+                DayOfWeek.Saturday => "Saturday",
+                DayOfWeek.Sunday => "Sunday",
+                _ => "Monday"
+            };
+
+            return dayString;
+        }
+        private string GetFrequencyFromPattern(RecurrencePattern pattern)
+        {
+            string freq = pattern.Frequency switch
+            {
+                FrequencyType.Daily => "Daily",
+                FrequencyType.Weekly => "Weekly",
+                FrequencyType.Monthly => "Monthly",
+                FrequencyType.Yearly => "Yearly",
+                _ => "Weekly"
+            };
+            return freq;
+        }
+
         public IActionResult CreateEvent()
         {
             ClaimsPrincipal currentUser = this.User;
@@ -179,7 +265,7 @@ namespace UsefulWebApps.Controllers
             {
                 calEvent.RRule = BuildRRule(vm, calEvent.StartDate);
             }
-            Console.WriteLine(calEvent.RRule);
+           
             bool success = await _unitOfWork.CalendarEvents.Add(calEvent);
             if (success)
             {

@@ -1,0 +1,177 @@
+﻿@using UsefulWebApps.Models.ViewModels.Calendar
+@{
+    ViewData["Title"] = "Edit Event";
+}
+
+@model UsefulWebApps.Models.ViewModels.Calendar.CalendarEventsVM
+
+<div class="max-width-550 mx-auto container pb-3">
+    <h1 class="display-3 mt-3 text-center">Edit Event</h1>
+    <form method="post" id="editEventForm">
+        <input type="hidden" asp-for="Event.UserId" />
+        <h3 class="mt-3 text-center">Title</h3>
+        <div class="form-floating mb-3">
+            <input asp-for="Event.Title" type="text" class="form-control" placeholder="Event Title" minlength="3" maxlength="255" required />
+            <label asp-for="Event.Title">Event Title</label>
+            <span asp-validation-for="Event.Title" class="text-danger"></span>
+        </div>
+        <p>
+            The below note input allow basic HTML.
+            Click <a asp-action="Directions" asp-controller="Home" target="_blank">here</a> for more detail.
+        </p>
+
+        <h3 class="mt-3 text-center">Description</h3>
+        <div class="form-floating">
+            <textarea asp-for="Event.Description" class="form-control textarea-input ignore" placeholder="Description"></textarea>
+            <label asp-for="Event.Description">Description</label>
+        </div>
+
+        <h3 class="mt-3 text-center">Start Date</h3>
+        <div class="form-floating mb-3">
+            <input asp-for="Event.StartDate" type="date" class="form-control" required />
+            <label asp-for="Event.StartDate">Start Date</label>
+            <span asp-validation-for="Event.StartDate" class="text-danger"></span>
+        </div>
+
+        <h3 class="mt-3 text-center">End Date</h3>
+        <div class="form-floating mb-3">
+            <input asp-for="Event.EndDate" type="date" class="form-control" required />
+            <label asp-for="Event.EndDate">End Date</label>
+            <span asp-validation-for="Event.EndDate" class="text-danger"></span>
+        </div>
+
+        <h3 class="mt-3 text-center">Event Duration</h3>
+        <div class="max-width-150 form-check mb-3 mx-auto">
+            <input asp-for="Event.IsAllDay" class="form-check-input" type="checkbox">
+            <label asp-for="Event.IsAllDay" class="form-check-label">All Day Event</label>
+        </div>
+
+        <h3 class="mt-3 text-center">Event Privacy</h3>
+        <div class="max-width-150 form-check mb-3 mx-auto">
+            <input asp-for="IsPrivateEvent" class="form-check-input" type="checkbox">
+            <label asp-for="IsPrivateEvent" class="form-check-label">Private Event</label>
+        </div>
+
+        <h3 class="mt-3 text-center">Event Recurrence</h3>
+        <div class="max-width-150 form-check mb-3 mx-auto">
+            <input asp-for="IsRecurring" class="form-check-input" type="checkbox">
+            <label asp-for="IsRecurring" class="form-check-label">Repeat Event</label>
+        </div>
+
+        <div id="recurrenceOptions" style="display: none;">
+
+            <label asp-for="Frequency">Repeating Frequency</label>
+            <select asp-for="Frequency" class="form-select mb-3">
+                <option value="Daily">Daily</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Yearly">Yearly</option>
+            </select>
+
+
+
+            <div class="form-floating mb-3">
+                <input asp-for="Interval" type="number" min="1" class="form-control" />
+                <label asp-for="Interval" class="form-check-label">Every <span id="intervalUnit">1</span> <span id="frequencyUnit">week</span><span id="frequencyUnitPlural" style="display: none;">s</span></label>
+            </div>
+
+            <!-- Weekly options -->
+            <div id="daysOfWeekContainer">
+                <label asp-for="DaysOfWeek">Repeat On This Day Of The Week</label>
+                <select asp-for="DaysOfWeek" class="form-select">
+                    <option value="">Select</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                </select>
+            </div>
+
+            <div class="form-floating mb-3 mt-3">
+                <input asp-for="RecurrenceEndDate" type="date" class="form-control" />
+                <label asp-for="RecurrenceEndDate">End on</label>
+            </div>
+        </div>
+
+
+        <div class="max-width-200 mx-auto">
+            <div>
+                <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Edit Event</button>
+            </div>
+            <div>
+                <a asp-controller="Calendar" asp-action="Index" class="btn btn-outline-dark w-100">Back To Calendar</a>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <script type="text/javascript">
+        (function () {
+            /*
+            show recurring on load. element will show checked/unchecked from server
+            */
+            window.addEventListener('DOMContentLoaded', (event) => {
+
+                if($('input[name="IsRecurring"]')[0].checked == true) {
+                    $("#recurrenceOptions")[0].style.display = "block";
+                }
+                else {
+                    $("#recurrenceOptions")[0].style.display = "none";
+                }
+            });
+        })();
+
+
+
+        $("#editEventForm").validate({
+            ignore: ".ignore"
+        });
+        $('input[name="IsRecurring"]').change(function() {
+            if($('input[name="IsRecurring"]')[0].checked == true) {
+                $("#recurrenceOptions")[0].style.display = "block";
+            }
+            else {
+                $("#recurrenceOptions")[0].style.display = "none";
+            }
+        });
+        $('input[name="Interval"]').change(function() {
+            const interval = $(this).val();
+            $("#intervalUnit").text(interval);
+
+            if(interval == 1) {
+                $("#frequencyUnitPlural")[0].style.display = "none";
+            }
+            else {
+                $("#frequencyUnitPlural")[0].style.display = "inline";
+            }
+
+        });
+        $('select[name="Frequency"]').change(function () {
+            const freq = $(this).val();
+            let unit = "day";
+
+            if (freq === "Weekly")
+                unit = "week";
+            else if (freq === "Monthly")
+                unit = "month";
+            else if (freq === "Yearly")
+                unit = "year";
+
+            if (freq === "Weekly")
+                $("#daysOfWeekContainer")[0].style.display = "block";
+            else
+                 $("#daysOfWeekContainer")[0].style.display = "none";
+
+            $("#frequencyUnit").text(unit);
+        });
+
+    </script>
+}

@@ -37,7 +37,7 @@
             @foreach (var ev in day.Events)
             {
                 <div class="calendar-event">
-                    @ev.Title
+                    <a asp-controller="Calendar" asp-action="EditEvent" asp-route-id="@ev.Id">@ev.Title</a>
                 </div>
             }
         </div>
