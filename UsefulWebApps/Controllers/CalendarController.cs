@@ -164,6 +164,58 @@ namespace UsefulWebApps.Controllers
             return View(calendarEventVM);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> EditEvent(CalendarEventsVM vm)
+        {
+            vm.Event.Description = sanitizer.Sanitize(vm.Event.Description);
+            if (!ModelState.IsValid)
+            {
+                TempData["error"] = "Edit event error. Try again.";
+                return View(vm);
+            }
+
+            // --- logical validation ---
+            if (vm.Event.EndDate < vm.Event.StartDate)
+            {
+                TempData["error"] = "End date cannot be before start date. Try again.";
+                return View(vm);
+            }
+
+            //create CalendarEvents object
+            CalendarEvents calEvent = new CalendarEvents
+            {
+                Id = vm.Event.Id,
+                UserId = vm.IsPrivateEvent == true ? vm.Event.UserId : null,
+                Title = vm.Event.Title,
+                Description = vm.Event.Description,
+                StartDate = vm.Event.StartDate,
+                EndDate = vm.Event.EndDate,
+                IsAllDay = vm.Event.IsAllDay,
+
+            };
+
+            // --- recurrence handling ---
+            if (vm.IsRecurring)
+            {
+                calEvent.RRule = BuildRRule(vm, calEvent.StartDate);
+            }
+            else
+            {
+                calEvent.RRule = null;
+            }
+
+            bool success = await _unitOfWork.CalendarEvents.Update(calEvent);
+            if (success)
+            {
+                TempData["success"] = "Event edited successfully.";
+            }
+            else
+            {
+                TempData["error"] = "Edit event error. Try again.";
+            }
+            return RedirectToAction("Index");
+        }
+
         private RecurrencePattern GetRecurrencePattern(CalendarEvents calendarEvent)
         {
             // --- Serialize only RRULE ---

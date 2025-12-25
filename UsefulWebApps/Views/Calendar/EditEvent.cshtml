@@ -9,6 +9,7 @@
     <h1 class="display-3 mt-3 text-center">Edit Event</h1>
     <form method="post" id="editEventForm">
         <input type="hidden" asp-for="Event.UserId" />
+        <input type="hidden" asp-for="Event.Id" />
         <h3 class="mt-3 text-center">Title</h3>
         <div class="form-floating mb-3">
             <input asp-for="Event.Title" type="text" class="form-control" placeholder="Event Title" minlength="3" maxlength="255" required />
