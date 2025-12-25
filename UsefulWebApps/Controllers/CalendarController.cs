@@ -128,6 +128,22 @@ namespace UsefulWebApps.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> DeleteEvent(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            bool success = await _unitOfWork.CalendarEvents.Delete(id);
+            if (success)
+            {
+                TempData["success"] = "Event deleted successfully.";
+                return RedirectToAction("Index");
+            }
+            TempData["error"] = "Delete event error. Try again.";
+            return RedirectToAction("Index");
+        }
 
         public async Task<IActionResult> EditEvent(int? id)
         {
