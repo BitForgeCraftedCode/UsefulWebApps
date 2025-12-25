@@ -48,9 +48,9 @@ namespace UsefulWebApps.Controllers
             //TakeWhileBefore method is exclusive
             DateTime rangeStart = vm.Days.First().Date.Date;
             DateTime rangeEnd = vm.Days.Last().Date.Date.AddDays(1);
-
-            //need better SQL method to pull events for currentUser -- this pulls all
-            List<CalendarEvents> events = (List<CalendarEvents>)await _unitOfWork.CalendarEvents.GetAll();
+            
+            List<CalendarEvents> events = await _unitOfWork.CalendarEvents.GetUserCalendarEventsForDateRange(rangeStart, rangeEnd, userId);
+            
             ExpandAndAttachEvents(vm, events, rangeStart, rangeEnd);
         }
 
@@ -119,8 +119,7 @@ namespace UsefulWebApps.Controllers
                     continue;
 
                 // Match calendar day
-                CalendarDayVM dayVm = vm.Days.FirstOrDefault(d =>
-                    d.Date.Date == occurrenceDate.Date);
+                CalendarDayVM dayVm = vm.Days.FirstOrDefault(d => d.Date.Date == occurrenceDate.Date);
 
                 if (dayVm != null)
                 {
@@ -190,8 +189,7 @@ namespace UsefulWebApps.Controllers
             {
                 TempData["error"] = "Create event error. Try again.";
             }
-            
-            return RedirectToAction("Index");
+            return View(vm);
         }
 
         /*
@@ -215,7 +213,7 @@ namespace UsefulWebApps.Controllers
                 DtStart = new CalDateTime(startDate)
             };
             //Creating the recurrence rule object
-            var pattern = new RecurrencePattern
+            RecurrencePattern pattern = new RecurrencePattern
             {
                 Interval = vm.Interval > 0 ? vm.Interval : 1
             };
@@ -262,7 +260,7 @@ namespace UsefulWebApps.Controllers
             calendarEvent.RecurrenceRules.Add(pattern);
 
             // --- Serialize only RRULE ---
-            var serializer = new RecurrencePatternSerializer();
+            RecurrencePatternSerializer serializer = new RecurrencePatternSerializer();
             return serializer.SerializeToString(pattern);
  
         }
