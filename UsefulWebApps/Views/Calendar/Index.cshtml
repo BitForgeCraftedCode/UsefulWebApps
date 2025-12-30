@@ -16,7 +16,7 @@
     <a href="@Url.Action("Index", new { year = nextMonth.Year, month = nextMonth.Month })">▶</a>
 </h2>
 
-<div class="ps-1 pe-1 calendar-grid">
+<div class="ps-1 pe-1 calendar-desktop calendar-grid-desktop">
     <!-- Day-of-week header -->
     <div class="dow-header">Sun</div>
     <div class="dow-header">Mon</div>
@@ -44,8 +44,30 @@
     }
     
 </div>
-<div class="max-width-250 mx-auto mt-3">
-    <div class="mb-3">
+
+<div class="ps-1 pe-1 calendar-mobile calendar-grid-mobile text-center">
+    @foreach (CalendarDayVM day in Model.Days)
+    {
+        string css = "day-box";
+        if (!day.IsCurrentMonth) css += " other-month";
+        if (day.IsToday) css += " today";
+
+        <div class="@css agenda-day">
+            <strong>@day.Date.ToString("ddd MMM d")</strong>
+            @foreach (var ev in day.Events)
+            {
+                <div>
+                    <a asp-controller="Calendar" asp-action="EditEvent" asp-route-id="@ev.Id">
+                        @ev.Title
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<div class="max-width-250 mx-auto mt-3 pb-3">
+    <div>
         <a asp-controller="Calendar" asp-action="CreateEvent" class="btn w-100">Add New Event</a>
     </div>
 </div>
