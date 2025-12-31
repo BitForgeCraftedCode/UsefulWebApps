@@ -343,7 +343,7 @@ namespace UsefulWebApps.Controllers
             {
                 TempData["error"] = "Create event error. Try again.";
             }
-            return View(vm);
+            return RedirectToAction("Index");
         }
 
         /*

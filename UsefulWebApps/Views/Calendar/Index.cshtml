@@ -53,7 +53,8 @@
         if (day.IsToday) css += " today";
 
         <div class="@css agenda-day">
-            <strong>@day.Date.ToString("ddd MMM d")</strong>
+            <strong>@day.Date.ToString("dddd")</strong><br/>
+            <strong>@day.Date.ToString("MMMM d")</strong>
             @foreach (var ev in day.Events)
             {
                 <div>
