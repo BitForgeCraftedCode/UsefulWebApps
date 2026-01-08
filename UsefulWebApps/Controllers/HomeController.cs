@@ -15,6 +15,7 @@ namespace UsefulWebApps.Controllers
             _logger = logger;
         }
 
+        [Authorize(Roles = "StandardUser, Admin")]
         public IActionResult Index()
         {
             return View();
