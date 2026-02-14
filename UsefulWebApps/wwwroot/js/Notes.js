@@ -22,18 +22,50 @@ const noteInput = document.getElementById('Note');
 if (noteInput.value) {
     quill.clipboard.dangerouslyPasteHTML(noteInput.value);
 }
-//before submit take quill html and add it to textarea element thats bound to the model
-document.getElementById('note-form').addEventListener('submit', function () {
-    noteInput.value = quill.root.innerHTML;
-});
-//limit the quill input to 5000 and display char usage -- data model is 5000 char limit
+
+//limit the submitted HTML to 5000 chars (matches server model max length)
 const limit = 5000;
-quill.on('text-change', function (delta, oldDelta, source) {
-    if (quill.getLength() > limit) {
-        quill.deleteText(limit, quill.getLength());
+const characterCount = document.querySelector('.character-count');
+
+function getHtmlLength() {
+    return quill.root.innerHTML.length;
+}
+
+function updateCharacterCount() {
+    if (!characterCount) {
+        return;
     }
 
-    let remaining = limit - quill.getLength() + 1; // +1 to account for the extra newline character Quill adds
-    // Update a counter element on your page
-    document.querySelector('.character-count').innerText = remaining + ' Characters Remaining';
+    const remaining = Math.max(0, limit - getHtmlLength());
+    characterCount.innerText = remaining + ' Characters Remaining';
+}
+
+//Note even when Quill is empty, there is still a blank line represented by '\n', so getLength will return 1.
+//The last editable character index is therefore getLength() - 2
+function enforceHtmlLengthLimit() {
+    //remove text from the end until rendered html fits in DB/model limit
+    while (getHtmlLength() > limit && quill.getLength() > 1) {
+        quill.deleteText(quill.getLength() - 2, 1, 'silent');
+    }
+}
+
+quill.on('text-change', function () {
+    enforceHtmlLengthLimit();
+    updateCharacterCount();
+});
+
+//initialize current count and enforce for existing content
+enforceHtmlLengthLimit();
+updateCharacterCount();
+
+
+document.getElementById('note-form').addEventListener('submit', function (event) {
+    enforceHtmlLengthLimit();
+    //before submit take quill html and add it to textarea element thats bound to the model
+    noteInput.value = quill.root.innerHTML;
+    //Should never really happen but a defensive check anyway
+    if (noteInput.value.length > limit) {
+        event.preventDefault();
+        toastr.error('Note exceeds 5000 character storage limit. Please shorten your note.');
+    }
 });
