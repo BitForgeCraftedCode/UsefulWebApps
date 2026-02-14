@@ -5,11 +5,10 @@
 
 <div class="max-width-550 mx-auto container pb-3">
     <h1 class="display-3 mt-3 text-center">My Note</h1>
-    <div class="card text-white bg-info mb-3">
+    <div class="card bg-light mb-3">
          <div class="card-header"><strong>@Model.NoteTitle</strong></div>
          <div class="card-body">
-            @* https://stackoverflow.com/questions/498461/how-to-save-user-entered-line-breaks-from-a-textarea-to-a-database *@
-            <notes html-notes-content="@Model.Note" class="card-text" style="white-space: pre-line"></notes>
+            <notes html-notes-content="@Model.Note" class="card-text"></notes>
          </div>
     </div>
     <div class="max-width-350 mx-auto">
