@@ -25,7 +25,7 @@ if (noteInput.value) {
 
 //limit the submitted HTML to 5000 chars (matches server model max length)
 const limit = 5000;
-const characterCount = document.querySelector('.character-count');
+const characterCount = document.getElementById('character-count');
 
 function getHtmlLength() {
     return quill.root.innerHTML.length;

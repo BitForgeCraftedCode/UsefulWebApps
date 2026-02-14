@@ -19,7 +19,7 @@
             <textarea asp-for="Note" class="form-control textarea-input d-none" minlength="10" maxlength="5000" required placeholder="Note"></textarea>
             <label asp-for="Note" class="d-none">Note</label>
             <span asp-validation-for="Note" class="text-danger"></span>
-            <span class="character-count"></span>
+            <span id="character-count"></span>
         </div>
 
         <div class="max-width-200 mx-auto">
