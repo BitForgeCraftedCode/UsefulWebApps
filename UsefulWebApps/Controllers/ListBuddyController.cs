@@ -17,7 +17,8 @@ namespace UsefulWebApps.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
 
-        private HtmlSanitizer sanitizer = new HtmlSanitizer();
+        //private HtmlSanitizer sanitizer = new HtmlSanitizer();
+        private readonly HtmlSanitizer sanitizer;
         private readonly IUnitOfWork _unitOfWork;
 
         public ListBuddyController(UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork)
@@ -25,6 +26,9 @@ namespace UsefulWebApps.Controllers
             _userManager = userManager;
 
             _unitOfWork = unitOfWork;
+
+            sanitizer = new HtmlSanitizer();
+            sanitizer.AllowedAttributes.UnionWith(new[] { "class", "data-list" });
         }
         public IActionResult Index()
         {

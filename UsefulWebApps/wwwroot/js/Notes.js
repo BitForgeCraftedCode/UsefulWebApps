@@ -8,6 +8,7 @@ const quill = new Quill('#editor', {
         toolbar: [
             [{ header: [1, 2, 3, 4, 5, 6, false] }],
             ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
             [{ 'align': [] }],
             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
             [{ 'color': [] }, { 'background': [] }],
