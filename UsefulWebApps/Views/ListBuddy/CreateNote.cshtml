@@ -15,7 +15,13 @@
         </div>
         <h3 class="mt-3 text-center">Note</h3>
         <div class="form-floating">
-            <div id="editor" class="form-control textarea-input"></div>
+            <div data-quill-editor
+                 data-input-selector="#Note"
+                 data-form-selector="#note-form"
+                 data-counter-selector="#character-count"
+                 data-limit="5000">
+                <div class="quill-editor form-control textarea-input"></div>
+            </div>
             <textarea asp-for="Note" class="form-control textarea-input d-none" minlength="10" maxlength="5000" required placeholder="Note"></textarea>
             <label asp-for="Note" class="d-none">Note</label>
             <span asp-validation-for="Note" class="text-danger"></span>
@@ -36,6 +42,6 @@
 @section Scripts {
     @{
         <partial name="_ValidationScriptsPartial" />
-        <script type="text/javascript" src="~/js/Notes.js"></script>
+        <script type="text/javascript" src="~/js/InitQuill.js"></script>
     }
 }
