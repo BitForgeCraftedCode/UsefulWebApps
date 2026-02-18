@@ -8,9 +8,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/toastrjs/toastr.min.js"></script>
     <link rel="stylesheet" href="~/lib/toastrjs/toastr.min.css" />
-    <script src="~/lib/quilljs/dist/quill.js"></script>
-    <link href="~/lib/quilljs/dist/quill.snow.css" rel="stylesheet" />
-    <link rel="icon" href="~/images/app/wizardHat3.png" type="image/x-icon" /> 
+    <link rel="icon" href="~/images/app/wizardHat3.png" type="image/x-icon" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="text-dark">
     <header>

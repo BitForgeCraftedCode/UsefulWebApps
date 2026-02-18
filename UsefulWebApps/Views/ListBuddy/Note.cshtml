@@ -32,6 +32,7 @@
 @section Scripts {
     @{
         <partial name="_ValidationScriptsPartial" />
+        <script src="~/lib/quilljs/dist/quill.js"></script>
     }
     <script type="text/javascript">
         $("#delete-note").validate({
@@ -48,4 +49,7 @@
             }
         });
     </script>
+}
+@section Styles {
+    <link href="~/lib/quilljs/dist/quill.snow.css" rel="stylesheet" />
 }
