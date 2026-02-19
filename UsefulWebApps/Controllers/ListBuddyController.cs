@@ -17,7 +17,6 @@ namespace UsefulWebApps.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
 
-        //private HtmlSanitizer sanitizer = new HtmlSanitizer();
         private readonly HtmlSanitizer sanitizer;
         private readonly IUnitOfWork _unitOfWork;
 
@@ -85,7 +84,7 @@ namespace UsefulWebApps.Controllers
                 return RedirectToAction("MyNotes");
             }
             TempData["error"] = "Create note error. Try again.";
-            return RedirectToAction("MyNotes");
+            return View(obj);
         }
 
         [HttpPost]
@@ -131,7 +130,7 @@ namespace UsefulWebApps.Controllers
                 return RedirectToAction("MyNotes");
             }
             TempData["error"] = "Edit note error. Try again.";
-            return RedirectToAction("MyNotes");
+            return View(obj);
         }
         #endregion
 

@@ -24,11 +24,11 @@ function initQuillEditor(container) {
     const counterSelector = container.dataset.counterSelector;
     const limit = Number(container.dataset.limit || 5000);
     //the textarea note element
-    const noteInput = inputSelector ? document.querySelector(inputSelector) : null;
+    const textInput = inputSelector ? document.querySelector(inputSelector) : null;
     const form = formSelector ? document.querySelector(formSelector) : null;
     const counter = counterSelector ? document.querySelector(counterSelector) : null;
 
-    if (!noteInput || !form) return;
+    if (!textInput || !form) return;
 
     //adds quill to the editor div
     const quill = new Quill(editorEl, {
@@ -36,8 +36,8 @@ function initQuillEditor(container) {
         modules: { toolbar: defaultToolbar }
     });
     //for edit dump html into quill
-    if (noteInput.value) {
-        quill.clipboard.dangerouslyPasteHTML(noteInput.value);
+    if (textInput.value) {
+        quill.clipboard.dangerouslyPasteHTML(textInput.value);
     }
 
     const getHtmlLength = () => {
@@ -71,13 +71,9 @@ function initQuillEditor(container) {
     form.addEventListener('submit', function (event) {
         enforceHtmlLengthLimit();
         //before submit take quill html and add it to textarea element thats bound to the model
-        noteInput.value = quill.root.innerHTML;
-        if (noteInput.value.length < 20) {
-            event.preventDefault();
-            toastr.error('Not enough characters.');
-        }
+        textInput.value = quill.root.innerHTML;
         //Should never really happen but a defensive check anyway
-        if (noteInput.value.length > limit) {
+        if (textInput.value.length > limit) {
             event.preventDefault();
             toastr.error('Exceeds character storage limit. Please shorten.');
         }

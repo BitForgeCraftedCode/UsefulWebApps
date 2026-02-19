@@ -64,12 +64,12 @@ namespace UsefulWebApps.Models.MyRecipes
 
         [Column("Ingredients")]
         [Required(ErrorMessage = "Recipe ingredients is required.")]
-        [StringLength(3000, MinimumLength = 3, ErrorMessage = "Please enter at least 3 characters.")]
+        [StringLength(3000, MinimumLength = 20, ErrorMessage = "Please enter at least 20 characters.")]
         public string Ingredients { get; set; } = string.Empty;
 
         [Column("Instructions")]
         [Required(ErrorMessage = "Recipe instructions is required.")]
-        [StringLength(3000, MinimumLength = 3, ErrorMessage = "Please enter at least 3 characters.")]
+        [StringLength(3000, MinimumLength = 20, ErrorMessage = "Please enter at least 20 characters.")]
         public string Instructions { get; set; } = string.Empty;
 
         [Column("Notes")]

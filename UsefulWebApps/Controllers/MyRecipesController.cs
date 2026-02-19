@@ -13,12 +13,16 @@ namespace UsefulWebApps.Controllers
     public class MyRecipesController : Controller
     {
         private IWebHostEnvironment Environment;
-        private HtmlSanitizer sanitizer = new HtmlSanitizer();
+        
+        private readonly HtmlSanitizer sanitizer;
         private readonly IUnitOfWork _unitOfWork;
         public MyRecipesController(IUnitOfWork unitOfWork, IWebHostEnvironment _environment)
         {
             Environment = _environment;
             _unitOfWork = unitOfWork;
+
+            sanitizer = new HtmlSanitizer();
+            sanitizer.AllowedAttributes.UnionWith(new[] { "class", "data-list" });
         }
 
         public async Task<IActionResult> Index(int page, string searchString)

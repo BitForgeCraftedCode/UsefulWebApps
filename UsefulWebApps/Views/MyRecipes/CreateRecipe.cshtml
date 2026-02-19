@@ -140,25 +140,57 @@
         </p>
         <h3 class="mt-3 text-center">Ingredients</h3>
         <div class="form-floating">
-            <textarea asp-for="Recipe.Ingredients" class="form-control textarea-input" minlength="3" required placeholder="Recipe Ingredients"></textarea>
-            <label asp-for="Recipe.Ingredients">Recipe Ingredients</label>
+            <div data-quill-editor
+                 data-input-selector="#Recipe_Ingredients"
+                 data-form-selector="#createRecipeForm"
+                 data-counter-selector="#ingredients-character-count"
+                 data-limit="3000">
+                <div class="quill-editor form-control textarea-input"></div>
+            </div>
+            <textarea asp-for="Recipe.Ingredients" class="form-control textarea-input d-none" minlength="20" required placeholder="Recipe Ingredients"></textarea>
+            <label asp-for="Recipe.Ingredients" class="d-none">Recipe Ingredients</label>
             <span asp-validation-for="Recipe.Ingredients" class="text-danger"></span>
+            <span id="ingredients-character-count"></span>
         </div>
         <h3 class="mt-3 text-center">Instructions</h3>
         <div class="form-floating">
-            <textarea asp-for="Recipe.Instructions" class="form-control textarea-input" minlength="3" required placeholder="Recipe Instructions"></textarea>
-            <label asp-for="Recipe.Instructions">Recipe Instructions</label>
+            <div data-quill-editor
+                 data-input-selector="#Recipe_Instructions"
+                 data-form-selector="#createRecipeForm"
+                 data-counter-selector="#instructions-character-count"
+                 data-limit="3000">
+                <div class="quill-editor form-control textarea-input"></div>
+            </div>
+            <textarea asp-for="Recipe.Instructions" class="form-control textarea-input d-none" minlength="20" required placeholder="Recipe Instructions"></textarea>
+            <label asp-for="Recipe.Instructions" class="d-none">Recipe Instructions</label>
             <span asp-validation-for="Recipe.Instructions" class="text-danger"></span>
+            <span id="instructions-character-count"></span>
         </div>
         <h3 class="mt-3 text-center">Notes</h3>
         <div class="form-floating">
-            <textarea asp-for="Recipe.Notes" class="form-control textarea-input ignore" placeholder="Recipe Notes"></textarea>
-            <label asp-for="Recipe.Notes">Recipe Notes</label>
+            <div data-quill-editor
+                 data-input-selector="#Recipe_Notes"
+                 data-form-selector="#createRecipeForm"
+                 data-counter-selector="#notes-character-count"
+                 data-limit="2000">
+                <div class="quill-editor form-control textarea-input"></div>
+            </div>
+            <textarea asp-for="Recipe.Notes" class="form-control textarea-input ignore d-none" placeholder="Recipe Notes"></textarea>
+            <label asp-for="Recipe.Notes" class="d-none">Recipe Notes</label>
+            <span id="notes-character-count"></span>
         </div>
         <h3 class="mt-3 text-center">Nutrition</h3>
         <div class="form-floating mb-3">
-            <textarea asp-for="Recipe.Nutrition" class="form-control textarea-input ignore" placeholder="Recipe Nutrition"></textarea>
-            <label asp-for="Recipe.Nutrition">Recipe Nutrition</label>
+            <div data-quill-editor
+                 data-input-selector="#Recipe_Nutrition"
+                 data-form-selector="#createRecipeForm"
+                 data-counter-selector="#nutrition-character-count"
+                 data-limit="2000">
+                <div class="quill-editor form-control textarea-input"></div>
+            </div>
+            <textarea asp-for="Recipe.Nutrition" class="form-control textarea-input ignore d-none" placeholder="Recipe Nutrition"></textarea>
+            <label asp-for="Recipe.Nutrition" class="d-none">Recipe Nutrition</label>
+            <span id="nutrition-character-count"></span>
         </div>
         <h3 class="mt-3 text-center">Author</h3>
         <div class="form-floating">
@@ -180,7 +212,9 @@
 <!--Partial View scripts-->
 @section Scripts {
     @{
-            <partial name="_ValidationScriptsPartial" />
+        <partial name="_ValidationScriptsPartial" />
+        <script src="~/lib/quilljs/dist/quill.js"></script>
+        <script type="text/javascript" src="~/js/InitQuill.js"></script>
     }
     <script type="text/javascript">
         $("#createRecipeForm").validate({
@@ -244,4 +278,7 @@
             toastr.error("Please check the form for errors.");
         }
     </script>
+}
+@section Styles {
+    <link href="~/lib/quilljs/dist/quill.snow.css" rel="stylesheet" />
 }
