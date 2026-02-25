@@ -35,11 +35,11 @@ namespace UsefulWebApps.Repository
 
             string sqlMult = @"
                 SELECT COUNT(*) FROM recipes;
-                SELECT * FROM recipes ORDER BY RecipeId, RecipeTitle LIMIT @Limit OFFSET @Offset;
+                SELECT * FROM recipes ORDER BY RecipeTitle LIMIT @Limit OFFSET @Offset;
             ";
             string sqlMultFilter = @"
-                SELECT COUNT(*) FROM recipes WHERE MATCH(RecipeTitle, Ingredients) AGAINST(@SearchString) ORDER BY RecipeId, RecipeTitle;
-                SELECT * FROM recipes WHERE MATCH(RecipeTitle, Ingredients) AGAINST(@SearchString) ORDER BY RecipeId, RecipeTitle LIMIT @Limit OFFSET @Offset;
+                SELECT COUNT(*) FROM recipes WHERE MATCH(RecipeTitle, Ingredients) AGAINST(@SearchString);
+                SELECT * FROM recipes WHERE MATCH(RecipeTitle, Ingredients) AGAINST(@SearchString) ORDER BY RecipeTitle LIMIT @Limit OFFSET @Offset;
             ";
             GridReader gridReader = null;
             if (String.IsNullOrEmpty(searchString))
@@ -52,6 +52,26 @@ namespace UsefulWebApps.Repository
             }
 
             //count is the total number of recipes in database
+            int count = await gridReader.ReadFirstAsync<int>();
+            List<Recipe> recipes = (List<Recipe>)await gridReader.ReadAsync<Recipe>();
+            await _connection.CloseAsync();
+            return (count, recipes);
+        }
+
+        public async Task<(int count, List<Recipe> recipes)> PaginationWithTagFilter(int limit, int offset, List<int> selectedCategoryIds)
+        {
+            string sql = @"
+                SELECT COUNT(DISTINCT recipes.RecipeId) FROM recipes
+                JOIN recipe_categories_join rcj ON recipes.RecipeId = rcj.RecipeId
+                WHERE rcj.CategoryId IN @CategoryIds;
+
+                SELECT DISTINCT recipes.* FROM recipes
+                JOIN recipe_categories_join rcj ON recipes.RecipeId = rcj.RecipeId
+                WHERE rcj.CategoryId IN @CategoryIds ORDER BY RecipeTitle LIMIT @Limit OFFSET @Offset;
+            ";
+
+            GridReader gridReader = await _connection.QueryMultipleAsync(sql, new { CategoryIds = selectedCategoryIds, Limit= limit, Offset = offset });
+
             int count = await gridReader.ReadFirstAsync<int>();
             List<Recipe> recipes = (List<Recipe>)await gridReader.ReadAsync<Recipe>();
             await _connection.CloseAsync();

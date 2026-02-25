@@ -13,7 +13,7 @@ namespace UsefulWebApps.Controllers
     public class MyRecipesController : Controller
     {
         private IWebHostEnvironment Environment;
-        
+        private const int PageSize = 10;
         private readonly HtmlSanitizer sanitizer;
         private readonly IUnitOfWork _unitOfWork;
         public MyRecipesController(IUnitOfWork unitOfWork, IWebHostEnvironment _environment)
@@ -25,18 +25,53 @@ namespace UsefulWebApps.Controllers
             sanitizer.AllowedAttributes.UnionWith(new[] { "class", "data-list" });
         }
 
-        public async Task<IActionResult> Index(int page, string searchString)
+        public async Task<IActionResult> Index(int page, string searchString, string categories)
         {
-            
-            if (page == 0)
+            List<int> selectedCategoryIds = new();
+
+            if (!string.IsNullOrEmpty(categories))
             {
-                page = 1;
+                selectedCategoryIds = categories
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(int.Parse)
+                    .ToList();
             }
+
+            if (page == 0)
+                page = 1;
+            
             //limit is the number of recipes per page
-            int limit = 10;
+            int limit = PageSize;
             int offset = (limit * (page - 1));
 
-            (int count, List<Recipe> recipes) result = await _unitOfWork.Recipe.Pagination(limit, offset, searchString);
+            (int count, List<Recipe> recipes) result;
+            if (selectedCategoryIds.Any())
+            {
+                result = await _unitOfWork.Recipe.PaginationWithTagFilter(limit, offset, selectedCategoryIds);
+            }
+            else
+            {
+                result = await _unitOfWork.Recipe.Pagination(limit, offset, searchString);
+            }
+
+            (
+                List<RecipeCategories> recipeCategories,
+                List<RecipeCourses> recipeCourses,
+                List<RecipeCuisines> recipeCuisines,
+                List<RecipeDifficulties> recipeDifficulties
+            ) resultB = await _unitOfWork.Recipe.GetCategoriesForCreateDisplay();
+
+            List<RecipeCategories> recipeCategories = resultB.recipeCategories;
+            List<RecipeCourses> recipeCourses = resultB.recipeCourses;
+            List<RecipeCuisines> recipeCuisines = resultB.recipeCuisines;
+            List<RecipeDifficulties> recipeDifficulties = resultB.recipeDifficulties;
+
+            // Persist UI state
+            foreach (var cat in recipeCategories)
+            {
+                if (selectedCategoryIds.Contains(cat.CategoryId))
+                    cat.IsChecked = true;
+            }
 
             //count is the total number of recipes in database when search sting in empty or the total
             //number of retured recipes that match the search string
@@ -48,6 +83,11 @@ namespace UsefulWebApps.Controllers
             RecipeIndexVM recipeIndexVM = new()
             {
                 Recipes = recipes,
+                RecipeCategories = recipeCategories,
+                RecipeCourses = recipeCourses,
+                RecipeCuisines = recipeCuisines,
+                RecipeDifficulties = recipeDifficulties,
+                CategoriesQuery = categories,
                 CurrentPage = page,
                 TotalPages = totalPages,
                 TotalRecipes = count,
@@ -55,6 +95,32 @@ namespace UsefulWebApps.Controllers
             };
             
             return View(recipeIndexVM);
+        }
+
+        //Post/Redirect/Get (PRG) pattern
+        [HttpPost]
+        public async Task<IActionResult> Index(RecipeIndexVM model, int page, string searchString = "")
+        {
+            if(model.RecipeCategories == null)
+                return RedirectToAction("Index", new { page = page, searchString = searchString });
+            
+            if (page == 0)
+                page = 1;
+            
+            // Get selected category IDs
+            List<int> selectedCategoryIds = model.RecipeCategories
+                .Where(c => c.IsChecked)
+                .Select(c => c.CategoryId)
+                .ToList();
+
+            if (selectedCategoryIds.Count == 0) 
+                return RedirectToAction("Index", new { page = page, searchString = searchString });
+            
+            return RedirectToAction("Index", new
+            {
+                page = page,
+                categories = string.Join(",", selectedCategoryIds)
+            });
         }
 
         public async Task<IActionResult> Recipe(int? id)
