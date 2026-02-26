@@ -20,6 +20,7 @@
             <input class="btn btn-outline-dark" type="submit" value="Search" />
             <input class="btn btn-outline-secondary" type="button" value="Clear" onclick="clearSearch()" />
         </div>
+        <input type="hidden" asp-for="@Model.Ascending" />
     </form>
     <h4>Filter: Tags</h4>
     <form asp-controller="MyRecipes" asp-action="Index" id="filter-tags-form">
@@ -36,8 +37,27 @@
         </ul>
         <input class="btn btn-outline-dark mb-3" type="submit" value="Filter" />
         <input class="btn btn-outline-secondary mb-3" type="button" value="Clear" onclick="clearSearch()" />
+        <input type="hidden" asp-for="@Model.Ascending" />
     </form>
     <h4>Recipes</h4>
+    <a class="btn @(Model.Ascending ? "btn-outline-dark" : "btn-outline-secondary") mb-2"
+        asp-controller="MyRecipes" 
+        asp-action="Index" 
+        asp-route-ascending="true" 
+        asp-route-categories="@Model.CategoriesQuery" 
+        asp-route-searchString="@Model.SearchString" 
+        asp-route-page="@(Model.CurrentPage)">
+        Ascending
+    </a>
+    <a class="btn @(!Model.Ascending ? "btn-outline-dark" : "btn-outline-secondary") mb-2"
+        asp-controller="MyRecipes" 
+        asp-action="Index" 
+        asp-route-ascending="false" 
+        asp-route-categories="@Model.CategoriesQuery" 
+        asp-route-searchString="@Model.SearchString" 
+        asp-route-page="@(Model.CurrentPage)">
+        Descending
+    </a>
     <div class="list-group">
         @foreach (Recipe recipe in Model.Recipes)
         {
@@ -52,18 +72,18 @@
             <ul class="pagination pagination-sm justify-content-center">
                 @if(Model.TotalPages < 4)
                 {
-                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage - 1 == 0 ? 1 : Model.CurrentPage - 1)">Previous</a></li>
-                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage + 1 < Model.TotalPages ? Model.CurrentPage + 1 : Model.TotalPages)">Next</a></li>
+                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-ascending="@Model.Ascending" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage - 1 == 0 ? 1 : Model.CurrentPage - 1)">Previous</a></li>
+                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-ascending="@Model.Ascending" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage + 1 < Model.TotalPages ? Model.CurrentPage + 1 : Model.TotalPages)">Next</a></li>
                 }
                 else if(Model.TotalPages >= 4 && Model.TotalPages < 8)
                 {
                     <!--display 1st and last pages if more than 4 pages total-->
-                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage - 1 == 0 ? 1 : Model.CurrentPage - 1)">&laquo;</a></li>
+                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-ascending="@Model.Ascending" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage - 1 == 0 ? 1 : Model.CurrentPage - 1)">&laquo;</a></li>
                     @for (int i = 1; i <= @Model.TotalPages; i++)
                     {
                         if (i == 1)
                         {
-                            <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@i">@i</a></li>
+                            <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-ascending="@Model.Ascending" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@i">@i</a></li>
                         }
                         else if (i == 2)
                         {
@@ -71,20 +91,20 @@
                         }
                         else if (i == Model.TotalPages)
                         {
-                            <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@i">@i</a></li>
+                            <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-ascending="@Model.Ascending" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@i">@i</a></li>
                         }
                     }
-                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage + 1 < Model.TotalPages ? Model.CurrentPage + 1 : Model.TotalPages)">&raquo;</a></li>
+                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-ascending="@Model.Ascending" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage + 1 < Model.TotalPages ? Model.CurrentPage + 1 : Model.TotalPages)">&raquo;</a></li>
                 }
                 else if(Model.TotalPages >= 8)
                 {
                     <!--display 1st 3 and last 3 pages if more than 8 pages total-->
-                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage - 1 == 0 ? 1 : Model.CurrentPage - 1)">&laquo;</a></li>
+                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-ascending="@Model.Ascending" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage - 1 == 0 ? 1 : Model.CurrentPage - 1)">&laquo;</a></li>
                     @for (int i = 1; i <= @Model.TotalPages; i++)
                     {
                         if (i <= 3)
                         {
-                            <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@i">@i</a></li>
+                            <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-ascending="@Model.Ascending" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@i">@i</a></li>
                         }
                         else if (i == 4)
                         {
@@ -92,10 +112,10 @@
                         }
                         else if (i > Model.TotalPages - 3)
                         {
-                            <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@i">@i</a></li>
+                            <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-ascending="@Model.Ascending" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@i">@i</a></li>
                         }
                     }
-                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage + 1 < Model.TotalPages ? Model.CurrentPage + 1 : Model.TotalPages)">&raquo;</a></li>
+                    <li class="page-item"><a class="page-link" asp-controller="MyRecipes" asp-action="Index" asp-route-ascending="@Model.Ascending" asp-route-categories="@Model.CategoriesQuery" asp-route-searchString="@Model.SearchString" asp-route-page="@(Model.CurrentPage + 1 < Model.TotalPages ? Model.CurrentPage + 1 : Model.TotalPages)">&raquo;</a></li>
                 }
             </ul>
         </nav>

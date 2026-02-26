@@ -16,7 +16,7 @@ namespace UsefulWebApps.Repository
         }
         //any Recipe model specific database methods here
         //Recipe is very specific no generic repo methods used
-        public async Task<(int count, List<Recipe> recipes)> Pagination(int limit, int offset, string searchString)
+        public async Task<(int count, List<Recipe> recipes)> Pagination(int limit, int offset, string searchString, bool ascending)
         {
             /* Basic limit offset pagination
             * 
@@ -33,13 +33,16 @@ namespace UsefulWebApps.Repository
             * https://planetscale.com/learn/courses/mysql-for-developers/indexes/fulltext-indexes?autoplay=1
             */
 
-            string sqlMult = @"
+            // Determine sort direction
+            string sortDirection = ascending ? "ASC" : "DESC";
+
+            string sqlMult = $@"
                 SELECT COUNT(*) FROM recipes;
-                SELECT * FROM recipes ORDER BY RecipeTitle LIMIT @Limit OFFSET @Offset;
+                SELECT * FROM recipes ORDER BY RecipeTitle {sortDirection} LIMIT @Limit OFFSET @Offset;
             ";
-            string sqlMultFilter = @"
+            string sqlMultFilter = $@"
                 SELECT COUNT(*) FROM recipes WHERE MATCH(RecipeTitle, Ingredients) AGAINST(@SearchString);
-                SELECT * FROM recipes WHERE MATCH(RecipeTitle, Ingredients) AGAINST(@SearchString) ORDER BY RecipeTitle LIMIT @Limit OFFSET @Offset;
+                SELECT * FROM recipes WHERE MATCH(RecipeTitle, Ingredients) AGAINST(@SearchString) ORDER BY RecipeTitle {sortDirection} LIMIT @Limit OFFSET @Offset;
             ";
             GridReader gridReader = null;
             if (String.IsNullOrEmpty(searchString))
@@ -58,16 +61,18 @@ namespace UsefulWebApps.Repository
             return (count, recipes);
         }
 
-        public async Task<(int count, List<Recipe> recipes)> PaginationWithTagFilter(int limit, int offset, List<int> selectedCategoryIds)
+        public async Task<(int count, List<Recipe> recipes)> PaginationWithTagFilter(int limit, int offset, List<int> selectedCategoryIds, bool ascending)
         {
-            string sql = @"
+            // Determine sort direction
+            string sortDirection = ascending ? "ASC" : "DESC";
+            string sql = $@"
                 SELECT COUNT(DISTINCT recipes.RecipeId) FROM recipes
                 JOIN recipe_categories_join rcj ON recipes.RecipeId = rcj.RecipeId
                 WHERE rcj.CategoryId IN @CategoryIds;
 
                 SELECT DISTINCT recipes.* FROM recipes
                 JOIN recipe_categories_join rcj ON recipes.RecipeId = rcj.RecipeId
-                WHERE rcj.CategoryId IN @CategoryIds ORDER BY RecipeTitle LIMIT @Limit OFFSET @Offset;
+                WHERE rcj.CategoryId IN @CategoryIds ORDER BY RecipeTitle {sortDirection} LIMIT @Limit OFFSET @Offset;
             ";
 
             GridReader gridReader = await _connection.QueryMultipleAsync(sql, new { CategoryIds = selectedCategoryIds, Limit= limit, Offset = offset });

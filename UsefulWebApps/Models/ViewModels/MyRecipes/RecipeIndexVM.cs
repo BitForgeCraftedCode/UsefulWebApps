@@ -10,6 +10,7 @@ namespace UsefulWebApps.Models.ViewModels.MyRecipes
         public List<RecipeCuisines> RecipeCuisines { get; set; }
         public List<RecipeDifficulties> RecipeDifficulties { get; set; }
         public string CategoriesQuery { get; set; }
+        public bool Ascending { get; set; } = true;
         public int CurrentPage { get; set; }
         public int TotalPages { get; set; }
         public int TotalRecipes { get; set; }

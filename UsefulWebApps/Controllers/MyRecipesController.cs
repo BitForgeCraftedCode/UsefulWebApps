@@ -25,7 +25,7 @@ namespace UsefulWebApps.Controllers
             sanitizer.AllowedAttributes.UnionWith(new[] { "class", "data-list" });
         }
 
-        public async Task<IActionResult> Index(int page, string searchString, string categories)
+        public async Task<IActionResult> Index(int page, string searchString, string categories, bool ascending = true)
         {
             List<int> selectedCategoryIds = new();
 
@@ -47,11 +47,11 @@ namespace UsefulWebApps.Controllers
             (int count, List<Recipe> recipes) result;
             if (selectedCategoryIds.Any())
             {
-                result = await _unitOfWork.Recipe.PaginationWithTagFilter(limit, offset, selectedCategoryIds);
+                result = await _unitOfWork.Recipe.PaginationWithTagFilter(limit, offset, selectedCategoryIds, ascending);
             }
             else
             {
-                result = await _unitOfWork.Recipe.Pagination(limit, offset, searchString);
+                result = await _unitOfWork.Recipe.Pagination(limit, offset, searchString, ascending);
             }
 
             (
@@ -88,6 +88,7 @@ namespace UsefulWebApps.Controllers
                 RecipeCuisines = recipeCuisines,
                 RecipeDifficulties = recipeDifficulties,
                 CategoriesQuery = categories,
+                Ascending = ascending,
                 CurrentPage = page,
                 TotalPages = totalPages,
                 TotalRecipes = count,
@@ -98,12 +99,28 @@ namespace UsefulWebApps.Controllers
         }
 
         //Post/Redirect/Get (PRG) pattern
+        /*
+            | Operation      | Verb |
+            | -------------- | ---- |
+            | Submit form    | POST |
+            | Navigate pages | GET  |
+            | Bookmark       | GET  |
+            | Share link     | GET  |
+            | Refresh        | GET  |
+            | Filter submit  | POST |
+            | Search submit  | POST |
+            | Pagination     | GET  |
+
+         */
         [HttpPost]
-        public async Task<IActionResult> Index(RecipeIndexVM model, int page, string searchString = "")
+        public async Task<IActionResult> Index(RecipeIndexVM model, int page, string searchString = "", bool ascending = true)
         {
+            //model.RecipeCategories null on Search Title and Ingredients form
             if(model.RecipeCategories == null)
-                return RedirectToAction("Index", new { page = page, searchString = searchString });
-            
+            {
+                return RedirectToAction("Index", new { page = page, searchString = searchString, ascending = model.Ascending });
+            }
+                
             if (page == 0)
                 page = 1;
             
@@ -114,11 +131,12 @@ namespace UsefulWebApps.Controllers
                 .ToList();
 
             if (selectedCategoryIds.Count == 0) 
-                return RedirectToAction("Index", new { page = page, searchString = searchString });
+                return RedirectToAction("Index", new { page = page, searchString = searchString, ascending = model.Ascending });
             
             return RedirectToAction("Index", new
             {
                 page = page,
+                ascending = model.Ascending,
                 categories = string.Join(",", selectedCategoryIds)
             });
         }

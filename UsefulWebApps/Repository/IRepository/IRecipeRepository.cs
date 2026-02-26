@@ -7,8 +7,8 @@ namespace UsefulWebApps.Repository.IRepository
     {
         //any Recipe model specific database methods here
         //Recipe is very specific no generic repo methods used
-        Task<(int count, List<Recipe> recipes)> Pagination(int limit, int offset, string searchString);
-        Task<(int count, List<Recipe> recipes)> PaginationWithTagFilter(int limit, int offset, List<int> selectedCategoryIds);
+        Task<(int count, List<Recipe> recipes)> Pagination(int limit, int offset, string searchString, bool ascending);
+        Task<(int count, List<Recipe> recipes)> PaginationWithTagFilter(int limit, int offset, List<int> selectedCategoryIds, bool ascending);
         Task<Recipe> GetRecipeById(int? id);
         Task<RecipePageVM> GetRecipeAndCommentsById(int? id);
         Task<List<RecipeUserSaved>> GetUserSavedRecipes(string userId);
