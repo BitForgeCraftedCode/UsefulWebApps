@@ -61,7 +61,28 @@
     <div class="list-group">
         @foreach (Recipe recipe in Model.Recipes)
         {
-            <a asp-controller="MyRecipes" asp-action="Recipe" asp-route-id="@recipe.RecipeId" class="list-group-item list-group-item-action">@recipe.RecipeTitle</a>
+            <div class="card mb-3">
+                <h4 class="card-title">
+                    <a asp-controller="MyRecipes" asp-action="Recipe" asp-route-id="@recipe.RecipeId" class="list-group-item list-group-item-action">@recipe.RecipeTitle</a>
+                </h4>
+                <div class="card-body">
+                    @if (!String.IsNullOrEmpty(recipe.RecipeDescription))
+                    {
+                        <p class="card-text">@recipe.RecipeDescription</p>
+                    }
+                    <p class="card-text">Author: @recipe.UserName</p>
+                    <p class="card-text">Rating: @recipe.Rating</p>
+                    
+                </div>
+                @if (String.IsNullOrEmpty(recipe.ImagePath))
+                {
+                    <img src="~/images/recipes/dish-spoon-knife-icon.png" class="img-fluid max-width-250 mx-auto" />
+                }
+                else
+                {
+                    <img src="@recipe.ImagePath" class="img-fluid max-width-250 mx-auto" />
+                }
+            </div>            
         }
     </div>
     <div class="mt-4">
