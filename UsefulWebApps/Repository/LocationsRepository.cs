@@ -6,11 +6,7 @@ namespace UsefulWebApps.Repository
 {
     public class LocationsRepository : Repository<Locations>, ILocationsRepository
     {
-        private readonly MySqlConnection _connection;
-        public LocationsRepository(MySqlConnection db) : base(db) 
-        {
-            _connection = db;
-        }
+        public LocationsRepository(MySqlConnection connection) : base(connection) { }
         //any LocationJSON model specific database methods here
     }
 }

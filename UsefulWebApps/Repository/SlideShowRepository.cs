@@ -9,12 +9,7 @@ namespace UsefulWebApps.Repository
 {
     public class SlideShowRepository : Repository<SlideShowImages>, ISlideShowRepository
     {
-        private readonly MySqlConnection _connection;
-
-        public SlideShowRepository(MySqlConnection db) : base(db) 
-        {
-            _connection = db;
-        }
+        public SlideShowRepository(MySqlConnection connection) : base(connection) { }
         //any SlideShow specific database methods here
         public async Task<List<SlideShowImages>> GetSlideShowImagesForUser(string userId)
         {
@@ -23,7 +18,6 @@ namespace UsefulWebApps.Repository
             )";
 
             List<SlideShowImages> userSlideShowImages = (List<SlideShowImages>)await _connection.QueryAsync<SlideShowImages>(sql, new { userId });
-            await _connection.CloseAsync();
             return userSlideShowImages;
         }
 
@@ -45,13 +39,12 @@ namespace UsefulWebApps.Repository
             return (userSlideShowFolder, allSlideShowFolders);
         }
 
+        //transaction method
         public async Task<bool> UpdateSlideShow(string userId, SelectSlideShowVM selectSlideShowVM)
         {
             int rowsEffected1 = 0;
             int rowsEffected2 = 0;
             string folderName = selectSlideShowVM.SelectedSlideShowFolder.FolderName;
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             //delete all users slideshow choice then add the new selection
             string sql1 = @"DELETE FROM user_slideshow_images WHERE UserId = @userId"; //may return 0 if user has no slideshow selected
             string sql2 = @"
@@ -61,10 +54,8 @@ namespace UsefulWebApps.Repository
                 CROSS JOIN aspnetusers
                 WHERE slideshow_images.FolderName = @folderName AND aspnetusers.Id = @userId;
             ";
-            rowsEffected1 = await _connection.ExecuteAsync(sql1, new { userId = userId }, transaction: txn);
-            rowsEffected2 = await _connection.ExecuteAsync(sql2, new { userId = userId, folderName = folderName }, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            rowsEffected1 = await _connection.ExecuteAsync(sql1, new { userId = userId }, transaction: _transaction);
+            rowsEffected2 = await _connection.ExecuteAsync(sql2, new { userId = userId, folderName = folderName }, transaction: _transaction);
             return (rowsEffected1 + rowsEffected2 > 0 ? true : false);
         }
     }

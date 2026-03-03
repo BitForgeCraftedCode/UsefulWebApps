@@ -6,12 +6,7 @@ namespace UsefulWebApps.Repository
 {
     public class NotesRepository : Repository<Notes>, INotesRepository
     {
-        private readonly MySqlConnection _connection;
-
-        public NotesRepository(MySqlConnection db) : base(db) 
-        {
-            _connection = db;
-        }
+        public NotesRepository(MySqlConnection connection) : base(connection) { }
         //any Notes model specific database methods here
     }
 }

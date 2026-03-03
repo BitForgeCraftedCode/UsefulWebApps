@@ -7,14 +7,8 @@ namespace UsefulWebApps.Repository
 {
     public class CalendarEventsRepository : Repository<CalendarEvents>, ICalendarEventsRepository
     {
-        private readonly MySqlConnection _connection;
-
-        public CalendarEventsRepository(MySqlConnection db) : base(db) 
-        { 
-            _connection = db;
-        }
+        public CalendarEventsRepository(MySqlConnection connection) : base(connection) { }
         //any CalendarEvents model specific database methods here
-
         public async Task<List<CalendarEvents>> GetUserCalendarEventsForDateRange(DateTime startDate, DateTime endDate, string userId)
         {
             string sql = @$"

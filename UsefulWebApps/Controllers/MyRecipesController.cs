@@ -151,7 +151,10 @@ namespace UsefulWebApps.Controllers
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
             string userName = currentUser.FindFirstValue(ClaimTypes.Name);
 
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
             RecipePageVM RecipePageVM = await _unitOfWork.Recipe.GetRecipeAndCommentsById(id);
+            await _unitOfWork.CommitAsync();
             RecipePageVM.RecipeComment.UserId = userId;
             RecipePageVM.RecipeComment.UserName = userName;
             RecipePageVM.RecipeUserSaved.UserId = userId;
@@ -206,14 +209,18 @@ namespace UsefulWebApps.Controllers
             if (ModelState.IsValid)
             {
                 int? id = recipeUserSaved.RecipeId;
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
                 bool success = await _unitOfWork.Recipe.AddUserSavedRecipe(recipeUserSaved);
                 if (success)
                 {
+                    await _unitOfWork.CommitAsync();
                     TempData["success"] = "Recipe saved to your list successfully";
                     return RedirectToAction("Recipe", new { id });
                 }
                 else
                 {
+                    await _unitOfWork.RollbackAsync();
                     TempData["error"] = "You can only save 10 recipes to your list";
                     return RedirectToAction("Recipe", new { id });
                 }
@@ -250,7 +257,10 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
-          
+            
+
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();  
             (
                 List<Recipe> recipe, 
                 List<RecipeCategories> recipeCategories,
@@ -258,7 +268,7 @@ namespace UsefulWebApps.Controllers
                 List<RecipeCuisines> recipeCuisines, 
                 List<RecipeDifficulties> recipeDifficulties
             ) result = await _unitOfWork.Recipe.GetRecipeAndCategoriesForEditDisplay(id);
-
+            await _unitOfWork.CommitAsync();
             //https://www.learndapper.com/relationships -- map the JOIN to C# objects
             //this is a list of 1 single recipe listed x times one for each category -- best to see this by running the above sql in workbench. 
             List<Recipe> recipe = result.recipe;
@@ -401,13 +411,17 @@ namespace UsefulWebApps.Controllers
                     //set database path in recipe model
                     recipeVM.Recipe.ImagePath = filePathDb;
                 }
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
                 bool success = await _unitOfWork.Recipe.UpdateRecipe(recipeVM);
                 if (success)
                 {
+                    await _unitOfWork.CommitAsync();
                     TempData["success"] = "Recipe updated successfully";
                 }
                 else
                 {
+                    await _unitOfWork.RollbackAsync();
                     TempData["error"] = "Update recipe error. Please try again.";
                 }
                 //return RedirectToAction("Index");
@@ -502,13 +516,17 @@ namespace UsefulWebApps.Controllers
                     //set database path in recipe model
                     recipeVM.Recipe.ImagePath = filePathDb;
                 }
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
                 bool success = await _unitOfWork.Recipe.AddRecipe(recipeVM);
                 if (success)
                 {
+                    await _unitOfWork.CommitAsync();
                     TempData["success"] = "Recipe created successfully";
                 }
                 else
                 {
+                    await _unitOfWork.RollbackAsync();
                     TempData["error"] = "Create recipe error. Please try again.";
                 }
                 return RedirectToAction("Index");
@@ -555,13 +573,17 @@ namespace UsefulWebApps.Controllers
                     System.IO.File.Delete(imageStoragePath);
                 }
             }
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
             bool success = await _unitOfWork.Recipe.DeleteRecipe(id);
             if (success) 
             {
+                await _unitOfWork.CommitAsync();
                 TempData["success"] = "Recipe deleted successfully";
             }
             else
             {
+                await _unitOfWork.RollbackAsync();
                 TempData["error"] = "Delete recipe error. Please try again";
             }
             return RedirectToAction("Index");

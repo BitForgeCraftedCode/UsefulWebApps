@@ -1,7 +1,9 @@
-﻿namespace UsefulWebApps.Repository.IRepository
+﻿using MySqlConnector;
+namespace UsefulWebApps.Repository.IRepository
 {
     public interface IRepository<T> where T : class
     {
+        void SetTransaction(MySqlTransaction? txn);
         //T -- ToDoList or any model/class we want to interact with dbContext
         //that is why T is a generic class
         //where T : class (just means T is a class)
@@ -22,6 +24,7 @@
         Task<bool> Add(T entity);
         Task<bool> Update(T entity);
         Task<bool> Delete(int? id);
+        //txn method
         Task<bool> DeleteAll();
         /// <summary>
         /// Delete all database rows for column where value is a string type

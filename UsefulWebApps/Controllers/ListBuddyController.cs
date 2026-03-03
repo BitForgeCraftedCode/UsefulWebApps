@@ -164,7 +164,8 @@ namespace UsefulWebApps.Controllers
             };
             return View(toDoListVM);
         }
-        
+
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> ToDoListToggleComplete(int? id, string listTitle)
         {
@@ -174,7 +175,10 @@ namespace UsefulWebApps.Controllers
             }
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
             List<ToDoList> listItems = await _unitOfWork.ToDoList.ToDoListToggleComplete(id, userId, listTitle);
+            await _unitOfWork.CommitAsync();
             ToDoListVM toDoListVM = new()
             {
                 ToDoListItems = listItems,
@@ -221,13 +225,17 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("MyToDoLists");
         }
 
+        //transaction method
         //add new item to already existing ToDoList
         [HttpPost]
         public async Task<IActionResult> ToDoListAddItem(ToDoList toDoList)
         {
             if (ModelState.IsValid)
             {
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
                 List<ToDoList> listItems = await _unitOfWork.ToDoList.ToDoListAdd(toDoList);
+                await _unitOfWork.CommitAsync();
                 ToDoListVM toDoListVM = new()
                 {
                     ToDoListItems = listItems,
@@ -369,6 +377,7 @@ namespace UsefulWebApps.Controllers
             return View(groceryListVM);
         }
 
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> GroceryListToggleComplete(int? id, string userId)
         {
@@ -376,17 +385,23 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
             (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GroceryListToggleComplete(id, userId);
-
+            await _unitOfWork.CommitAsync();
             GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, userId);
 
             return PartialView("_GroceryListPartial", groceryListVM);
         }
 
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> GroceryListSortCategories(int sortOrder, string category, string userId)
         {
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
             (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GroceryListSortCategories(sortOrder, category, userId);
+            await _unitOfWork.CommitAsync();
             GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, userId);
 
             return PartialView("_GroceryListPartial", groceryListVM);
@@ -416,6 +431,7 @@ namespace UsefulWebApps.Controllers
             return View(groceryListEditVM);
         }
 
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> GroceryListEdit(GroceryList groceryList, GroceryListEditVM groceryListEditVM)
         {
@@ -425,13 +441,17 @@ namespace UsefulWebApps.Controllers
 
             if (ModelState.IsValid)
             {
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
                 bool success = await _unitOfWork.GroceryList.GroceryListUpdate(groceryList);
                 if (success) 
                 {
+                    await _unitOfWork.CommitAsync();
                     TempData["success"] = "Grocery item updated successfully.";
                 }
                 else
                 {
+                    await _unitOfWork.RollbackAsync();
                     TempData["error"] = "Update grocery item error. Please try again.";
                 }
                 return RedirectToAction("GroceryList");
@@ -457,6 +477,7 @@ namespace UsefulWebApps.Controllers
             return Json(jsonString);
         }
 
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> GroceryListCreate(GroceryListVM groceryListVM)
         {
@@ -467,7 +488,10 @@ namespace UsefulWebApps.Controllers
             TryValidateModel(groceryListVM.GroceryList);
             if (ModelState.IsValid)
             {
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
                 (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GroceryListAdd(groceryListVM.GroceryList);
+                await _unitOfWork.CommitAsync();
                 GroceryListVM newGroceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, groceryListVM.GroceryList.UserId);
                 return PartialView("_GroceryListPartial", newGroceryListVM);
             }
@@ -484,6 +508,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("GroceryList");
         }
 
+        //transaction method
         [HttpPost]
         public async Task<JsonResult> SaveUserGroceryList(string userId)
         {
@@ -492,26 +517,35 @@ namespace UsefulWebApps.Controllers
                 return Json("error userId was null");
             }
             //jquery ajax handles the toast
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
             bool success = await _unitOfWork.GroceryList.SaveUserGroceryList(userId);
             if (!success)
             {
+                await _unitOfWork.RollbackAsync();  
                 return Json("failed to save list");
             }
+            await _unitOfWork.CommitAsync();
             return Json("success");
         }
 
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> UseSavedGroceryList(string userId)
         {
             if (ModelState.IsValid) 
             {
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
                 bool success = await _unitOfWork.GroceryList.UseSavedGroceryList(userId);
                 if (success)
                 {
+                    await _unitOfWork.CommitAsync();
                     TempData["success"] = "Grocery template loaded successfully.";
                 }
                 else
                 {
+                    await _unitOfWork.RollbackAsync();
                     TempData["error"] = "You currently don't have a saved list. Save one first.";
                 }
                 return RedirectToAction("GroceryList");
@@ -529,6 +563,7 @@ namespace UsefulWebApps.Controllers
             return View(shareGroceryListVM);  
         }
 
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> ShareGroceryList(ShareGroceryListVM shareGroceryListVM)
         {
@@ -540,13 +575,17 @@ namespace UsefulWebApps.Controllers
                 TempData["error"] = "Share list error. Please try again. Make sure you have the correct user name and email.";
                 return View();
             };
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
             bool success = await _unitOfWork.GroceryList.ShareGroceryList(shareGroceryListVM.UserId, friend.Id);
             if (success)
             {
+                await _unitOfWork.CommitAsync();
                 TempData["success"] = "Grocery list shared.";
             }
             else
             {
+                await _unitOfWork.RollbackAsync();
                 TempData["error"] = "Share list error. Please try again. Make sure your friend has a list.";
             }
             return RedirectToAction("GroceryList");

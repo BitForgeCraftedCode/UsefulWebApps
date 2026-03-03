@@ -9,11 +9,7 @@ namespace UsefulWebApps.Repository
 {
     public class RecipeRepository : Repository<Recipe>, IRecipeRepository
     {
-        private readonly MySqlConnection _connection;
-        public RecipeRepository(MySqlConnection db) : base(db)
-        {
-            _connection = db;
-        }
+        public RecipeRepository(MySqlConnection connection) : base(connection) { }
         //any Recipe model specific database methods here
         //Recipe is very specific no generic repo methods used
         public async Task<(int count, List<Recipe> recipes)> Pagination(int limit, int offset, string searchString, bool ascending)
@@ -57,7 +53,6 @@ namespace UsefulWebApps.Repository
             //count is the total number of recipes in database
             int count = await gridReader.ReadFirstAsync<int>();
             List<Recipe> recipes = (List<Recipe>)await gridReader.ReadAsync<Recipe>();
-            await _connection.CloseAsync();
             return (count, recipes);
         }
 
@@ -79,7 +74,6 @@ namespace UsefulWebApps.Repository
 
             int count = await gridReader.ReadFirstAsync<int>();
             List<Recipe> recipes = (List<Recipe>)await gridReader.ReadAsync<Recipe>();
-            await _connection.CloseAsync();
             return (count, recipes);
         }
 
@@ -116,15 +110,12 @@ namespace UsefulWebApps.Repository
                 return singleRecipe;
             }).ToList();
 
-            await _connection.CloseAsync();
             return filteredRecipe[0];
         }
 
+        //transaction method
         public async Task<RecipePageVM> GetRecipeAndCommentsById(int? id)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
-
             //returns x rows of a single recipe at RecipeId where x is the number of categories
             string sql = @"SELECT * FROM recipes
                 JOIN recipe_categories_join ON recipe_categories_join.RecipeId = recipes.RecipeId
@@ -145,7 +136,7 @@ namespace UsefulWebApps.Repository
                     recipe.Cuisine = recipeCuisines;
                     recipe.Difficulty = recipeDifficulties;
                     return recipe;
-                }, new { id }, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId", transaction: txn);
+                }, new { id }, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId", transaction: _transaction);
 
             //since we sql SELECT on 1 id GroupBy returns 1 group with x num recipe rows
             //foreach group get the First recipe and add the categories to it
@@ -158,10 +149,8 @@ namespace UsefulWebApps.Repository
                 return singleRecipe;
             }).ToList();
 
-            List<RecipeComment> recipeComments = (List<RecipeComment>)await _connection.QueryAsync<RecipeComment>(sql2, new { id }, transaction: txn);
+            List<RecipeComment> recipeComments = (List<RecipeComment>)await _connection.QueryAsync<RecipeComment>(sql2, new { id }, transaction: _transaction);
 
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
             RecipePageVM RecipePageVM = new RecipePageVM 
             { 
                 Recipe = filteredRecipe[0],
@@ -176,10 +165,10 @@ namespace UsefulWebApps.Repository
         {
             string sql = @"SELECT UserSavedId, RecipeId, RecipeTitle FROM recipe_usersaved WHERE UserId = @userId";
             List<RecipeUserSaved> recipeUserSaved = (List<RecipeUserSaved>)await _connection.QueryAsync<RecipeUserSaved>(sql, new { userId });
-            await _connection.CloseAsync();
             return recipeUserSaved;
         }
 
+        //transaction method
         public async Task<(
             List<Recipe> recipe,
             List<RecipeCategories> recipeCategories,
@@ -203,8 +192,6 @@ namespace UsefulWebApps.Repository
                 SELECT * FROM recipe_cuisines;
                 SELECT * FROM recipe_difficulties;
             ";
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             //https://www.learndapper.com/relationships -- map the JOIN to C# objects
             //this is a list of 1 single recipe listed x times one for each category -- best to see this by running the above sql in workbench. 
             List<Recipe> recipe = (List<Recipe>)await _connection.QueryAsync<Recipe, RecipeCategories, RecipeCourses, RecipeCuisines, RecipeDifficulties, Recipe>(sql,
@@ -214,20 +201,19 @@ namespace UsefulWebApps.Repository
                     recipe.Cuisine = recipeCuisines;
                     recipe.Difficulty = recipeDifficulties;
                     return recipe;
-                }, new { id }, transaction: txn, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId");
+                }, new { id }, transaction: _transaction, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId");
 
-            GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult, transaction: txn);
+            GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult, transaction: _transaction);
 
             List<RecipeCategories> recipeCategories = (List<RecipeCategories>)await gridReader.ReadAsync<RecipeCategories>();
             List<RecipeCourses> recipeCourses = (List<RecipeCourses>)await gridReader.ReadAsync<RecipeCourses>();
             List<RecipeCuisines> recipeCuisines = (List<RecipeCuisines>)await gridReader.ReadAsync<RecipeCuisines>();
             List<RecipeDifficulties> recipeDifficulties = (List<RecipeDifficulties>)await gridReader.ReadAsync<RecipeDifficulties>();
 
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
             return (recipe, recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties);
         }
 
+        //transaction method
         public async Task<bool> UpdateRecipe(RecipeVM recipeVM)
         {
             int rowsEffected1 = 0;
@@ -245,8 +231,6 @@ namespace UsefulWebApps.Repository
                 }
             }
 
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             string sql = @"UPDATE recipes
                     SET RecipeTitle = @recipeTitle, RecipeDescription = @recipeDescription, CourseId = @courseId,
                     CuisineId = @cuisineId, DifficultyId = @difficultyId, PrepTime = @prepTime, CookTime = @cookTime,
@@ -274,12 +258,10 @@ namespace UsefulWebApps.Repository
                 notes = recipeVM.Recipe.Notes,
                 imagePath = recipeVM.Recipe.ImagePath,
                 id = recipeVM.Recipe.RecipeId
-            }, transaction: txn);
-            rowsEffected2 = await _connection.ExecuteAsync(sql2, new { id = recipeVM.Recipe.RecipeId }, transaction: txn);
-            rowsEffected3 = await _connection.ExecuteAsync(sql3, checkedCategoriesParams, transaction: txn);
+            }, transaction: _transaction);
+            rowsEffected2 = await _connection.ExecuteAsync(sql2, new { id = recipeVM.Recipe.RecipeId }, transaction: _transaction);
+            rowsEffected3 = await _connection.ExecuteAsync(sql3, checkedCategoriesParams, transaction: _transaction);
 
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
             return (rowsEffected1 > 0 && rowsEffected2 > 0 && rowsEffected3 > 0) ? true : false;
         }
 
@@ -303,18 +285,16 @@ namespace UsefulWebApps.Repository
             List<RecipeCourses> recipeCourses = (List<RecipeCourses>)await gridReader.ReadAsync<RecipeCourses>();
             List<RecipeCuisines> recipeCuisines = (List<RecipeCuisines>)await gridReader.ReadAsync<RecipeCuisines>();
             List<RecipeDifficulties> recipeDifficulties = (List<RecipeDifficulties>)await gridReader.ReadAsync<RecipeDifficulties>();
-            await _connection.CloseAsync();
             return (recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties);
         }
 
+        //transaction method
         public async Task<bool> AddRecipe(RecipeVM recipeVM)
         {
             int rowsEffected1 = 0;
             int rowsEffected2 = 0;
             //make a checked categories parameter list for sql INSERT
             List<Object> checkedCategoriesParams = new List<Object>();
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             string sql = @"INSERT INTO recipes 
                     (
                         RecipeTitle, 
@@ -371,7 +351,7 @@ namespace UsefulWebApps.Repository
                 userId = recipeVM.Recipe.UserId,
                 userName = recipeVM.Recipe.UserName,
                 imagePath = recipeVM.Recipe.ImagePath
-            }, transaction: txn);
+            }, transaction: _transaction);
 
             //need the id before adding to recipe_categories_join
             //not sure on the best way but for now using LAST_INSERT_ID() should get the job done. 
@@ -380,7 +360,7 @@ namespace UsefulWebApps.Repository
             //https://stackoverflow.com/questions/19714308/mysql-how-to-insert-into-table-that-has-many-to-many-relationship
             string sql2 = @"SELECT RecipeId FROM recipes WHERE RecipeId = LAST_INSERT_ID()";
             //string sql2 = @"LAST_INSERT_ID()";
-            int idLastRecipeInsert = await _connection.QuerySingleAsync<int>(sql2, transaction: txn);
+            int idLastRecipeInsert = await _connection.QuerySingleAsync<int>(sql2, transaction: _transaction);
 
             foreach (RecipeCategories category in recipeVM.Recipe.Categories)
             {
@@ -393,9 +373,7 @@ namespace UsefulWebApps.Repository
             }
             string sql3 = @"INSERT INTO recipe_categories_join (RecipeId, CategoryId) VALUES (@id, @categoryId)";
 
-            rowsEffected2 = await _connection.ExecuteAsync(sql3, checkedCategoriesParams, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            rowsEffected2 = await _connection.ExecuteAsync(sql3, checkedCategoriesParams, transaction: _transaction);
             return (rowsEffected1 > 0 && rowsEffected2 > 0) ? true : false;
         }
 
@@ -423,25 +401,22 @@ namespace UsefulWebApps.Repository
                 userName = recipeComment.UserName,
                 recipeId = recipeComment.RecipeId
             });
-            await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
 
+        //transaction method
         public async Task<bool> AddUserSavedRecipe(RecipeUserSaved recipeUserSaved)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             int rowsEffected = 0;
             string sql1 = @"SELECT COUNT(*) FROM recipe_usersaved WHERE UserId = @userId";
             int savedRecipeCount = await _connection.QuerySingleAsync<int>(sql1, new 
             { 
                 userId = recipeUserSaved.UserId,
-            }, transaction: txn);
+            }, transaction: _transaction);
 
             if (savedRecipeCount >= 10) 
             { 
-                await txn.RollbackAsync();
-                await _connection.CloseAsync();
+                //false rollback
                 return rowsEffected > 0 ? true : false;
             }
             string sql2 = @"INSERT INTO recipe_usersaved
@@ -464,23 +439,19 @@ namespace UsefulWebApps.Repository
                 userName = recipeUserSaved.UserName,
                 recipeId = recipeUserSaved.RecipeId,
                 recipeTitle = recipeUserSaved.RecipeTitle
-            }, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            }, transaction: _transaction);
             return rowsEffected > 0 ? true : false;
         }
+
+        //transaction method
         public async Task<bool> DeleteRecipe(int? id)
         {
             int rowsEffected1 = 0;
             int rowsEffected2 = 0;
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             string sql = @"DELETE FROM recipe_categories_join WHERE RecipeId = @recipeId";
             string sql2 = @"DELETE FROM recipes WHERE RecipeId = @recipeId";
-            rowsEffected1 = await _connection.ExecuteAsync(sql, new { recipeId = id }, transaction: txn);
-            rowsEffected2 = await _connection.ExecuteAsync(sql2, new { recipeId = id }, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            rowsEffected1 = await _connection.ExecuteAsync(sql, new { recipeId = id }, transaction: _transaction);
+            rowsEffected2 = await _connection.ExecuteAsync(sql2, new { recipeId = id }, transaction: _transaction);
             return (rowsEffected1 > 0 && rowsEffected2 > 0) ? true : false;
         }
 
@@ -489,7 +460,6 @@ namespace UsefulWebApps.Repository
             int rowsEffected = 0;
             string sql = @"DELETE FROM recipe_usersaved WHERE UserSavedId = @id";
             rowsEffected = await _connection.ExecuteAsync(sql, new { id });
-            await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
 

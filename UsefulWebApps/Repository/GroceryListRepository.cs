@@ -7,12 +7,7 @@ namespace UsefulWebApps.Repository
 {
     public class GroceryListRepository : Repository<GroceryList>, IGroceryListRepository
     {
-        private readonly MySqlConnection _connection;
-        public GroceryListRepository(MySqlConnection db) : base(db)
-        {
-            _connection = db;
-        }
-
+        public GroceryListRepository(MySqlConnection connection) : base(connection) { }
         //any GroceryList model specific database methods here
 
         //return multiple types with a tuple https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-tuples 
@@ -27,7 +22,6 @@ namespace UsefulWebApps.Repository
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
             List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
-            await _connection.CloseAsync();
             return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
         }
 
@@ -40,16 +34,14 @@ namespace UsefulWebApps.Repository
             GridReader gridReader = await _connection.QueryMultipleAsync(query, new { id });
             GroceryList groceryListItem = await gridReader.ReadFirstAsync<GroceryList>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
-            await _connection.CloseAsync();
             return (groceryListItem, groceryCategoriesEnum);
         }
 
+        //transaction method
         public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GroceryListToggleComplete(int? id, string userId)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             string sql = "SELECT Complete FROM grocery_list WHERE Id = @id";
-            bool isComplete = await _connection.QuerySingleAsync<bool>(sql, new { id }, transaction: txn);
+            bool isComplete = await _connection.QuerySingleAsync<bool>(sql, new { id }, transaction: _transaction);
             string sql2 = String.Empty;
             if (isComplete)
             {
@@ -59,48 +51,42 @@ namespace UsefulWebApps.Repository
             {
                 sql2 = "UPDATE grocery_list SET Complete = True WHERE Id = @id";
             }
-            await _connection.ExecuteAsync(sql2, new { id }, transaction: txn);
+            await _connection.ExecuteAsync(sql2, new { id }, transaction: _transaction);
             string sql3 = $@"
                 SELECT * FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC, GroceryItem ASC;
                 SELECT * FROM grocery_categories ORDER BY Category ASC;
                 SELECT DISTINCT Category, SortOrder FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC; 
             ";
-            GridReader gridReader = await _connection.QueryMultipleAsync(sql3, new { Parameter = userId }, transaction: txn);
+            GridReader gridReader = await _connection.QueryMultipleAsync(sql3, new { Parameter = userId }, transaction: _transaction);
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
             List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
             return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
         }
 
+        //transaction method
         public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GroceryListSortCategories(int sortOrder, string category, string userId)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             string sql = "UPDATE grocery_list SET SortOrder = @sortOrder WHERE Category = @category AND UserId = @userId";
-            await _connection.ExecuteAsync(sql, new { sortOrder, category, userId }, transaction: txn);
+            await _connection.ExecuteAsync(sql, new { sortOrder, category, userId }, transaction: _transaction);
             string sql2 = $@"
                 SELECT * FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC, GroceryItem ASC;
                 SELECT * FROM grocery_categories ORDER BY Category ASC;
                 SELECT DISTINCT Category, SortOrder FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC; 
             ";
-            GridReader gridReader = await _connection.QueryMultipleAsync(sql2, new { Parameter = userId }, transaction: txn);
+            GridReader gridReader = await _connection.QueryMultipleAsync(sql2, new { Parameter = userId }, transaction: _transaction);
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
             List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
             return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
         }
 
+        //transaction method
         public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GroceryListAdd(GroceryList groceryList)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             //before insert get the sort order of the current category if no category yet set sort order to 1
             string sql = "SELECT SortOrder FROM grocery_list WHERE Category = @category AND UserId = @userId";
-            int? sortOrder = await _connection.QueryFirstOrDefaultAsync<int?>(sql, new { category = groceryList.Category, userId = groceryList.UserId}, transaction: txn);
+            int? sortOrder = await _connection.QueryFirstOrDefaultAsync<int?>(sql, new { category = groceryList.Category, userId = groceryList.UserId}, transaction: _transaction);
             if (sortOrder == null) 
             {
                 sortOrder = 1; 
@@ -113,29 +99,26 @@ namespace UsefulWebApps.Repository
                 complete = groceryList.Complete,
                 userId = groceryList.UserId,
                 sortOrder = sortOrder,
-            }, transaction: txn);
+            }, transaction: _transaction);
             string sql2 = $@"
                 SELECT * FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC, GroceryItem ASC;
                 SELECT * FROM grocery_categories ORDER BY Category ASC;
                 SELECT DISTINCT Category, SortOrder FROM grocery_list WHERE UserId = @Parameter ORDER BY SortOrder ASC, Category ASC; 
             ";
-            GridReader gridReader = await _connection.QueryMultipleAsync(sql2, new { Parameter = groceryList.UserId }, transaction: txn);
+            GridReader gridReader = await _connection.QueryMultipleAsync(sql2, new { Parameter = groceryList.UserId }, transaction: _transaction);
             List<GroceryList> groceryListItems = (List<GroceryList>)await gridReader.ReadAsync<GroceryList>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
             List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
             return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
         }
 
+        //transaction method
         public async Task<bool> GroceryListUpdate(GroceryList groceryList)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             int rowsEffected = 0;
             //before update get the sort order of the category if no category yet set sort order to 1
             string sql = "SELECT SortOrder FROM grocery_list WHERE Category = @category AND UserId = @userId";
-            int? sortOrder = await _connection.QueryFirstOrDefaultAsync<int?>(sql, new { category = groceryList.Category, userId = groceryList.UserId }, transaction: txn);
+            int? sortOrder = await _connection.QueryFirstOrDefaultAsync<int?>(sql, new { category = groceryList.Category, userId = groceryList.UserId }, transaction: _transaction);
             if (sortOrder == null)
             {
                 sortOrder = 1;
@@ -149,77 +132,64 @@ namespace UsefulWebApps.Repository
                 userId = groceryList.UserId,
                 sortOrder = sortOrder,
                 id = groceryList.Id
-            }, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            }, transaction: _transaction);
             return rowsEffected > 0 ? true : false;
         }
 
+        //transaction method
         public async Task<bool> SaveUserGroceryList(string userId)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             int rowsEffected = 0;
             string sql = "DELETE FROM grocery_list_usersaved WHERE UserId = @userId";
-            await _connection.ExecuteAsync(sql, new { userId }, transaction: txn);
+            await _connection.ExecuteAsync(sql, new { userId }, transaction: _transaction);
             string sql1 = "INSERT INTO grocery_list_usersaved (GroceryItem, Category, Complete, UserId, SortOrder) SELECT GroceryItem, Category, Complete, UserId, SortOrder FROM grocery_list WHERE UserId = @userId";
-            rowsEffected = await _connection.ExecuteAsync(sql1, new { userId } , transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            rowsEffected = await _connection.ExecuteAsync(sql1, new { userId } , transaction: _transaction);
             return rowsEffected > 0 ? true : false;
         }
 
+        //transaction method
         public async Task<bool> UseSavedGroceryList(string userId)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             int rowsEffected = 0;
             //check there is a saved list
             string sql1 = "SELECT COUNT(Id) FROM grocery_list_usersaved WHERE UserId = @userId";
-            int savedListRows =  await _connection.QuerySingleAsync<int>(sql1, new { userId }, transaction: txn);
+            int savedListRows =  await _connection.QuerySingleAsync<int>(sql1, new { userId }, transaction: _transaction);
             if (savedListRows == 0) 
             {
-                await txn.RollbackAsync();
-                await _connection.CloseAsync();
+                //false rollback
                 return rowsEffected > 0 ? true : false;
             }
             //delete current list
             string sql2 = "DELETE FROM grocery_list WHERE UserId = @userId";
-            await _connection.ExecuteAsync(sql2, new { userId }, transaction: txn);
+            await _connection.ExecuteAsync(sql2, new { userId }, transaction: _transaction);
             //insert saved list as current
             string sql3 = "INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId, SortOrder) SELECT GroceryItem, Category, Complete, UserId, SortOrder FROM grocery_list_usersaved WHERE UserId = @userId";
-            rowsEffected = await _connection.ExecuteAsync(sql3, new { userId }, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            rowsEffected = await _connection.ExecuteAsync(sql3, new { userId }, transaction: _transaction);
             return rowsEffected > 0 ? true : false;
         }
 
+        //transaction method
         public async Task<bool> ShareGroceryList(string userId, string friendUserId)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             int rowsEffected = 0;
             //check if friend has a saved list
             string sql1 = "SELECT COUNT(Id) FROM grocery_list WHERE UserId = @friendUserId";
-            int savedListRows = await _connection.QuerySingleAsync<int>(sql1, new { friendUserId }, transaction: txn);
+            int savedListRows = await _connection.QuerySingleAsync<int>(sql1, new { friendUserId }, transaction: _transaction);
             if (savedListRows == 0)
             {
-                await txn.RollbackAsync();
-                await _connection.CloseAsync();
+                //false rollback
                 return rowsEffected > 0 ? true : false;
             }
             //add user's id to ShareUserId col of friend's list
             string sql = "UPDATE grocery_list SET ShareUserId = @userId WHERE UserId = @friendUserId";
-            await _connection.ExecuteAsync(sql, new { userId, friendUserId }, transaction: txn);
+            await _connection.ExecuteAsync(sql, new { userId, friendUserId }, transaction: _transaction);
             //delete user's grocery list
             string sql2 = "DELETE FROM grocery_list WHERE UserId = @userId";
-            await _connection.ExecuteAsync(sql2, new { userId }, transaction: txn);  
+            await _connection.ExecuteAsync(sql2, new { userId }, transaction: _transaction);  
             //insert friends list into users -- NOTE UserId here is ShareUserId from friend list
             string sql3 = "INSERT INTO grocery_list (GroceryItem, Category, Complete, UserId, SortOrder) SELECT GroceryItem, Category, Complete, ShareUserId, SortOrder FROM grocery_list WHERE UserId = @friendUserId";
-            rowsEffected = await _connection.ExecuteAsync(sql3, new { friendUserId }, transaction: txn);
+            rowsEffected = await _connection.ExecuteAsync(sql3, new { friendUserId }, transaction: _transaction);
             //commit txn and close connection
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
     }

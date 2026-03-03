@@ -20,6 +20,7 @@ builder.Services.AddDbContext<EFCoreDbContext>(options => {
     options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+//see UnitOfWork Class DisposeAsync method is implemented. ASP.NET Core DI AddScoped will call DisposeAsync when request ends
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>

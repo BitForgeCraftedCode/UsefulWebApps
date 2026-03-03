@@ -1,7 +1,15 @@
 ﻿namespace UsefulWebApps.Repository.IRepository
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IAsyncDisposable, IDisposable
     {
+        Task OpenConnectionAsync();
+        Task BeginTxnAsync();
+        Task CommitAsync();
+        Task RollbackAsync();
+        ValueTask DisposeAsync();
+        void Dispose();
+
+        // Repositories
         IToDoListRepository ToDoList {  get; }
         IGroceryListRepository GroceryList { get; }
         IRecipeRepository Recipe { get; }
@@ -12,6 +20,5 @@
         IQuotesRepository Quotes { get; }
         ILocationsRepository Locations { get; }
         ICalendarEventsRepository CalendarEvents { get; }
-        //other repos here
     }
 }

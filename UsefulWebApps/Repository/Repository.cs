@@ -10,18 +10,22 @@ namespace UsefulWebApps.Repository
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly MySqlConnection _connection;
-        public Repository(MySqlConnection db)
+        protected readonly MySqlConnection _connection;
+        protected MySqlTransaction? _transaction;
+        public Repository(MySqlConnection connection)
         {
-            _connection = db;
+            _connection = connection;
         }
 
+        public void SetTransaction(MySqlTransaction? txn)
+        {
+            _transaction = txn;
+        }
         public async Task<IEnumerable<T>> GetAll()
         {
             string tableName = GetTableName();
             string sql = $"SELECT * FROM {tableName}";
             List<T> allDbRows = (List<T>)await _connection.QueryAsync<T>(sql);
-            await _connection.CloseAsync();
             return allDbRows;
         }
 
@@ -30,7 +34,6 @@ namespace UsefulWebApps.Repository
             string tableName = GetTableName();
             string sql = $"SELECT * FROM {tableName} WHERE {column} = @Parameter";
             List<T> allDbRows = (List<T>)await _connection.QueryAsync<T>(sql, new { Parameter = value });
-            await _connection.CloseAsync();
             return allDbRows;
         }
         public async Task<T> GetById(int? id)
@@ -41,7 +44,6 @@ namespace UsefulWebApps.Repository
             //string sql = $"SELECT * FROM {tableName} WHERE {keyColumn} = @{keyProperty}";
             string sql = $"SELECT * FROM {tableName} WHERE {keyColumn} = @id";
             T singleDbRow = await _connection.QuerySingleAsync<T>(sql, new { id });
-            await _connection.CloseAsync();
             return singleDbRow;
         }
 
@@ -50,7 +52,6 @@ namespace UsefulWebApps.Repository
             string tableName = GetTableName();
             string sql = $"SELECT * FROM {tableName} ORDER BY RAND() LIMIT 1;";
             T singleDbRow = await _connection.QuerySingleAsync<T>(sql);
-            await _connection.CloseAsync();
             return singleDbRow;
         }
 
@@ -63,7 +64,6 @@ namespace UsefulWebApps.Repository
             string query = $"INSERT INTO {tableName} ({columns}) VALUES ({properties})";
 
             rowsEffected = await _connection.ExecuteAsync(query, entity);
-            await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
 
@@ -94,7 +94,6 @@ namespace UsefulWebApps.Repository
             //https://github.com/DapperLib/Dapper/issues/540
             rowsEffected = await _connection.ExecuteAsync(query.ToString(), entity);
 
-            await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
 
@@ -109,24 +108,20 @@ namespace UsefulWebApps.Repository
 
             rowsEffected = await _connection.ExecuteAsync(query, new { id });
 
-            await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
 
+        //transaction method
         public async Task<bool> DeleteAll()
         {
             int rowsEffected = 0;
             string tableName = GetTableName();
             string keyColumn = GetKeyColumnName();
 
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             string query1 = $"DELETE FROM {tableName} WHERE {keyColumn} >= 1";
             string query2 = $"ALTER TABLE {tableName} AUTO_INCREMENT = 1";
-            rowsEffected = await _connection.ExecuteAsync(query1, transaction: txn);
-            await _connection.ExecuteAsync(query2, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            rowsEffected = await _connection.ExecuteAsync(query1, transaction: _transaction);
+            await _connection.ExecuteAsync(query2, transaction: _transaction);
             return rowsEffected > 0 ? true : false;
         }
 
@@ -136,7 +131,6 @@ namespace UsefulWebApps.Repository
             string tableName = GetTableName();
             string sql = $"DELETE FROM {tableName} WHERE {column} = @Parameter";
             rowsEffected = await _connection.ExecuteAsync(sql, new { Parameter = value });
-            await _connection.CloseAsync();
             return rowsEffected > 0 ? true : false;
         }
         private static string GetTableName()

@@ -81,6 +81,7 @@ namespace UsefulWebApps.Controllers
             return View(selectQuickLinksVM);
         }
 
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> SelectQuickLinks(SelectQuickLinksVM selectQuickLinksVM)
         {
@@ -90,13 +91,17 @@ namespace UsefulWebApps.Controllers
 
             if (ModelState.IsValid) 
             {
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
                 bool success = await _unitOfWork.QuickLinks.UpdateQuickLinks(userId, userName, selectQuickLinksVM);
                 if (success)
                 {
+                    await _unitOfWork.CommitAsync();
                     TempData["success"] = "Quick links updated successfully";
                 }
                 else
                 {
+                    await _unitOfWork.RollbackAsync();
                     TempData["error"] = "Update quick link error. Please try again.";
                 }
                 return RedirectToAction("Index");
@@ -127,6 +132,8 @@ namespace UsefulWebApps.Controllers
             SelectSlideShowVM selectSlideShowVM = new() { SlideShowFolders = allSlideShowFolders };
             return View(selectSlideShowVM);
         }
+
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> SelectSlideShow(SelectSlideShowVM selectSlideShowVM)
         {
@@ -135,13 +142,17 @@ namespace UsefulWebApps.Controllers
 
             if (ModelState.IsValid)
             {
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
                 bool success = await _unitOfWork.SlideShow.UpdateSlideShow(userId, selectSlideShowVM);
                 if (success)
                 {
+                    await _unitOfWork.CommitAsync();
                     TempData["success"] = "Slideshow updated successfully";
                 }
                 else
                 {
+                    await _unitOfWork.RollbackAsync();
                     TempData["error"] = "Update slideshow error. Please try again.";
                 }
                 return RedirectToAction("Index");

@@ -9,12 +9,7 @@ namespace UsefulWebApps.Repository
 {
     public class QuickLinksRepository : Repository<QuickLinks> , IQuickLinksRepository
     {
-        private readonly MySqlConnection _connection;
-
-        public QuickLinksRepository(MySqlConnection db) : base(db)
-        {
-            _connection = db;
-        }
+        public QuickLinksRepository(MySqlConnection connection) : base(connection) { }
         //any QuickLinks sepecific database methods here
         public async Task<List<QuickLinks>> GetQuickLinksForUser(string userId)
         {
@@ -23,7 +18,6 @@ namespace UsefulWebApps.Repository
             ) ORDER BY Category;";
 
             List<QuickLinks> usersQuickLinks = (List<QuickLinks>)await _connection.QueryAsync<QuickLinks>(sql, new { userId });
-            await _connection.CloseAsync();
             return usersQuickLinks;
         }
 
@@ -44,6 +38,7 @@ namespace UsefulWebApps.Repository
             return (userQuickLinks, allQuickLinks);
         }
 
+        //transaction method
         public async Task<bool> UpdateQuickLinks(string userId, string userName, SelectQuickLinksVM selectQuickLinksVM)
         {
             int rowsEffected1 = 0;
@@ -59,15 +54,11 @@ namespace UsefulWebApps.Repository
                     );
                 }
             }
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
             //delete all users links then add the new selection
             string sql1 = @"DELETE FROM user_quick_links WHERE UserId = @userId"; //may return 0 if user has no links selected
             string sql2 = @"INSERT INTO user_quick_links (UserId, UserName, QuickLinkId) VALUES (@userId, @userName, @quickLinkId)";
-            rowsEffected1 = await _connection.ExecuteAsync(sql1, new { userId = userId}, transaction: txn); 
-            rowsEffected2 = await _connection.ExecuteAsync(sql2, checkedQuickLinksParams, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            rowsEffected1 = await _connection.ExecuteAsync(sql1, new { userId = userId}, transaction: _transaction); 
+            rowsEffected2 = await _connection.ExecuteAsync(sql2, checkedQuickLinksParams, transaction: _transaction);
             return (rowsEffected1 + rowsEffected2 > 0 ? true : false);
         }
     }
