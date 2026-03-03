@@ -8,16 +8,20 @@ namespace UsefulWebApps.Repository
     public class ManageAccountDataRepository : IManageAccountDataRepository
     {
         private readonly MySqlConnection _connection;
-
+        private MySqlTransaction? _transaction;
         public ManageAccountDataRepository(MySqlConnection db)
         {
             _connection = db;
         }
 
+        public void SetTransaction(MySqlTransaction? txn)
+        {
+            _transaction = txn;
+        }
+        //transaction method
         public async Task<bool> DeleteUserData(IdentityUser user, IdentityUser admin)
         {
-            await _connection.OpenAsync();
-            MySqlTransaction txn = await _connection.BeginTransactionAsync();
+
             int? rowsEffected1 = null;
             int? rowsEffected2 = null;
             int? rowsEffected3 = null;
@@ -37,18 +41,16 @@ namespace UsefulWebApps.Repository
             //delete to do list associated with user
             string sql5 = @"DELETE FROM to_do_list WHERE UserId = @userId";
 
-            rowsEffected1 = await _connection.ExecuteAsync(sql1, new { userId = user.Id }, transaction: txn);
-            rowsEffected2 = await _connection.ExecuteAsync(sql2, new { userId = user.Id }, transaction: txn);
+            rowsEffected1 = await _connection.ExecuteAsync(sql1, new { userId = user.Id }, transaction: _transaction);
+            rowsEffected2 = await _connection.ExecuteAsync(sql2, new { userId = user.Id }, transaction: _transaction);
             rowsEffected3 = await _connection.ExecuteAsync(sql3, new 
             { 
                 adminUserId = admin.Id, 
                 adminUserName = admin.UserName, 
                 userId = user.Id 
-            }, transaction: txn);
-            rowsEffected4 = await _connection.ExecuteAsync(sql4, new { userId = user.Id }, transaction: txn);
-            rowsEffected5 = await _connection.ExecuteAsync(sql5, new { userId = user.Id }, transaction: txn);
-            await txn.CommitAsync();
-            await _connection.CloseAsync();
+            }, transaction: _transaction);
+            rowsEffected4 = await _connection.ExecuteAsync(sql4, new { userId = user.Id }, transaction: _transaction);
+            rowsEffected5 = await _connection.ExecuteAsync(sql5, new { userId = user.Id }, transaction: _transaction);
 
             return (rowsEffected1 >= 0 && rowsEffected2 >= 0 && rowsEffected3 >= 0 && rowsEffected4 >= 0 && rowsEffected5 >= 0) ? true : false; ;
         }

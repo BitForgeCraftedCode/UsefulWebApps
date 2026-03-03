@@ -196,6 +196,7 @@ namespace UsefulWebApps.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult DeleteUserData() { return View(); }
 
+        //transaction method
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> DeleteUserData(DeleteUserData userInfo)
@@ -208,14 +209,18 @@ namespace UsefulWebApps.Controllers
                 TempData["error"] = "User data clean up error. Please try again.";
                 return View(); 
             };
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
             bool success = await _unitOfWork.ManageAccountData.DeleteUserData(user, admin);
             if (success) 
             {
+                await _unitOfWork.CommitAsync();
                 TempData["success"] = "User data cleaned up successfully";
                 return RedirectToAction("Manage", "Account");
             }
             else
             {
+                await _unitOfWork.RollbackAsync();
                 TempData["error"] = "User data clean up error. Please try again.";
                 return View();
             }

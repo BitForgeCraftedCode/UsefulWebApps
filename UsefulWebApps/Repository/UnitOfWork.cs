@@ -142,7 +142,7 @@ namespace UsefulWebApps.Repository
             ToDoList.SetTransaction(txn);
             GroceryList.SetTransaction(txn);
             Recipe.SetTransaction(txn);
-            //ManageAccountData.SetTransaction(txn);
+            ManageAccountData.SetTransaction(txn);
             Notes.SetTransaction(txn);
             QuickLinks.SetTransaction(txn);
             SlideShow.SetTransaction(txn);
