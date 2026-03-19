@@ -71,6 +71,27 @@
             <ingredients html-ingredients-content="@Model.Recipe.Ingredients" class="ql-editor"></ingredients>
         </div>
     </div>
+    <div class="mb-3 max-width-700">
+        <h3>Add Ingredient To Grocery List</h3>
+        <form method="post" asp-route="addIngredientToGroceryList">
+            <input type="hidden" asp-for="AddIngredientToGrocery.RecipeId" />
+            <div class="input-group mb-3">
+                <input asp-for="AddIngredientToGrocery.GroceryItem" type="text" class="form-control" placeholder="Ingredient to add" minlength="3" maxlength="100" />
+                <button class="btn btn-outline-dark" type="submit">Add To Grocery List</button>
+            </div>
+            <div class="mb-2">
+                <select class="form-select" asp-for="AddIngredientToGrocery.Category" asp-items="@Model.GroceryCategoriesList" minlength="1" required>
+                    <option disabled selected value="">Please Select a Category</option>
+                </select>
+            </div>
+            <div class="mb-1">
+                <span asp-validation-for="AddIngredientToGrocery.GroceryItem" class="text-danger"></span>
+            </div>
+            <div>
+                <span asp-validation-for="AddIngredientToGrocery.Category" class="text-danger"></span>
+            </div>
+        </form>
+    </div>
     <div class="mb-3">
         <h3>Instructions</h3>
         <div class="ql-snow">
@@ -80,7 +101,6 @@
     @* empth quill inputs will have 11 html chars *@
     @if(Model.Recipe.Notes.Length > 11)
     {
-        Console.WriteLine(Model.Recipe.Notes.Length);
         <div class="mb-3">
             <h3>Notes</h3>
             <div class="ql-snow">

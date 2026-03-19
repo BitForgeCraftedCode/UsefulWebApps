@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Ganss.Xss;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
+using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.MyRecipes;
 using UsefulWebApps.Models.ViewModels.MyRecipes;
 using UsefulWebApps.Repository.IRepository;
-using Ganss.Xss;
 
 namespace UsefulWebApps.Controllers
 {
@@ -159,9 +161,49 @@ namespace UsefulWebApps.Controllers
             RecipePageVM.RecipeComment.UserName = userName;
             RecipePageVM.RecipeUserSaved.UserId = userId;
             RecipePageVM.RecipeUserSaved.UserName = userName;
+
+            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) groceryResult = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories("UserId", userId);
+            RecipePageVM.GroceryCategoriesList = groceryResult.groceryCategoriesEnum.Select(u => new SelectListItem
+            {
+                Text = u.Category,
+                Value = u.Category
+            });
+            RecipePageVM.AddIngredientToGrocery = new AddRecipeIngredientToGroceryVM
+            {
+                RecipeId = RecipePageVM.Recipe.RecipeId,
+            };
             return View(RecipePageVM);
         }
+        [HttpPost]
+        [Route("/MyRecipes/AddIngredientToGroceryList", Name = "addIngredientToGroceryList")]
+        //in html asp-for="AddIngredientToGrocery.GroceryItem" so Bibd Prefix AddIngredientToGrocery so model validates
+        public async Task<IActionResult> AddIngredientToGroceryList([Bind(Prefix = "AddIngredientToGrocery")] AddRecipeIngredientToGroceryVM addIngredientToGroceryVM)
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            if (!ModelState.IsValid)
+            {
+                TempData["error"] = "Add ingredient to grocery list error. Please try again.";
+                return RedirectToAction("Recipe", new { id = addIngredientToGroceryVM.RecipeId });
+            }
+
+            GroceryList groceryList = new()
+            {
+                GroceryItem = addIngredientToGroceryVM.GroceryItem.Trim(),
+                Category = addIngredientToGroceryVM.Category,
+                Complete = false,
+                UserId = userId
+            };
+
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
+            await _unitOfWork.GroceryList.GroceryListAdd(groceryList);
+            await _unitOfWork.CommitAsync();
+
+            TempData["success"] = "Ingredient added to grocery list successfully.";
+            return RedirectToAction("Recipe", new { id = addIngredientToGroceryVM.RecipeId });
+        }
         public async Task<IActionResult> SavedRecipes()
         {
             ClaimsPrincipal currentUser = this.User;

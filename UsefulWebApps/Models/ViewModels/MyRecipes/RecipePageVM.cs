@@ -1,4 +1,5 @@
-﻿using UsefulWebApps.Models.MyRecipes;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using UsefulWebApps.Models.MyRecipes;
 
 namespace UsefulWebApps.Models.ViewModels.MyRecipes
 {
@@ -11,5 +12,9 @@ namespace UsefulWebApps.Models.ViewModels.MyRecipes
         public RecipeComment RecipeComment { get; set; }
 
         public RecipeUserSaved RecipeUserSaved { get; set; }
+        //add recipe ingredient to grocery list
+        public AddRecipeIngredientToGroceryVM AddIngredientToGrocery { get; set; }
+
+        public IEnumerable<SelectListItem> GroceryCategoriesList { get; set; }
     }
 }
