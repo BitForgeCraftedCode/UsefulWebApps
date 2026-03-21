@@ -144,7 +144,7 @@
                  data-input-selector="#Recipe_Ingredients"
                  data-form-selector="#createRecipeForm"
                  data-counter-selector="#ingredients-character-count"
-                 data-limit="3000">
+                 data-limit="50000">
                 <div class="quill-editor form-control textarea-input"></div>
             </div>
             <textarea asp-for="Recipe.Ingredients" class="form-control textarea-input d-none" minlength="20" required placeholder="Recipe Ingredients"></textarea>
@@ -158,7 +158,7 @@
                  data-input-selector="#Recipe_Instructions"
                  data-form-selector="#createRecipeForm"
                  data-counter-selector="#instructions-character-count"
-                 data-limit="3000">
+                 data-limit="50000">
                 <div class="quill-editor form-control textarea-input"></div>
             </div>
             <textarea asp-for="Recipe.Instructions" class="form-control textarea-input d-none" minlength="20" required placeholder="Recipe Instructions"></textarea>
@@ -172,7 +172,7 @@
                  data-input-selector="#Recipe_Notes"
                  data-form-selector="#createRecipeForm"
                  data-counter-selector="#notes-character-count"
-                 data-limit="2000">
+                 data-limit="20000">
                 <div class="quill-editor form-control textarea-input"></div>
             </div>
             <textarea asp-for="Recipe.Notes" class="form-control textarea-input ignore d-none" placeholder="Recipe Notes"></textarea>
@@ -185,7 +185,7 @@
                  data-input-selector="#Recipe_Nutrition"
                  data-form-selector="#createRecipeForm"
                  data-counter-selector="#nutrition-character-count"
-                 data-limit="2000">
+                 data-limit="5000">
                 <div class="quill-editor form-control textarea-input"></div>
             </div>
             <textarea asp-for="Recipe.Nutrition" class="form-control textarea-input ignore d-none" placeholder="Recipe Nutrition"></textarea>

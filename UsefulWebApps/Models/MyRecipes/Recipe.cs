@@ -59,23 +59,23 @@ namespace UsefulWebApps.Models.MyRecipes
         [Column("Nutrition")]
         //allow null empty Nutrition
         [ValidateNever]
-        [StringLength(2000, MinimumLength = 0)]
+        [StringLength(5000, MinimumLength = 0)]
         public string Nutrition { get; set; } = string.Empty;
 
         [Column("Ingredients")]
         [Required(ErrorMessage = "Recipe ingredients is required.")]
-        [StringLength(3000, MinimumLength = 20, ErrorMessage = "Please enter at least 20 characters.")]
+        [StringLength(50000, MinimumLength = 20, ErrorMessage = "Please enter at least 20 characters.")]
         public string Ingredients { get; set; } = string.Empty;
 
         [Column("Instructions")]
         [Required(ErrorMessage = "Recipe instructions is required.")]
-        [StringLength(3000, MinimumLength = 20, ErrorMessage = "Please enter at least 20 characters.")]
+        [StringLength(50000, MinimumLength = 20, ErrorMessage = "Please enter at least 20 characters.")]
         public string Instructions { get; set; } = string.Empty;
 
         [Column("Notes")]
         //allow null empty Notes
         [ValidateNever]
-        [StringLength(2000, MinimumLength = 0)]
+        [StringLength(20000, MinimumLength = 0)]
         public string Notes { get; set; } = string.Empty;
 
         [Column("UserId")]

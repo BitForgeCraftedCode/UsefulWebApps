@@ -11,7 +11,7 @@ namespace UsefulWebApps.Models.ListBuddy
         public int Id { get; set; }
 
         [Column("Note")]
-        [StringLength(5000, MinimumLength = 20, ErrorMessage = "Please Enter At Least 20 Characters.")]
+        [StringLength(50000, MinimumLength = 20, ErrorMessage = "Please Enter At Least 20 Characters.")]
         [Required(ErrorMessage = "Note Is Required.")]
         public string Note { get; set; } = string.Empty;
 
