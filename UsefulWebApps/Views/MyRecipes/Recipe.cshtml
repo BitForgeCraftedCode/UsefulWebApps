@@ -134,7 +134,15 @@
                     </div>
                 </form>
                 <div>
-                    <a asp-controller="MyRecipes" asp-action="Index" class="btn btn-outline-dark mb-3 w-100">Back To Recipe List</a>
+                    <a class="btn btn-outline-dark mb-3 w-100" 
+                        asp-controller="MyRecipes" 
+                        asp-action="Index"
+                        asp-route-page="@Model.ReturnPage"
+                        asp-route-searchString="@Model.ReturnSearchString"
+                        asp-route-categories="@Model.ReturnCategories"
+                        asp-route-ascending="@Model.ReturnAscending">
+                            Back To Recipe List
+                    </a>
                 </div>
             </div>
             <div class="col-sm-12 col-md-6 col-lg-6 max-width-250 mx-auto">

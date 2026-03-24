@@ -63,7 +63,16 @@
         {
             <div class="card mb-3">
                 <h4 class="card-title">
-                    <a asp-controller="MyRecipes" asp-action="Recipe" asp-route-id="@recipe.RecipeId" class="list-group-item list-group-item-action">@recipe.RecipeTitle</a>
+                    <a class="list-group-item list-group-item-action" 
+                        asp-controller="MyRecipes" 
+                        asp-action="Recipe" 
+                        asp-route-id="@recipe.RecipeId"
+                        asp-route-page="@Model.CurrentPage"
+                        asp-route-searchString="@Model.SearchString"
+                        asp-route-categories="@Model.CategoriesQuery"
+                        asp-route-ascending="@Model.Ascending">
+                            @recipe.RecipeTitle
+                    </a>
                 </h4>
                 <div class="card-body">
                     @if (!String.IsNullOrEmpty(recipe.RecipeDescription))

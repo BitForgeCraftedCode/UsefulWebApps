@@ -143,7 +143,7 @@ namespace UsefulWebApps.Controllers
             });
         }
 
-        public async Task<IActionResult> Recipe(int? id)
+        public async Task<IActionResult> Recipe(int? id, int page, string searchString = "", string categories = "", bool ascending = true)
         {
             if (id == null || id == 0)
             {
@@ -161,6 +161,10 @@ namespace UsefulWebApps.Controllers
             RecipePageVM.RecipeComment.UserName = userName;
             RecipePageVM.RecipeUserSaved.UserId = userId;
             RecipePageVM.RecipeUserSaved.UserName = userName;
+            RecipePageVM.ReturnPage = page;
+            RecipePageVM.ReturnSearchString = searchString;
+            RecipePageVM.ReturnCategories = categories;
+            RecipePageVM.ReturnAscending = ascending;
 
             (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) groceryResult = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories("UserId", userId);
             RecipePageVM.GroceryCategoriesList = groceryResult.groceryCategoriesEnum.Select(u => new SelectListItem
@@ -176,7 +180,7 @@ namespace UsefulWebApps.Controllers
         }
         [HttpPost]
         [Route("/MyRecipes/AddIngredientToGroceryList", Name = "addIngredientToGroceryList")]
-        //in html asp-for="AddIngredientToGrocery.GroceryItem" so Bibd Prefix AddIngredientToGrocery so model validates
+        //in html asp-for="AddIngredientToGrocery.GroceryItem" so Bind Prefix AddIngredientToGrocery so model validates
         public async Task<IActionResult> AddIngredientToGroceryList([Bind(Prefix = "AddIngredientToGrocery")] AddRecipeIngredientToGroceryVM addIngredientToGroceryVM)
         {
             ClaimsPrincipal currentUser = this.User;
