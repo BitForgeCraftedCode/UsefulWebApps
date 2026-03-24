@@ -98,6 +98,8 @@ html {
 
 body {
     margin-bottom: 60px;
+    /*padding to offset fixed-top in nav bar*/
+    padding-top: 60px;
 }
 
 /*Custom scrollbar*/
