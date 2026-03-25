@@ -26,14 +26,29 @@
                         </li>
                         @if (User.IsInRole("Admin") || User.IsInRole("StandardUser"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="ListBuddy" asp-action="Index">List Buddy</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">List Buddy</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-controller="ListBuddy" asp-action="Index">List Buddy Home</a>
+                                    <a class="dropdown-item" asp-controller="ListBuddy" asp-action="MyToDoLists">My To Do Lists</a>
+                                    <a class="dropdown-item" asp-controller="ListBuddy" asp-action="GroceryList">Grocery List</a>
+                                    <a class="dropdown-item" asp-controller="ListBuddy" asp-action="MyNotes">My Notes</a>
+                                </div>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="MyRecipes" asp-action="Index">My Recipes</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Recipes</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-controller="MyRecipes" asp-action="Index">My Recipes</a>
+                                    <a class="dropdown-item" asp-controller="MyRecipes" asp-action="CreateRecipe">Create Recipe</a>
+                                    <a class="dropdown-item" asp-controller="MyRecipes" asp-action="SavedRecipes">Saved Recipes</a>
+                                </div>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Calendar" asp-action="Index">Calendar</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Calendar</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-controller="Calendar" asp-action="Index">My Calendar</a>
+                                    <a class="dropdown-item" asp-controller="Calendar" asp-action="CreateEvent">Add Calendar Event</a>
+                                </div>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="MyHomePage" asp-action="Index">Custom Home Page</a>
