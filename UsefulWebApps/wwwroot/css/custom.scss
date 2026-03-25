@@ -126,3 +126,18 @@ body {
     color: red;
 }
 /*End jquery validate*/
+
+.fixed-btn-container {
+    transform: translate(-50%, 0);
+    left: 50%;
+    z-index: auto;
+    width: 105px;
+}
+
+.fixed-btn-container a {
+    padding: 10px;
+}
+
+.fixed-btn-container img {
+    width: 30px;
+}

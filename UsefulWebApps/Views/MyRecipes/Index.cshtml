@@ -8,11 +8,18 @@
 <div class="text-center max-width-550 mx-auto container pb-3">
     <h1 class="display-3 mt-3">Recipes</h1>
     @if (User?.Identity?.IsAuthenticated == true)
-    {
-        <p>To make a new recipe click <a asp-controller="MyRecipes" asp-action="CreateRecipe">here</a></p>
-        <p>To view your saved recipes click <a asp-controller="MyRecipes" asp-action="SavedRecipes">here</a></p>
+    { 
+        <a class="btn btn-outline-dark mb-2 me-1" asp-controller="MyRecipes" asp-action="CreateRecipe">Create Recipe</a>
+        <a class="btn btn-outline-secondary mb-2" 
+            asp-controller="MyRecipes" 
+            asp-action="SavedRecipes"
+            asp-route-page="@Model.CurrentPage"
+            asp-route-searchString="@Model.SearchString"
+            asp-route-categories="@Model.CategoriesQuery"
+            asp-route-ascending="@Model.Ascending">
+            Saved Recipes
+        </a>
     }
-    
     <h4>Search: Title and Ingredients</h4>
     <form asp-controller="MyRecipes" asp-action="Index" id="search-form">
         <div class="input-group mb-3">  
@@ -150,6 +157,23 @@
             </ul>
         </nav>
     </div>
+    @if (User?.Identity?.IsAuthenticated == true)
+    {
+        <div class="fixed-bottom fixed-btn-container">
+            <a class="btn btn-outline-secondary mb-2" asp-controller="MyRecipes" asp-action="CreateRecipe">
+                <img src="/images/app/pencil-square-outline-icon.png" />
+            </a>
+            <a class="btn btn-outline-secondary mb-2" 
+                asp-controller="MyRecipes" 
+                asp-action="SavedRecipes"
+                asp-route-page="@Model.CurrentPage"
+                asp-route-searchString="@Model.SearchString"
+                asp-route-categories="@Model.CategoriesQuery"
+                asp-route-ascending="@Model.Ascending">
+                <img src="/images/app/wishlist-icon.png" />
+            </a>
+        </div>
+    }
 </div>
 
 <!--scripts-->

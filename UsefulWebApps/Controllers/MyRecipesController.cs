@@ -208,7 +208,7 @@ namespace UsefulWebApps.Controllers
             TempData["success"] = "Ingredient added to grocery list successfully.";
             return RedirectToAction("Recipe", new { id = addIngredientToGroceryVM.RecipeId });
         }
-        public async Task<IActionResult> SavedRecipes()
+        public async Task<IActionResult> SavedRecipes(int page, string searchString = "", string categories = "", bool ascending = true)
         {
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -216,6 +216,10 @@ namespace UsefulWebApps.Controllers
             SavedRecipesVM savedRecipesVM = new SavedRecipesVM 
             { 
                 RecipeUserSaved = recipeUserSaved,
+                ReturnPage = page,
+                ReturnSearchString = searchString,
+                ReturnCategories = categories,
+                ReturnAscending = ascending
             };
             if(recipeUserSaved.Count == 0)
             {
