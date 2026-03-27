@@ -399,6 +399,59 @@ namespace UsefulWebApps.Controllers
             return View(recipeVM);
         }
 
+        private async Task<(bool Success, string? FilePathDb, string? ErrorMessage)> ProcessAndSaveImageAsync(IFormFile imageFile)
+        {
+            // max image size 10MB
+            const int maxFileSize = 10 * 1024 * 1024;
+
+            if (imageFile.Length == 0 ||
+                imageFile.Length > maxFileSize ||
+                !imageFile.ContentType.StartsWith("image/"))
+            {
+                return (false, null, "Invalid image file. Please try again.");
+            }
+            // generate unique file name
+            string fileName = $"{Guid.NewGuid()}.jpg";
+            string directory = Path.Combine(this.Environment.WebRootPath, "images/recipes/");
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            //get filepath for physical storage location
+            string storageFilePath = Path.Combine(directory, fileName);
+            //get filepath for database
+            string filePathDb = $"images/recipes/{fileName}";
+            try
+            {
+                //resize the image then save to storage location
+                using (Image image = await Image.LoadAsync(imageFile.OpenReadStream()))
+                {
+                    image.Mutate(x => x.AutoOrient());
+                    if (image.Width > 800)
+                    {
+                        image.Mutate(x => x.Resize(new ResizeOptions
+                        {
+                            Size = new Size(800, 0), // 0 for height auto
+                            Mode = ResizeMode.Max
+                        }));
+                    }
+                    // Save as compressed JPEG
+                    JpegEncoder encoder = new JpegEncoder
+                    {
+                        Quality = 75
+                    };
+                    //upload image -- copy/save image to wwwroot
+                    await image.SaveAsync(storageFilePath, encoder);
+                }
+            }
+            catch
+            {
+                return (false, null, "Invalid or corrupted image. Please try again.");
+            }
+
+            return (true, filePathDb, null);
+        }
+
         [HttpPost]
         public async Task<IActionResult> EditRecipe(RecipeVM recipeVM)
         {
@@ -439,69 +492,24 @@ namespace UsefulWebApps.Controllers
             {
                 string oldFilePathDb = recipeVM.Recipe.ImagePath;
                
-                //remove old image if there and new image is not null
-                if (oldFilePathDb != null && recipeVM.ImageFile != null)
-                {
-                    string oldImageStoragePath = Path.Combine(this.Environment.WebRootPath, oldFilePathDb);
-                    if (System.IO.File.Exists(oldImageStoragePath))
-                    {
-                        System.IO.File.Delete(oldImageStoragePath);
-                    }
-                }
                 if (recipeVM.ImageFile != null)
                 {
-                    //max image size 10MB
-                    const int maxFileSize = 10 * 1024 * 1024;
-                    if (recipeVM.ImageFile.Length == 0 ||
-                        recipeVM.ImageFile.Length > maxFileSize ||
-                        !recipeVM.ImageFile.ContentType.StartsWith("image/"))
+                    (bool Success, string? FilePathDb, string? ErrorMessage) result = await ProcessAndSaveImageAsync(recipeVM.ImageFile);
+                    if (!result.Success)
                     {
-                        TempData["error"] = "Create recipe error. Invalid image file. Please try again.";
+                        TempData["error"] = $"Update recipe error. {result.ErrorMessage}";
                         return View(recipeVM);
                     }
-                    //generate a unique file name
-                    string fileName = $"{Guid.NewGuid()}.jpg";
-                    string directory = Path.Combine(this.Environment.WebRootPath, "images/recipes/");
-                    if (!Directory.Exists(directory))
+                    // delete old image AFTER new one succeeds
+                    if (oldFilePathDb != null)
                     {
-                        Directory.CreateDirectory(directory);
-                    }
-                    //get filepath for physical storage location
-                    string storageFilePath = Path.Combine(directory, fileName);
-                    //get filepath for database
-                    string filePathDb = $"images/recipes/{fileName}";
-                    try
-                    {
-                        //resize the image then save to storage location
-                        using (Image image = await Image.LoadAsync(recipeVM.ImageFile.OpenReadStream()))
+                        string oldImageStoragePath = Path.Combine(this.Environment.WebRootPath, oldFilePathDb);
+                        if (System.IO.File.Exists(oldImageStoragePath))
                         {
-                            image.Mutate(x => x.AutoOrient());
-                            // Resize if wider than 800px
-                            if (image.Width > 800)
-                            {
-                                image.Mutate(x => x.Resize(new ResizeOptions
-                                {
-                                    Size = new Size(800, 0), // height auto
-                                    Mode = ResizeMode.Max
-                                }));
-                            }
-                            // Save as compressed JPEG
-                            JpegEncoder encoder = new JpegEncoder
-                            {
-                                Quality = 75 // tweak 60–80 range
-                            };
-                            //upload image -- copy image to wwwroot
-                            await image.SaveAsync(storageFilePath, encoder);
+                            System.IO.File.Delete(oldImageStoragePath);
                         }
                     }
-                    catch
-                    {
-                        TempData["error"] = "Create recipe error. Invalid or corrupted image. Please try again.";
-                        return View(recipeVM);
-                    }
-
-                    //set database path in recipe model
-                    recipeVM.Recipe.ImagePath = filePathDb;
+                    recipeVM.Recipe.ImagePath = result.FilePathDb;
                 }
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
@@ -594,58 +602,14 @@ namespace UsefulWebApps.Controllers
             {
                 if (recipeVM.ImageFile != null)
                 {
-                    //max image size 10MB
-                    const int maxFileSize = 10 * 1024 * 1024;
-                    if (recipeVM.ImageFile.Length == 0 ||
-                        recipeVM.ImageFile.Length > maxFileSize ||
-                        !recipeVM.ImageFile.ContentType.StartsWith("image/"))
+                    (bool Success, string? FilePathDb, string? ErrorMessage) result = await ProcessAndSaveImageAsync(recipeVM.ImageFile);
+
+                    if (!result.Success)
                     {
-                        TempData["error"] = "Create recipe error. Invalid image file. Please try again.";
+                        TempData["error"] = $"Create recipe error. {result.ErrorMessage}";
                         return View(recipeVM);
                     }
-                    //generate a unique file name
-                    string fileName = $"{Guid.NewGuid()}.jpg";
-                    string directory = Path.Combine(this.Environment.WebRootPath, "images/recipes/");
-                    if (!Directory.Exists(directory))
-                    {
-                        Directory.CreateDirectory(directory);
-                    }
-                    //get filepath for physical storage location
-                    string storageFilePath = Path.Combine(directory, fileName);
-                    //get filepath for database
-                    string filePathDb = $"images/recipes/{fileName}";
-                    try
-                    {
-                        //resize the image then save to storage location
-                        using (Image image = await Image.LoadAsync(recipeVM.ImageFile.OpenReadStream()))
-                        {
-                            image.Mutate(x => x.AutoOrient());
-                            // Resize if wider than 800px
-                            if (image.Width > 800)
-                            {
-                                image.Mutate(x => x.Resize(new ResizeOptions
-                                {
-                                    Size = new Size(800, 0), // height auto
-                                    Mode = ResizeMode.Max
-                                }));
-                            }
-                            // Save as compressed JPEG
-                            JpegEncoder encoder = new JpegEncoder
-                            {
-                                Quality = 75 // tweak 60–80 range
-                            };
-                            //upload image -- copy image to wwwroot
-                            await image.SaveAsync(storageFilePath, encoder);
-                        }
-                    }
-                    catch
-                    {
-                        TempData["error"] = "Create recipe error. Invalid or corrupted image. Please try again.";
-                        return View(recipeVM);
-                    }
-                    
-                    //set database path in recipe model
-                    recipeVM.Recipe.ImagePath = filePathDb;
+                    recipeVM.Recipe.ImagePath = result.FilePathDb;
                 }
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
