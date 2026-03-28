@@ -1,11 +1,14 @@
-﻿@using UsefulWebApps.Models.MyRecipes
+﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@using UsefulWebApps.Models.MyRecipes
 @{
     ViewData["Title"] = "Recipe";
+    var requestToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
 
 @model UsefulWebApps.Models.ViewModels.MyRecipes.RecipePageVM
 
 <div class="max-width-700 mx-auto container pb-3">
+    <input id="RequestVerificationToken" type="hidden" value="@requestToken" />
     <h1 class="mt-3 text-center">@Model.Recipe.RecipeTitle</h1>
     @if(Model.Recipe.RecipeDescription != "")
     {
@@ -73,7 +76,7 @@
     </div>
     <div class="mb-3 max-width-700">
         <h3>Add Ingredient To Grocery List</h3>
-        <form method="post" asp-route="addIngredientToGroceryList">
+        <form method="post" asp-route="addIngredientToGroceryList" id="add-ingredient-form">
             <input type="hidden" asp-for="AddIngredientToGrocery.RecipeId" />
             <div class="input-group mb-3">
                 <input asp-for="AddIngredientToGrocery.GroceryItem" type="text" class="form-control" placeholder="Ingredient to add" minlength="3" maxlength="100" />
@@ -255,7 +258,8 @@
     @{
         <partial name="_ValidationScriptsPartial" />
         <script src="~/lib/quilljs/dist/quill.js"></script>
-    }
+        <script type="text/javascript" src="/js/Recipe.js"></script>
+    }   
 }
 @section Styles {
     <link href="~/lib/quilljs/dist/quill.snow.css" rel="stylesheet" />

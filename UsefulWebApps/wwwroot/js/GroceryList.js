@@ -103,7 +103,7 @@ function saveUserList(userID) {
     });
 }
 function saveUserListSubmit(userID) {
-    formData = {
+    var formData = {
         userId = userID
     };
     $.ajax({

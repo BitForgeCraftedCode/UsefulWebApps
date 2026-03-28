@@ -184,15 +184,14 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         [Route("/MyRecipes/AddIngredientToGroceryList", Name = "addIngredientToGroceryList")]
         //in html asp-for="AddIngredientToGrocery.GroceryItem" so Bind Prefix AddIngredientToGrocery so model validates
-        public async Task<IActionResult> AddIngredientToGroceryList([Bind(Prefix = "AddIngredientToGrocery")] AddRecipeIngredientToGroceryVM addIngredientToGroceryVM)
+        public async Task<JsonResult> AddIngredientToGroceryList([Bind(Prefix = "AddIngredientToGrocery")] AddRecipeIngredientToGroceryVM addIngredientToGroceryVM)
         {
             ClaimsPrincipal currentUser = this.User;
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (!ModelState.IsValid)
             {
-                TempData["error"] = "Add ingredient to grocery list error. Please try again.";
-                return RedirectToAction("Recipe", new { id = addIngredientToGroceryVM.RecipeId });
+                return Json(new { success = false, message = "Invalid input." });
             }
 
             GroceryList groceryList = new()
@@ -202,14 +201,19 @@ namespace UsefulWebApps.Controllers
                 Complete = false,
                 UserId = userId
             };
+            try
+            {
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
+                await _unitOfWork.GroceryList.GroceryListAdd(groceryList);
+                await _unitOfWork.CommitAsync();
 
-            await _unitOfWork.OpenConnectionAsync();
-            await _unitOfWork.BeginTxnAsync();
-            await _unitOfWork.GroceryList.GroceryListAdd(groceryList);
-            await _unitOfWork.CommitAsync();
-
-            TempData["success"] = "Ingredient added to grocery list successfully.";
-            return RedirectToAction("Recipe", new { id = addIngredientToGroceryVM.RecipeId });
+                return Json(new { success = true, message = "Ingredient added to grocery list." });
+            }
+            catch (Exception ex) 
+            {
+                return Json(new { success = false, message = "Server error. Please try again." });
+            }
         }
         public async Task<IActionResult> SavedRecipes(int page, string searchString = "", string categories = "", bool ascending = true)
         {
