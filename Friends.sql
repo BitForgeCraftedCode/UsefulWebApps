@@ -32,6 +32,11 @@ CREATE TABLE `user_profiles` (
   CONSTRAINT `FK_user_profiles_user` FOREIGN KEY (`UserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- creates a profile row for every existing user in one shot will need to run this on Ubuntu server
+INSERT INTO `user_profiles` (`UserId`, `DisplayName`, `AvatarPath`)
+SELECT `Id`, `UserName`, NULL
+FROM `aspnetusers`;
+
 CREATE TABLE `note_shares` (
   `Id`     bigint unsigned NOT NULL AUTO_INCREMENT,
   `NoteId` bigint unsigned NOT NULL,
