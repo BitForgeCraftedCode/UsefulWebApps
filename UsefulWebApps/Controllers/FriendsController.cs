@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using UsefulWebApps.Models.Friends;
+using UsefulWebApps.Models.ViewModels.Friends;
 using UsefulWebApps.Repository.IRepository;
 
 namespace UsefulWebApps.Controllers
@@ -24,7 +26,12 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> People()
         {
-            return View();
+            List<UserProfiles> userProfiles =  (List<UserProfiles>)await _unitOfWork.UserProfiles.GetAll();
+            UserProfilesVM userProfilesVM = new()
+            {
+                UserProfiles = userProfiles,
+            };
+            return View(userProfilesVM);
         }
 
         public async Task<IActionResult> Requests()
