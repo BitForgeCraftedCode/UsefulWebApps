@@ -38,5 +38,15 @@ namespace UsefulWebApps.Controllers
         {
             return View();
         }
+
+        public async Task<IActionResult> MyProfile()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> EditMyProfile()
+        {
+            return View();
+        }
     }
 }
