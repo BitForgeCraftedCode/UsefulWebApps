@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using UsefulWebApps.Models.Friends;
 using UsefulWebApps.Models.ViewModels.Friends;
 using UsefulWebApps.Repository.IRepository;
@@ -41,7 +42,12 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> MyProfile()
         {
-            return View();
+            ClaimsPrincipal currentUser = this.User;
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            UserProfiles userProfile = await _unitOfWork.UserProfiles.GetByUserId(userId);
+
+            return View(userProfile);
         }
 
         public async Task<IActionResult> EditMyProfile()

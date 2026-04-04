@@ -36,6 +36,17 @@ namespace UsefulWebApps.Repository
             List<T> allDbRows = (List<T>)await _connection.QueryAsync<T>(sql, new { Parameter = value });
             return allDbRows;
         }
+
+        public async Task<T> GetByUserId(string? id)
+        {
+            string tableName = GetTableName();
+            string keyColumn = GetKeyColumnName();
+            string keyProperty = GetKeyPropertyName();
+            //string sql = $"SELECT * FROM {tableName} WHERE {keyColumn} = @{keyProperty}";
+            string sql = $"SELECT * FROM {tableName} WHERE {keyColumn} = @id";
+            T singleDbRow = await _connection.QuerySingleAsync<T>(sql, new { id });
+            return singleDbRow;
+        }
         public async Task<T> GetById(int? id)
         {
             string tableName = GetTableName();

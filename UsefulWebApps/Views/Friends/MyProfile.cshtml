@@ -2,11 +2,30 @@
     ViewData["Title"] = "My Profile";
 }
 
+@model UsefulWebApps.Models.Friends.UserProfiles
 
 <div class="text-center container pb-3">
     <h1 class="display-3 mt-3">Your Account Profile</h1>
     
-    <div class="list-group max-width-200 mx-auto">
-        <p>Display Account Profile Here</p>
+    <div class="list-group max-width-550 mx-auto">
+        @{var avatarSrc = !string.IsNullOrEmpty(@Model.AvatarPath) ? @Model.AvatarPath : "/images/app/robot-bot-icon.png";}
+        <div class="list-group-item list-group-item-action active">
+            <div class="row align-items-center">
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <img src="@avatarSrc" alt="Avatar" class="rounded-circle" width="100" />
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <p class="mb-0 fw-semibold">
+                        @(Model.DisplayName ?? "Unnamed User")
+                    </p>
+                    <small class="text-muted">Joined @Model.CreatedAt.ToString("MMMM yyyy")</small>
+                </div>
+
+                <div class="col-lg-5 col-md-5 col-sm-12">
+                    <a class="btn btn-primary">Edit Profile</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

@@ -19,6 +19,7 @@ namespace UsefulWebApps.Repository.IRepository
         /// <param name="value"> The string type value to filter on</param>
         /// <returns>A List of all the returned rows</returns>
         Task<IEnumerable<T>> GetAllWhere(string column, string value);
+        Task<T> GetByUserId(string? userId);
         Task<T> GetById(int? id);
         Task<T> GetRandomRow();
         Task<bool> Add(T entity);
