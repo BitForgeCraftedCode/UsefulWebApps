@@ -17,24 +17,28 @@
             @foreach (var userProfile in Model.UserProfiles)
             {
                 var avatarSrc = !string.IsNullOrEmpty(userProfile.AvatarPath) ? userProfile.AvatarPath : "/images/app/robot-bot-icon.png";
-                <div class="list-group-item list-group-item-action active">
-                    <div class="row align-items-center">
-                        <div class="col-lg-3 col-md-3 col-sm-12">
-                            <img src="@avatarSrc" alt="Avatar" class="rounded-circle" width="100" />
-                        </div>
+                <form method="post" asp-action="SendFriendRequest">
+                    <div class="list-group-item list-group-item-action active">
+                        <div class="row align-items-center">
+                            <div class="col-lg-3 col-md-3 col-sm-12">
+                                <img src="@avatarSrc" alt="Avatar" class="rounded-circle" width="100" />
+                            </div>
 
-                        <div class="col-lg-4 col-md-4 col-sm-12">
-                            <p class="mb-0 fw-semibold">
-                                @(userProfile.DisplayName ?? "Unnamed User")
-                            </p>
-                            <small class="text-muted">Joined @userProfile.CreatedAt.ToString("MMMM yyyy")</small>
-                        </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                <p class="mb-0 fw-semibold">
+                                    @(userProfile.DisplayName ?? "Unnamed User")
+                                </p>
+                                <small class="text-muted">Joined @userProfile.CreatedAt.ToString("MMMM yyyy")</small>
+                                <input asp-for="@userProfile.UserId" type="hidden" value="@userProfile.UserId" />
+                                <input asp-for="@userProfile.DisplayName" type="hidden" value="@userProfile.DisplayName" />
+                            </div>
 
-                        <div class="col-lg-5 col-md-5 col-sm-12">
-                            <a class="btn btn-primary">Add Friend</a>
+                            <div class="col-lg-5 col-md-5 col-sm-12">
+                                <button type="submit" class="btn btn-primary">Add Friend</button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
             }
         }
     </div>

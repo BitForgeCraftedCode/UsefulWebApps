@@ -35,6 +35,54 @@ namespace UsefulWebApps.Controllers
             return View(userProfilesVM);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SendFriendRequest(UserProfiles userProfile)
+        {
+            if (!ModelState.IsValid) 
+            {
+                TempData["error"] = "Friend request error.";
+                return RedirectToAction("People");
+            }
+            ClaimsPrincipal currentUser = this.User;
+            string? requesterId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(requesterId))
+            {
+                TempData["error"] = "Unable to identify current user.";
+                return RedirectToAction("People");
+            }
+            // Prevent sending a friend request to yourself
+            if (requesterId == userProfile.UserId)
+            {
+                TempData["error"] = "You cannot send a friend request to yourself.";
+                return RedirectToAction("People");
+            }
+            // Check if a friendship/request already exists in either direction
+            Friendships? existing = await _unitOfWork.Friendships.GetExisting(requesterId, userProfile.UserId);
+            if (existing != null)
+            {
+                TempData["error"] = existing.Status == FriendshipStatus.Accepted
+                    ? "You are already friends with this user."
+                    : "A friend request already exists with this user.";
+                return RedirectToAction("People");
+            }
+            Friendships friendship = new()
+            {
+                RequesterUserId = requesterId,
+                AddresseeUserId = userProfile.UserId,
+                Status = FriendshipStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            bool success = await _unitOfWork.Friendships.Add(friendship);
+
+            TempData[success ? "success" : "error"] = success
+                ? "Friend request sent!"
+                : "Could not send friend request. Please try again.";
+
+            return RedirectToAction("People");
+        }
+
         public async Task<IActionResult> Requests()
         {
             return View();
