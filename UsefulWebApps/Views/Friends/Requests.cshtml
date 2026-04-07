@@ -2,12 +2,73 @@
     ViewData["Title"] = "Friend Requests";
 }
 
+@model UsefulWebApps.Models.ViewModels.Friends.RequestsVM
 
 <div class="text-center container pb-3">
     <h1 class="display-3 mt-3">Your Friend Requests</h1>
     
-    <div class="list-group max-width-200 mx-auto">
-        <p>Display pending friend requests here</p>
+    <div class="list-group max-width-550 mx-auto">
+        @if (!Model.UserProfiles.Any())
+        {
+            <p class="fw-semibold">No friend requests found.</p>
+        }
+        else
+        {
+            @for (int i = 0; i < Model.UserProfiles.Count; i++)
+            {
+                var userProfile = Model.UserProfiles[i];
+                var friendship = Model.PendingRequests[i];
+                var avatarSrc = !string.IsNullOrEmpty(userProfile.AvatarPath) ? userProfile.AvatarPath : "/images/app/robot-bot-icon.png";
+
+                <div class="list-group-item list-group-item-action active mb-2">
+                    <div class="row align-items-center">
+                        <div class="col-lg-3 col-md-3 col-sm-12">
+                            <img src="@avatarSrc" alt="Avatar" class="rounded-circle" width="100" />
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <p class="mb-0 fw-semibold">
+                                @(userProfile.DisplayName ?? "Unnamed User")
+                            </p>
+                            <small class="text-muted">Joined @userProfile.CreatedAt.ToString("MMMM yyyy")</small>
+                        </div>
+
+                        <div class="col-lg-5 col-md-5 col-sm-12 d-flex gap-2 justify-content-center">
+                            <form method="post" asp-action="AcceptFriendRequest">
+                                <input type="hidden" name="friendshipId" value="@friendship.Id" />
+                                <button type="submit" class="btn btn-outline-secondary">Accept</button>
+                            </form>
+                            <form method="post" asp-action="DeclineFriendRequest" class="decline-friend">
+                                <input type="hidden" name="friendshipId" value="@friendship.Id" />
+                                <button type="submit" class="btn btn-outline-danger">Decline</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        } 
     </div>
 </div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <script type="text/javascript">
+        $(".decline-friend").each(function () {
+            $(this).validate({
+                submitHandler: function (form) {
+                    //ask to confirm decline
+                    toastConfirmDeclineFriend().then(declineConfirm => {
+                        if (declineConfirm == true) {
+                            form.submit();
+                        } else {
+                            toastr.success("Friend has NOT been declined");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
 

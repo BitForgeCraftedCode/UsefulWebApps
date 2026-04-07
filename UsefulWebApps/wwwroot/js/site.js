@@ -24,6 +24,25 @@ function toastConfirm() {
     });
 }
 
+function toastConfirmDeclineFriend() {
+    return new Promise((resolve, reject) => {
+        toastr.warning("Are you sure you want to decline the friend request?<br/><br/><button class='btn' id='declineYes'>Yes</button><br/><br/><button class='btn' id='declineNo'>No</button>", 'Decline Confirm', {
+            closeButton: false,
+            allowHtml: true,
+            timeOut: 0,
+            extendedTimeOut: 0,
+            onShown: function (toast) {
+                $("#declineYes").on("click", function () {
+                    resolve(true)
+                });
+                $("#declineNo").on("click", function () {
+                    resolve(false)
+                });
+            }
+        });
+    });
+}
+
 function toastConfirmUseSavedList() {
     return new Promise((resolve, reject) => {
         toastr.warning("Are you sure you want to use a saved list?<br/><br/><button class='btn' id='useSavedYes'>Yes</button><br/><br/><button class='btn' id='useSavedNo'>No</button>", 'Use Saved List Confirm', {

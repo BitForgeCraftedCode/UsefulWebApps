@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using UsefulWebApps.IdentityModels;
 using UsefulWebApps.Models.Friends;
 using UsefulWebApps.Models.ViewModels.Friends;
 using UsefulWebApps.Repository.IRepository;
@@ -85,7 +86,35 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> Requests()
         {
-            return View();
+            ClaimsPrincipal currentUser = this.User;
+            string? addresseeUserId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(addresseeUserId)) return NotFound();
+
+            (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetPendingRequestsWithProfiles(addresseeUserId);
+
+            RequestsVM vm = new() 
+            { 
+                UserProfiles = result.profiles,
+                PendingRequests = result.friendships
+            };
+            return View(vm);
+            
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AcceptFriendRequest(ulong friendshipId)
+        {
+            bool success = await _unitOfWork.Friendships.UpdateStatus(friendshipId, FriendshipStatus.Accepted);
+            TempData[success ? "success" : "error"] = success ? "Friend request accepted!" : "Something went wrong.";
+            return RedirectToAction("Requests");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeclineFriendRequest(ulong friendshipId)
+        {
+            bool success = await _unitOfWork.Friendships.UpdateStatus(friendshipId, FriendshipStatus.Declined);
+            TempData[success ? "success" : "error"] = success ? "Friend request declined." : "Something went wrong.";
+            return RedirectToAction("Requests");
         }
 
         public async Task<IActionResult> MyProfile()
