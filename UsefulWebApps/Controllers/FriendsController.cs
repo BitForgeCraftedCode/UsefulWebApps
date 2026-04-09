@@ -61,10 +61,24 @@ namespace UsefulWebApps.Controllers
             Friendships? existing = await _unitOfWork.Friendships.GetExisting(requesterId, userProfile.UserId);
             if (existing != null)
             {
-                TempData["error"] = existing.Status == FriendshipStatus.Accepted
-                    ? "You are already friends with this user."
-                    : "A friend request already exists with this user.";
-                return RedirectToAction("People");
+                if (existing.Status == FriendshipStatus.Accepted)
+                {
+                    TempData["error"] = "You are already friends with this user.";
+                    return RedirectToAction("People");
+                }
+                if (existing.Status == FriendshipStatus.Pending)
+                {
+                    TempData["error"] = "A friend request already exists with this user.";
+                    return RedirectToAction("People");
+                }
+                if (existing.Status == FriendshipStatus.Declined)
+                {
+                    bool reRequest = await _unitOfWork.Friendships.UpdateStatus(existing.Id, FriendshipStatus.Pending);
+                    TempData[reRequest ? "success" : "error"] = reRequest
+                        ? "Friend request sent!"
+                        : "Could not send friend request. Please try again.";
+                    return RedirectToAction("People");
+                }
             }
             Friendships friendship = new()
             {
