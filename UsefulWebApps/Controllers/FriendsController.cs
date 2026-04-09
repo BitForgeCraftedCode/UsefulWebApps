@@ -23,7 +23,17 @@ namespace UsefulWebApps.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            return View();
+            ClaimsPrincipal currentUser = this.User;
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetFriendsWithProfiles(userId);
+            FriendsVM vm = new()
+            {
+                UserProfiles = result.profiles,
+                Friendships = result.friendships
+            };
+            return View(vm);
         }
 
         public async Task<IActionResult> People()
