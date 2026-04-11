@@ -2,11 +2,50 @@
     ViewData["Title"] = "Edit My Profile";
 }
 
+@model UsefulWebApps.Models.ViewModels.Friends.EditUserProfileVM
 
 <div class="text-center container pb-3">
     <h1 class="display-3 mt-3">Edit Your Account Profile</h1>
     
-    <div class="list-group max-width-200 mx-auto">
-        <p>Edit Account Profile Here</p>
-    </div>
+    @{
+        var avatarSrc = !string.IsNullOrEmpty(@Model.UserProfile.AvatarPath) ? @Model.UserProfile.AvatarPath : "/images/app/robot-bot-icon.png";
+    }
+
+    
+    <form asp-controller="Friends" asp-action="EditMyProfile" method="post" enctype="multipart/form-data">
+        <div class="max-width-350 mx-auto">
+            <div class="row align-items-center">
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <img src="@avatarSrc" alt="Avatar" class="rounded-circle" width="100" />
+                </div>
+
+                <div class="col-lg-8 col-md-8 col-sm-12">
+                    <p class="mb-0 fw-semibold">
+                        @(Model.UserProfile.DisplayName ?? "Unnamed User")
+                    </p>
+                    <small class="text-muted">Joined @Model.UserProfile.CreatedAt.ToString("MMMM yyyy")</small>
+                </div>
+
+                
+            </div>
+            <h3 class="mt-3 text-center">Edit Avatar Image</h3>
+            <input type="hidden" asp-for="UserProfile.UserId" />
+            <input type="hidden" asp-for="UserProfile.DisplayName" />
+            <input type="hidden" asp-for="UserProfile.CreatedAt" />
+            <input type="hidden" asp-for="UserProfile.UpdatedAt" />
+            <input type="hidden" asp-for="UserProfile.AvatarPath" />
+            <div>
+                <label asp-for="ImageFile" class="form-label">Choose Image</label>
+                <input asp-for="ImageFile" type="file" class="form-control ignore" required placeholder="Choose Image" accept="image/png,image/jpeg,image/gif,image/webp" />
+            </div>
+            <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Edit Profile</button>
+        </div>
+       
+    </form>
 </div>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+   
+}
