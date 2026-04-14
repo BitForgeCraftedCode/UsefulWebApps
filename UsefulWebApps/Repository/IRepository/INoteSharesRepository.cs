@@ -6,7 +6,7 @@ namespace UsefulWebApps.Repository.IRepository
     {
         //any NoteShares model specific database methods here
         Task<bool> ShareNote(int noteId, string sharedWithUserId);
-        Task<bool> UnshareNote(int noteId, string sharedWithUserId);
+        Task<bool> UnshareNote(int noteId);
         Task<List<Notes>> GetNotesSharedWithUser(string userId);
         // Returns noteId -> list of friend DisplayNames this note is shared to
         Task<Dictionary<int, List<string>>> GetSharedToMapForOwner(string ownerUserId);

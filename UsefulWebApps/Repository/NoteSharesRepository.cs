@@ -18,11 +18,10 @@ namespace UsefulWebApps.Repository
             return rows > 0;
         }
 
-        public async Task<bool> UnshareNote(int noteId, string sharedWithUserId)
+        public async Task<bool> UnshareNote(int noteId)
         {
-            string sql = @"DELETE FROM note_shares 
-                           WHERE NoteId = @noteId AND SharedWithUserId = @sharedWithUserId";
-            int rows = await _connection.ExecuteAsync(sql, new { noteId, sharedWithUserId });
+            string sql = "DELETE FROM note_shares WHERE NoteId = @noteId";
+            int rows = await _connection.ExecuteAsync(sql, new { noteId });
             return rows > 0;
         }
 

@@ -140,7 +140,7 @@ namespace UsefulWebApps.Controllers
             TempData["error"] = "Edit note error. Try again.";
             return View(obj);
         }
-
+        //shared notes methods
         public async Task<IActionResult> ShareNote(int? id)
         {
             if (id == null || id == 0) return NotFound();
@@ -206,6 +206,28 @@ namespace UsefulWebApps.Controllers
                 : "Could not share note. It may already be shared with this friend.";
 
             return RedirectToAction("Note", new { id = vm.NoteId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UnshareNote(int noteId)
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            Notes note = await _unitOfWork.Notes.GetById(noteId);
+            if (note.UserId != userId)
+            {
+                TempData["error"] = "You can only manage sharing on your own notes.";
+                return RedirectToAction("MyNotes");
+            }
+
+            bool success = await _unitOfWork.NoteShares.UnshareNote(noteId);
+            TempData[success ? "success" : "error"] = success
+                ? "Note unshared."
+                : "Could not unshare note.";
+
+            return RedirectToAction("MyNotes");
         }
 
         #endregion
