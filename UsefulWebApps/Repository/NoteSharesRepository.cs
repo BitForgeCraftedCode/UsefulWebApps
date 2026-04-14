@@ -1,0 +1,58 @@
+﻿using Dapper;
+using MySqlConnector;
+using UsefulWebApps.Models.ListBuddy;
+using UsefulWebApps.Repository.IRepository;
+
+namespace UsefulWebApps.Repository
+{
+    public class NoteSharesRepository : Repository<NoteShares>, INoteSharesRepository
+    {
+        public NoteSharesRepository(MySqlConnection connection) : base(connection) { }
+        //any NoteShares model specific database methods here
+        public async Task<bool> ShareNote(int noteId, string sharedWithUserId)
+        {
+            string sql = @"INSERT IGNORE INTO note_shares (NoteId, SharedWithUserId) 
+                           VALUES (@noteId, @sharedWithUserId)";
+            int rows = await _connection.ExecuteAsync(sql, new { noteId, sharedWithUserId });
+            return rows > 0;
+        }
+
+        public async Task<bool> UnshareNote(int noteId, string sharedWithUserId)
+        {
+            string sql = @"DELETE FROM note_shares 
+                           WHERE NoteId = @noteId AND SharedWithUserId = @sharedWithUserId";
+            int rows = await _connection.ExecuteAsync(sql, new { noteId, sharedWithUserId });
+            return rows > 0;
+        }
+
+        public async Task<List<Notes>> GetNotesSharedWithUser(string userId)
+        {
+            string sql = @"SELECT n.* FROM notes n
+                           INNER JOIN note_shares ns ON ns.NoteId = n.Id
+                           WHERE ns.SharedWithUserId = @userId";
+            List<Notes> notes = (List<Notes>)await _connection.QueryAsync<Notes>(sql, new { userId });
+            return notes;
+        }
+
+        public async Task<Dictionary<int, List<string>>> GetSharedToMapForOwner(string ownerUserId)
+        {
+            // For all notes owned by this user that have been shared, return noteId -> friend display names
+            string sql = @"SELECT ns.NoteId, COALESCE(up.DisplayName, 'Unknown') AS DisplayName
+                           FROM note_shares ns
+                           INNER JOIN notes n ON n.Id = ns.NoteId
+                           INNER JOIN user_profiles up ON up.UserId = ns.SharedWithUserId
+                           WHERE n.UserId = @ownerUserId";
+
+            var rows = await _connection.QueryAsync<(int NoteId, string DisplayName)>(sql, new { ownerUserId });
+
+            Dictionary<int, List<string>> map = new();
+            foreach (var row in rows)
+            {
+                if (!map.ContainsKey(row.NoteId))
+                    map[row.NoteId] = new List<string>();
+                map[row.NoteId].Add(row.DisplayName);
+            }
+            return map;
+        }
+    }
+}

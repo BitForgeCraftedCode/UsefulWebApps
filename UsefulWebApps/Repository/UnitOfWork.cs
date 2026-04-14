@@ -86,6 +86,7 @@ namespace UsefulWebApps.Repository
         public ICalendarEventsRepository CalendarEvents { get; private set; }
         public IFriendshipsRepository Friendships { get; private set; }
         public IUserProfilesRepository UserProfiles { get; private set; }
+        public INoteSharesRepository NoteShares { get; private set; }
         //other repos here
 
         public UnitOfWork(MySqlConnection connection)
@@ -105,6 +106,7 @@ namespace UsefulWebApps.Repository
             CalendarEvents = new CalendarEventsRepository(_connection);
             Friendships = new FriendshipsRepository(_connection);
             UserProfiles = new UserProfilesRepository(_connection);
+            NoteShares = new NoteSharesRepository(_connection);
         }
 
         public async Task OpenConnectionAsync()
