@@ -11,7 +11,7 @@ namespace UsefulWebApps.Models.MyRecipes
     {
         [Key]
         [Column("RecipeId")]
-        public int RecipeId { get; set; }
+        public long RecipeId { get; set; }
 
         [Column("RecipeTitle")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Please enter at least 3 characters.")]
@@ -26,15 +26,15 @@ namespace UsefulWebApps.Models.MyRecipes
 
         [ForeignKey("CourseId")]
         [Column("CourseId")]
-        public int CourseId { get; set; }
+        public long CourseId { get; set; }
 
         [ForeignKey("CuisineId")]
         [Column("CuisineId")]
-        public int CuisineId { get; set; }
+        public long CuisineId { get; set; }
 
         [ForeignKey("DifficultyId")]
         [Column("DifficultyId")]
-        public int DifficultyId { get; set; }
+        public long DifficultyId { get; set; }
 
         [Column("PrepTime")]
         [Required(ErrorMessage = "Enter a prep time")]

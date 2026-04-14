@@ -8,7 +8,7 @@ namespace UsefulWebApps.Models.MyHomePage
     {
         [Key]
         [Column("UserQuickLinkId")]
-        public int UserQuickLinkId { get; set; }
+        public long UserQuickLinkId { get; set; }
 
         [Column("UserId")]
         public string UserId { get; set; } = string.Empty;
@@ -18,6 +18,6 @@ namespace UsefulWebApps.Models.MyHomePage
 
         [ForeignKey("QuickLinkId")]
         [Column("QuickLinkId")]
-        public int QuickLinkId { get; set; }
+        public long QuickLinkId { get; set; }
     }
 }

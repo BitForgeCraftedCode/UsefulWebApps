@@ -8,7 +8,7 @@ namespace UsefulWebApps.Models.MyHomePage
     {
         [Key]
         [Column("UserSlideShowImageId")]
-        public int UserSlideShowImageId { get; set; }
+        public long UserSlideShowImageId { get; set; }
 
         [Column("UserId")]
         public string UserId { get; set; } = string.Empty;
@@ -18,6 +18,6 @@ namespace UsefulWebApps.Models.MyHomePage
 
         [ForeignKey("SlideShowImageId")]
         [Column("SlideShowImageId")]
-        public int SlideShowImageId { get; set; }
+        public long SlideShowImageId { get; set; }
     }
 }

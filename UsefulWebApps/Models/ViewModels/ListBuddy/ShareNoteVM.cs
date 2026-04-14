@@ -5,7 +5,7 @@ namespace UsefulWebApps.Models.ViewModels.ListBuddy
     public class ShareNoteVM
     {
         // The note being shared
-        public int NoteId { get; set; }
+        public long NoteId { get; set; }
         public string NoteTitle { get; set; } = string.Empty;
 
         // Selected friend's UserId from the dropdown

@@ -8,7 +8,7 @@ namespace UsefulWebApps.Models.MyRecipes
     {
         [Key]
         [Column("UserSavedId")]
-        public int UserSavedId { get; set; }
+        public long UserSavedId { get; set; }
 
         [Column("UserId")]
         [Required(ErrorMessage = "User Id is required.")]
@@ -20,7 +20,7 @@ namespace UsefulWebApps.Models.MyRecipes
 
         [ForeignKey("RecipeId")]
         [Column("RecipeId")]
-        public int RecipeId { get; set; }
+        public long RecipeId { get; set; }
 
         [Column("RecipeTitle")]
         public string RecipeTitle { get; set; } = string.Empty;

@@ -44,7 +44,7 @@ namespace UsefulWebApps.Controllers
 
             List<Notes> myNotes = (List<Notes>)await _unitOfWork.Notes.GetAllWhere("UserId", userId);
             List<Notes> sharedWithMe = await _unitOfWork.NoteShares.GetNotesSharedWithUser(userId);
-            Dictionary<int, List<string>> sharedToMap = await _unitOfWork.NoteShares.GetSharedToMapForOwner(userId);
+            Dictionary<long, List<string>> sharedToMap = await _unitOfWork.NoteShares.GetSharedToMapForOwner(userId);
 
             NotesVM notesVM = new()
             {
@@ -55,7 +55,7 @@ namespace UsefulWebApps.Controllers
             return View(notesVM);
         }
 
-        public async Task<IActionResult> Note(int? id)
+        public async Task<IActionResult> Note(long? id)
         {
             if (id == null || id == 0)
             {
@@ -96,7 +96,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteNote(int? id)
+        public async Task<IActionResult> DeleteNote(long? id)
         {
             if (id == null || id == 0)
             {
@@ -112,7 +112,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("MyNotes");
         }
 
-        public async Task<IActionResult> EditNote(int? id)
+        public async Task<IActionResult> EditNote(long? id)
         {
             if (id == null || id == 0)
             {
@@ -141,7 +141,7 @@ namespace UsefulWebApps.Controllers
             return View(obj);
         }
         //shared notes methods
-        public async Task<IActionResult> ShareNote(int? id)
+        public async Task<IActionResult> ShareNote(long? id)
         {
             if (id == null || id == 0) return NotFound();
 
@@ -209,7 +209,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UnshareNote(int noteId)
+        public async Task<IActionResult> UnshareNote(long noteId)
         {
             ClaimsPrincipal currentUser = this.User;
             string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -265,7 +265,7 @@ namespace UsefulWebApps.Controllers
 
         //transaction method
         [HttpPost]
-        public async Task<IActionResult> ToDoListToggleComplete(int? id, string listTitle)
+        public async Task<IActionResult> ToDoListToggleComplete(long? id, string listTitle)
         {
             if (id == null || id == 0 || listTitle == "" || listTitle == null)
             {
@@ -349,7 +349,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> ToDoListDeleteItem(int? id)
+        public async Task<JsonResult> ToDoListDeleteItem(long? id)
         {
             if (id == null || id == 0)
             {
@@ -389,7 +389,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("MyToDoLists");
         }
 
-        public async Task<IActionResult> ToDoListEdit(int? id)
+        public async Task<IActionResult> ToDoListEdit(long? id)
         {
             if (id == null || id == 0)
             {
@@ -477,7 +477,7 @@ namespace UsefulWebApps.Controllers
 
         //transaction method
         [HttpPost]
-        public async Task<IActionResult> GroceryListToggleComplete(int? id, string userId)
+        public async Task<IActionResult> GroceryListToggleComplete(long? id, string userId)
         {
             if (id == null || id == 0 || userId == "")
             {
@@ -505,7 +505,7 @@ namespace UsefulWebApps.Controllers
             return PartialView("_GroceryListPartial", groceryListVM);
         }
 
-        public async Task<IActionResult> GroceryListEdit(int? id)
+        public async Task<IActionResult> GroceryListEdit(long? id)
         {
             if (id == null || id == 0)
             {
@@ -559,7 +559,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GroceryListDeleteItem(int? id)
+        public async Task<JsonResult> GroceryListDeleteItem(long? id)
         {
             if (id == null || id == 0)
             {

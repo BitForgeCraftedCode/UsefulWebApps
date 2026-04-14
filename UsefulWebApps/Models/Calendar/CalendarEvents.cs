@@ -9,7 +9,7 @@ namespace UsefulWebApps.Models.Calendar
     {
         [Key]
         [Column("Id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Column("UserId")]
         public string? UserId { get; set; } = string.Empty;

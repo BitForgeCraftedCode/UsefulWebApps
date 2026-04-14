@@ -8,11 +8,11 @@ namespace UsefulWebApps.Models.ListBuddy
     {
         [Key]
         [Column("Id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Column("NoteId")]
         [Required]
-        public int NoteId { get; set; }
+        public long NoteId { get; set; }
 
         [Column("SharedWithUserId")]
         [Required]

@@ -7,6 +7,6 @@ namespace UsefulWebApps.Models.ViewModels.ListBuddy
         public List<Notes> MyNotes { get; set; }
         public List<Notes> SharedWithMeNotes { get; set; }
         // Key: NoteId, Value: list of display names the note is shared with
-        public Dictionary<int, List<string>> SharedToFriends { get; set; }
+        public Dictionary<long, List<string>> SharedToFriends { get; set; }
     }
 }

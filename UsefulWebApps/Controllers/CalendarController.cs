@@ -129,7 +129,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteEvent(int? id)
+        public async Task<IActionResult> DeleteEvent(long? id)
         {
             if (id == null || id == 0)
             {
@@ -145,7 +145,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> EditEvent(int? id)
+        public async Task<IActionResult> EditEvent(long? id)
         {
             if (id == null || id == 0)
             {

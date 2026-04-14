@@ -8,7 +8,7 @@ namespace UsefulWebApps.Models.MyHomePage
     {
         [Key]
         [Column("SlideShowImageId")]
-        public int SlideShowImageId { get; set; }
+        public long SlideShowImageId { get; set; }
 
         [Column("ImagePath")]
         public string ImagePath { get; set; } = string.Empty;

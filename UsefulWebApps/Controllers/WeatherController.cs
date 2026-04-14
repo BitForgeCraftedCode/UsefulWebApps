@@ -112,7 +112,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Weather(int? id)
+        public async Task<IActionResult> Weather(long? id)
         {
             if (id == null || id == 0)
             {
@@ -160,7 +160,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteLocation(int? id)
+        public async Task<IActionResult> DeleteLocation(long? id)
         {
             if (!ModelState.IsValid) 
             {

@@ -56,7 +56,7 @@ namespace UsefulWebApps.Repository
             return (count, recipes);
         }
 
-        public async Task<(int count, List<Recipe> recipes)> PaginationWithTagFilter(int limit, int offset, List<int> selectedCategoryIds, bool ascending)
+        public async Task<(int count, List<Recipe> recipes)> PaginationWithTagFilter(int limit, int offset, List<long> selectedCategoryIds, bool ascending)
         {
             // Determine sort direction
             string sortDirection = ascending ? "ASC" : "DESC";
@@ -77,7 +77,7 @@ namespace UsefulWebApps.Repository
             return (count, recipes);
         }
 
-        public async Task<Recipe> GetRecipeById(int? id)
+        public async Task<Recipe> GetRecipeById(long? id)
         {
             //returns x rows of a single recipe at RecipeId where x is the number of categories
             string sql = @"SELECT * FROM recipes
@@ -114,7 +114,7 @@ namespace UsefulWebApps.Repository
         }
 
         //transaction method
-        public async Task<RecipePageVM> GetRecipeAndCommentsById(int? id)
+        public async Task<RecipePageVM> GetRecipeAndCommentsById(long? id)
         {
             //returns x rows of a single recipe at RecipeId where x is the number of categories
             string sql = @"SELECT * FROM recipes
@@ -175,7 +175,7 @@ namespace UsefulWebApps.Repository
             List<RecipeCourses> recipeCourses,
             List<RecipeCuisines> recipeCuisines,
             List<RecipeDifficulties> recipeDifficulties
-            )> GetRecipeAndCategoriesForEditDisplay(int? id)
+            )> GetRecipeAndCategoriesForEditDisplay(long? id)
         {
             //returns x rows of a single recipe at RecipeId where x is the number of categories
             string sql = @"SELECT * FROM recipes
@@ -360,7 +360,7 @@ namespace UsefulWebApps.Repository
             //https://stackoverflow.com/questions/19714308/mysql-how-to-insert-into-table-that-has-many-to-many-relationship
             string sql2 = @"SELECT RecipeId FROM recipes WHERE RecipeId = LAST_INSERT_ID()";
             //string sql2 = @"LAST_INSERT_ID()";
-            int idLastRecipeInsert = await _connection.QuerySingleAsync<int>(sql2, transaction: _transaction);
+            long idLastRecipeInsert = await _connection.QuerySingleAsync<long>(sql2, transaction: _transaction);
 
             foreach (RecipeCategories category in recipeVM.Recipe.Categories)
             {
@@ -444,7 +444,7 @@ namespace UsefulWebApps.Repository
         }
 
         //transaction method
-        public async Task<bool> DeleteRecipe(int? id)
+        public async Task<bool> DeleteRecipe(long? id)
         {
             int rowsEffected1 = 0;
             int rowsEffected2 = 0;
@@ -455,7 +455,7 @@ namespace UsefulWebApps.Repository
             return (rowsEffected1 > 0 && rowsEffected2 > 0) ? true : false;
         }
 
-        public async Task<bool> DeleteUserSavedRecipe(int? id)
+        public async Task<bool> DeleteUserSavedRecipe(long? id)
         {
             int rowsEffected = 0;
             string sql = @"DELETE FROM recipe_usersaved WHERE UserSavedId = @id";

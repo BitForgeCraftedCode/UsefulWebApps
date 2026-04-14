@@ -25,7 +25,7 @@ namespace UsefulWebApps.Repository
             return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
         }
 
-        public async Task<(GroceryList groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemAndCategoriesAtId(int? id)
+        public async Task<(GroceryList groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum)> GetGroceryListItemAndCategoriesAtId(long? id)
         {
             string query = @"
                 SELECT * FROM grocery_list WHERE Id = @id;
@@ -38,7 +38,7 @@ namespace UsefulWebApps.Repository
         }
 
         //transaction method
-        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GroceryListToggleComplete(int? id, string userId)
+        public async Task<(List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GroceryListToggleComplete(long? id, string userId)
         {
             string sql = "SELECT Complete FROM grocery_list WHERE Id = @id";
             bool isComplete = await _connection.QuerySingleAsync<bool>(sql, new { id }, transaction: _transaction);

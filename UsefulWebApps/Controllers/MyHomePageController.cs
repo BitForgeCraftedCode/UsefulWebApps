@@ -187,7 +187,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> EditQuote(int? id) 
+        public async Task<IActionResult> EditQuote(long? id) 
         {
             if (id == null || id == 0)
             {

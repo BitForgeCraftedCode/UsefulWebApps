@@ -32,13 +32,13 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> Index(int page, string searchString, string categories, bool ascending = true)
         {
-            List<int> selectedCategoryIds = new();
+            List<long> selectedCategoryIds = new();
 
             if (!string.IsNullOrEmpty(categories))
             {
                 selectedCategoryIds = categories
                     .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(int.Parse)
+                    .Select(long.Parse)
                     .ToList();
             }
 
@@ -130,7 +130,7 @@ namespace UsefulWebApps.Controllers
                 page = 1;
             
             // Get selected category IDs
-            List<int> selectedCategoryIds = model.RecipeCategories
+            List<long> selectedCategoryIds = model.RecipeCategories
                 .Where(c => c.IsChecked)
                 .Select(c => c.CategoryId)
                 .ToList();
@@ -146,7 +146,7 @@ namespace UsefulWebApps.Controllers
             });
         }
 
-        public async Task<IActionResult> Recipe(int? id, int page, string searchString = "", string categories = "", bool ascending = true)
+        public async Task<IActionResult> Recipe(long? id, int page, string searchString = "", string categories = "", bool ascending = true)
         {
             if (id == null || id == 0)
             {
@@ -242,7 +242,7 @@ namespace UsefulWebApps.Controllers
             if (ModelState.IsValid)
             {
                
-                int? id = recipeComment.RecipeId;
+                long? id = recipeComment.RecipeId;
                 bool success = await _unitOfWork.Recipe.AddRecipeComment(recipeComment);
                 if (success)
                 {
@@ -265,7 +265,7 @@ namespace UsefulWebApps.Controllers
         {
             if (ModelState.IsValid)
             {
-                int? id = recipeUserSaved.RecipeId;
+                long? id = recipeUserSaved.RecipeId;
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
                 bool success = await _unitOfWork.Recipe.AddUserSavedRecipe(recipeUserSaved);
@@ -288,7 +288,7 @@ namespace UsefulWebApps.Controllers
 
         [HttpPost]
         [Route("/MyRecipes/DeleteUserSavedRecipe", Name = "deleteUserSavedRecipe")]
-        public async Task<IActionResult> DeleteUserSavedRecipe(int? id)
+        public async Task<IActionResult> DeleteUserSavedRecipe(long? id)
         {
             
             if (id == null || id == 0)
@@ -308,7 +308,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("SavedRecipes");
         }
 
-        public async Task<IActionResult> EditRecipe(int? id)
+        public async Task<IActionResult> EditRecipe(long? id)
         {
             if (id == null || id == 0)
             {
@@ -634,7 +634,7 @@ namespace UsefulWebApps.Controllers
             return View(recipeVM);
         }
 
-        public async Task<IActionResult> DeleteRecipe(int? id)
+        public async Task<IActionResult> DeleteRecipe(long? id)
         {
             if (id == null || id == 0)
             {
@@ -657,7 +657,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost, ActionName("DeleteRecipe")]
-        public async Task<IActionResult> DeleteRecipeFromDb(int? id, string imagePath)
+        public async Task<IActionResult> DeleteRecipeFromDb(long? id, string imagePath)
         {
             if (id == null || id == 0)
             {
