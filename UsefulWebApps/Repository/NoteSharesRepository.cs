@@ -34,10 +34,11 @@ namespace UsefulWebApps.Repository
             List<Notes> notes = (List<Notes>)await _connection.QueryAsync<Notes>(sql, new { userId });
             return notes;
         }
-
+        // Key: NoteId, Value: list of display names the note is shared with
         public async Task<Dictionary<int, List<string>>> GetSharedToMapForOwner(string ownerUserId)
         {
             // For all notes owned by this user that have been shared, return noteId -> friend display names
+            // (NoteId, DisplayName of the user the note is shared with)
             string sql = @"SELECT ns.NoteId, COALESCE(up.DisplayName, 'Unknown') AS DisplayName
                            FROM note_shares ns
                            INNER JOIN notes n ON n.Id = ns.NoteId
@@ -49,8 +50,10 @@ namespace UsefulWebApps.Repository
             Dictionary<int, List<string>> map = new();
             foreach (var row in rows)
             {
+                //if map does not contain key create it
                 if (!map.ContainsKey(row.NoteId))
                     map[row.NoteId] = new List<string>();
+                //add display name to the correct key
                 map[row.NoteId].Add(row.DisplayName);
             }
             return map;

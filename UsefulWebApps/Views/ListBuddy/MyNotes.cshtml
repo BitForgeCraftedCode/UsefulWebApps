@@ -6,12 +6,37 @@
 
 <div class="text-center container pb-3">
     <h1 class="display-3 mt-3">My Notes</h1>
-    <div class="list-group max-width-250 mx-auto">
-        @foreach (var note in Model.Notes)
+    <div class="list-group max-width-350 mx-auto">
+        @foreach (var note in Model.MyNotes)
         {
-            <a asp-controller="ListBuddy" asp-action="Note" asp-route-id="@note.Id" class="list-group-item list-group-item-action">@note.NoteTitle</a>
+            @* <a asp-controller="ListBuddy" asp-action="Note" asp-route-id="@note.Id" class="list-group-item list-group-item-action">@note.NoteTitle</a> *@
+
+            <a asp-controller="ListBuddy" asp-action="Note" asp-route-id="@note.Id" 
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span>@note.NoteTitle</span>
+                @if (Model.SharedToFriends.ContainsKey(note.Id))
+                {
+                    <span class="badge bg-info rounded-pill"
+                          title="Shared with: @string.Join(", ", Model.SharedToFriends[note.Id])">
+                        Shared
+                    </span>
+                }
+            </a>
         }
     </div>
+    @if (Model.SharedWithMeNotes.Any())
+    {
+        <h2 class="mt-4">Shared With Me</h2>
+        <div class="list-group max-width-350 mx-auto">
+            @foreach (var note in Model.SharedWithMeNotes)
+            {
+                <a asp-controller="ListBuddy" asp-action="Note" asp-route-id="@note.Id"
+                       class="list-group-item list-group-item-action">
+                    @note.NoteTitle
+                </a>
+            }
+        </div>
+    }
     <div class="max-width-250 mx-auto mt-3">
         <div class="mb-3">
             <a asp-controller="ListBuddy" asp-action="CreateNote" class="btn w-100">Add New Note</a>

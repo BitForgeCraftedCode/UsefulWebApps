@@ -39,11 +39,18 @@ namespace UsefulWebApps.Controllers
         public async Task<IActionResult> MyNotes()
         {
             ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<Notes> notes = (List<Notes>)await _unitOfWork.Notes.GetAllWhere("UserId", userId);
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            List<Notes> myNotes = (List<Notes>)await _unitOfWork.Notes.GetAllWhere("UserId", userId);
+            List<Notes> sharedWithMe = await _unitOfWork.NoteShares.GetNotesSharedWithUser(userId);
+            Dictionary<int, List<string>> sharedToMap = await _unitOfWork.NoteShares.GetSharedToMapForOwner(userId);
+
             NotesVM notesVM = new()
             {
-                Notes = notes
+                MyNotes = myNotes,
+                SharedWithMeNotes = sharedWithMe,
+                SharedToFriends = sharedToMap
             };
             return View(notesVM);
         }
