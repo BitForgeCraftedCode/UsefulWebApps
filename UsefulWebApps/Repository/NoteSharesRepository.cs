@@ -11,6 +11,7 @@ namespace UsefulWebApps.Repository
         //any NoteShares model specific database methods here
         public async Task<bool> ShareNote(int noteId, string sharedWithUserId)
         {
+            //IGNORE so it will not throw duplicate key error if trying to share same note with same user twice
             string sql = @"INSERT IGNORE INTO note_shares (NoteId, SharedWithUserId) 
                            VALUES (@noteId, @sharedWithUserId)";
             int rows = await _connection.ExecuteAsync(sql, new { noteId, sharedWithUserId });

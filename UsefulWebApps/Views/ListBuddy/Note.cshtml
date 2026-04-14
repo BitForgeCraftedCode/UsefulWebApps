@@ -20,6 +20,16 @@
                 <a asp-controller="ListBuddy" asp-action="EditNote" asp-route-id="@Model.Id" class="btn btn-outline-dark w-100 mb-3">Edit Note</a>
             </div>
         </div>
+        @if (Model.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+        {
+            <div class="row">
+                <div class="col-12">
+                    <a asp-controller="ListBuddy" asp-action="ShareNote" asp-route-id="@Model.Id" class="btn btn-outline-dark mb-3 w-100">
+                       Share Note
+                   </a>
+                </div>
+            </div>
+        }
         <form method="post" asp-action="DeleteNote" id="delete-note" class="max-width-175 mx-auto">
             <div>
                 <input type="hidden" asp-for="@Model.Id" />

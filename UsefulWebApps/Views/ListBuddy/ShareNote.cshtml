@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Share Note";
+}
+@model UsefulWebApps.Models.ViewModels.ListBuddy.ShareNoteVM
+
+<div class="max-width-550 mx-auto container pb-3">
+    <h1 class="display-3 mt-3 text-center">Share Note</h1>
+    <h2 class="text-center text-muted">@Model.NoteTitle</h2>
+
+    @if (!Model.FriendsList.Any())
+    {
+        <p class="text-center">You have no friends to share with yet.</p>
+    }
+    else
+    {
+        <form method="post">
+            <input type="hidden" asp-for="NoteId" />
+            <div class="form-floating mb-3">
+                <select asp-for="SelectedFriendUserId" asp-items="Model.FriendsList"
+                        class="form-select" required>
+                    <option value="">-- Select a Friend --</option>
+                </select>
+                <label asp-for="SelectedFriendUserId">Share With</label>
+                <span asp-validation-for="SelectedFriendUserId" class="text-danger"></span>
+            </div>
+            <div class="max-width-200 mx-auto">
+                <button class="btn btn-primary w-100 mb-3" type="submit">Share Note</button>
+                <a asp-action="Note" asp-route-id="@Model.NoteId"
+                   class="btn btn-outline-dark w-100">Back To Note</a>
+            </div>
+        </form>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Ganss.Xss;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
+using UsefulWebApps.Models.Friends;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.ViewModels.ListBuddy;
 using UsefulWebApps.Repository.IRepository;
-using Ganss.Xss;
-using Microsoft.AspNetCore.Identity;
 
 
 namespace UsefulWebApps.Controllers
@@ -132,6 +133,74 @@ namespace UsefulWebApps.Controllers
             TempData["error"] = "Edit note error. Try again.";
             return View(obj);
         }
+
+        public async Task<IActionResult> ShareNote(int? id)
+        {
+            if (id == null || id == 0) return NotFound();
+
+            ClaimsPrincipal currentUser = this.User;
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            Notes note = await _unitOfWork.Notes.GetById(id);
+
+            // Only the owner can share their note
+            if (note.UserId != userId)
+            {
+                TempData["error"] = "You can only share your own notes.";
+                return RedirectToAction("MyNotes");
+            }
+
+            // Get friends to populate dropdown
+            (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetFriendsWithProfiles(userId);
+
+            IEnumerable<SelectListItem> friendsList = result.profiles.Select(p => new SelectListItem
+            {
+                //?? null-coalescing operator
+                Text = p.DisplayName ?? p.UserId,
+                Value = p.UserId
+            });
+
+            ShareNoteVM vm = new()
+            {
+                NoteId = note.Id,
+                NoteTitle = note.NoteTitle,
+                FriendsList = friendsList
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ShareNote(ShareNoteVM vm)
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            // Server-side: verify these two users are actually friends
+            Friendships? friendship = await _unitOfWork.Friendships.GetExisting(userId, vm.SelectedFriendUserId);
+            if (friendship == null || friendship.Status != FriendshipStatus.Accepted)
+            {
+                TempData["error"] = "You can only share notes with friends.";
+                return RedirectToAction("MyNotes");
+            }
+
+            // Verify the note belongs to the current user
+            Notes note = await _unitOfWork.Notes.GetById(vm.NoteId);
+            if (note.UserId != userId)
+            {
+                TempData["error"] = "You can only share your own notes.";
+                return RedirectToAction("MyNotes");
+            }
+
+            bool success = await _unitOfWork.NoteShares.ShareNote(vm.NoteId, vm.SelectedFriendUserId);
+            TempData[success ? "success" : "error"] = success
+                ? "Note shared successfully."
+                : "Could not share note. It may already be shared with this friend.";
+
+            return RedirectToAction("Note", new { id = vm.NoteId });
+        }
+
         #endregion
 
         #region To Do List
