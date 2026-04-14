@@ -8,7 +8,7 @@ namespace UsefulWebApps.Models.MyHomePage
     {
         [Key]
         [Column("QuickLinkId")]
-        public int QuickLinkId { get; set; }
+        public long QuickLinkId { get; set; }
 
         [Column("ImagePath")]
         public string ImagePath { get; set; } = string.Empty;

@@ -8,7 +8,7 @@ namespace UsefulWebApps.Models.ListBuddy
     {
         [Key]
         [Column("Id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Column("Note")]
         [StringLength(50000, MinimumLength = 20, ErrorMessage = "Please Enter At Least 20 Characters.")]

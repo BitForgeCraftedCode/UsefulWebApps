@@ -9,7 +9,7 @@ namespace UsefulWebApps.Models.MyHomePage
     {
         [Key]
         [Column("QuoteId")]
-        public int QuoteId { get; set; }
+        public long QuoteId { get; set; }
 
         [Column("Quote")]
         [StringLength(500, MinimumLength = 10, ErrorMessage = "Please enter at least 10 characters.")]

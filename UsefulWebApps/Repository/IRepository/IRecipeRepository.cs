@@ -8,9 +8,9 @@ namespace UsefulWebApps.Repository.IRepository
         //any Recipe model specific database methods here
         //Recipe is very specific no generic repo methods used
         Task<(int count, List<Recipe> recipes)> Pagination(int limit, int offset, string searchString, bool ascending);
-        Task<(int count, List<Recipe> recipes)> PaginationWithTagFilter(int limit, int offset, List<int> selectedCategoryIds, bool ascending);
-        Task<Recipe> GetRecipeById(int? id);
-        Task<RecipePageVM> GetRecipeAndCommentsById(int? id);
+        Task<(int count, List<Recipe> recipes)> PaginationWithTagFilter(int limit, int offset, List<long> selectedCategoryIds, bool ascending);
+        Task<Recipe> GetRecipeById(long? id);
+        Task<RecipePageVM> GetRecipeAndCommentsById(long? id);
         Task<List<RecipeUserSaved>> GetUserSavedRecipes(string userId);
         Task<(
             List<Recipe> recipe, 
@@ -18,7 +18,7 @@ namespace UsefulWebApps.Repository.IRepository
             List<RecipeCourses> recipeCourses, 
             List<RecipeCuisines> recipeCuisines, 
             List<RecipeDifficulties> recipeDifficulties
-            )> GetRecipeAndCategoriesForEditDisplay(int? id);
+            )> GetRecipeAndCategoriesForEditDisplay(long? id);
         Task<bool> UpdateRecipe(RecipeVM recipeVM);
         Task<(
             List<RecipeCategories> recipeCategories,
@@ -30,8 +30,8 @@ namespace UsefulWebApps.Repository.IRepository
         Task<bool> AddRecipe(RecipeVM recipeVM);
         Task<bool> AddRecipeComment(RecipeComment recipeComment);
         Task<bool> AddUserSavedRecipe(RecipeUserSaved recipeUserSaved);
-        Task<bool> DeleteRecipe(int? id);
-        Task<bool> DeleteUserSavedRecipe(int? id);
+        Task<bool> DeleteRecipe(long? id);
+        Task<bool> DeleteUserSavedRecipe(long? id);
 
     }
 }

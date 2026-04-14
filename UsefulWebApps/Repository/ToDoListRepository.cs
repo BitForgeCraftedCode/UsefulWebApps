@@ -12,7 +12,7 @@ namespace UsefulWebApps.Repository
         //any ToDoList model specific database methods here
 
         //transaction method
-        public async Task<List<ToDoList>> ToDoListToggleComplete(int? id, string userId, string listTitle)
+        public async Task<List<ToDoList>> ToDoListToggleComplete(long? id, string userId, string listTitle)
         {
            
             //toggle complete

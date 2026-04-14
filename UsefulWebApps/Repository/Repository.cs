@@ -47,7 +47,7 @@ namespace UsefulWebApps.Repository
             T singleDbRow = await _connection.QuerySingleAsync<T>(sql, new { id });
             return singleDbRow;
         }
-        public async Task<T> GetById(int? id)
+        public async Task<T> GetById(long? id)
         {
             string tableName = GetTableName();
             string keyColumn = GetKeyColumnName();
@@ -108,7 +108,7 @@ namespace UsefulWebApps.Repository
             return rowsEffected > 0 ? true : false;
         }
 
-        public async Task<bool> Delete(int? id)
+        public async Task<bool> Delete(long? id)
         {
             int rowsEffected = 0;
 

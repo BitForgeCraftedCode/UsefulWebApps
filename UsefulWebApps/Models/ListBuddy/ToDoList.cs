@@ -8,7 +8,7 @@ namespace UsefulWebApps.Models.ListBuddy
     {
         [Key]
         [Column("Id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Column("ToDoItem")]
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Please Enter At Least 3 Characters.")]

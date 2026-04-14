@@ -9,7 +9,7 @@ namespace UsefulWebApps.Models.Weather
     {
         [Key]
         [Column("Id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Column("City")]
         [Required(ErrorMessage = "City Is Required")]

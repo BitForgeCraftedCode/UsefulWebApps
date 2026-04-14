@@ -8,7 +8,7 @@ namespace UsefulWebApps.Models.MyRecipes
     {
         [Key]
         [Column("CuisineId")]
-        public int CuisineId { get; set; }
+        public long CuisineId { get; set; }
 
         [Column("Cuisine")]
         [Required(ErrorMessage = "Recipe cuisine is required.")]

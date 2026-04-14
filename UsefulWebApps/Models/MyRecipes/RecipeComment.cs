@@ -8,7 +8,7 @@ namespace UsefulWebApps.Models.MyRecipes
     {
         [Key]
         [Column("CommentId")]
-        public int CommentId { get; set; }
+        public long CommentId { get; set; }
 
         [Column("Comment")]
         [Required(ErrorMessage = "Recipe comment is required.")]
@@ -25,6 +25,6 @@ namespace UsefulWebApps.Models.MyRecipes
 
         [ForeignKey("RecipeId")]
         [Column("RecipeId")]
-        public int RecipeId { get; set; }
+        public long RecipeId { get; set; }
     }
 }
