@@ -26,6 +26,12 @@ namespace UsefulWebApps.Models.ListBuddy
 
         [Column("Version")]
         public int Version { get; set; }
+
+        [Column("CreatedAt")]
+        public DateTime CreatedAt { get; set; }
+
+        [Column("UpdatedAt")]
+        public DateTime UpdatedAt { get; set; }
     }
 }
 
