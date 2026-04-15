@@ -7,9 +7,12 @@ notes is the parent of note_shares
 */
 CREATE TABLE `notes` (
   `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `Note` varchar(5000) NOT NULL,
+  `Note` mediumtext NOT NULL,
   `UserId` varchar(255) NOT NULL,
   `NoteTitle` varchar(100) NOT NULL,
+  `Version` int unsigned NOT NULL DEFAULT '0',
+  `CreatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
