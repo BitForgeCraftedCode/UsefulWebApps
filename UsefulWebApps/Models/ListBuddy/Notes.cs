@@ -23,6 +23,9 @@ namespace UsefulWebApps.Models.ListBuddy
         [StringLength(100, MinimumLength = 3, ErrorMessage = "Please Enter At Least 3 Characters.")]
         [Required(ErrorMessage = "Note Title Is Required.")]
         public string NoteTitle {  get; set; } = string.Empty;
+
+        [Column("Version")]
+        public int Version { get; set; }
     }
 }
 

@@ -128,12 +128,24 @@ namespace UsefulWebApps.Controllers
             obj.Note = sanitizer.Sanitize(obj.Note);
             if (ModelState.IsValid)
             {
-                bool success = await _unitOfWork.Notes.Update(obj);
-                if (success)
+                (bool Success, bool WasConflict) result = await _unitOfWork.Notes.UpdateWithVersionCheck(obj);
+
+                if (result.Success)
                 {
                     TempData["success"] = "Note edited successfully.";
                     return RedirectToAction("Note", new { id = obj.Id });
                 }
+
+                if (result.WasConflict)
+                {
+                    // Load the latest version so the user can see what changed
+                    Notes latest = await _unitOfWork.Notes.GetById(obj.Id);
+                    //must clear model state for latest version to load up.
+                    ModelState.Clear();
+                    TempData["error"] = "This note was modified by someone else while you were editing. The current version is shown below. Please re-apply your changes.";
+                    return View(latest); // show them the current state
+                }
+
                 TempData["error"] = "Edit note error. Try again.";
                 return RedirectToAction("MyNotes");
             }

@@ -1,12 +1,13 @@
 DROP TABLE to_do_list;
 
 CREATE TABLE `to_do_list` (
-  `Id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `ToDoItem` varchar(100) NOT NULL,
-  `Complete` BOOLEAN NOT NULL,
+  `Complete` tinyint(1) NOT NULL,
   `UserId` varchar(255) NOT NULL,
+  `ListTitle` varchar(100) NOT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 
