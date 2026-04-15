@@ -8,7 +8,7 @@ namespace UsefulWebApps.Models.Friends
     {
         [Key]
         [Column("Id")]
-        public ulong Id { get; set; }
+        public long Id { get; set; }
 
         [Column("RequesterUserId")]
         [Required]

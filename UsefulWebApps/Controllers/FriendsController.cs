@@ -137,7 +137,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AcceptFriendRequest(ulong friendshipId)
+        public async Task<IActionResult> AcceptFriendRequest(long friendshipId)
         {
             bool success = await _unitOfWork.Friendships.UpdateStatus(friendshipId, FriendshipStatus.Accepted);
             TempData[success ? "success" : "error"] = success ? "Friend request accepted!" : "Something went wrong.";
@@ -145,7 +145,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeclineFriendRequest(ulong friendshipId)
+        public async Task<IActionResult> DeclineFriendRequest(long friendshipId)
         {
             bool success = await _unitOfWork.Friendships.UpdateStatus(friendshipId, FriendshipStatus.Declined);
             TempData[success ? "success" : "error"] = success ? "Friend request declined." : "Something went wrong.";

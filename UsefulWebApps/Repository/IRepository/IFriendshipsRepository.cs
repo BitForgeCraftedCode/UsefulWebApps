@@ -7,7 +7,7 @@ namespace UsefulWebApps.Repository.IRepository
         //any Friendships specific database methods here
         Task<Friendships?> GetExisting(string userId1, string userId2);
         Task<(List<UserProfiles> profiles, List<Friendships> friendships)> GetPendingRequestsWithProfiles(string addresseeUserId);
-        Task<bool> UpdateStatus(ulong friendshipId, FriendshipStatus status);
+        Task<bool> UpdateStatus(long friendshipId, FriendshipStatus status);
         Task<(List<UserProfiles> profiles, List<Friendships> friendships)> GetFriendsWithProfiles(string userId);
     }
 }

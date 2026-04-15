@@ -89,7 +89,7 @@ namespace UsefulWebApps.Repository
             return (profiles, friendships);
         }
 
-        public async Task<bool> UpdateStatus(ulong friendshipId, FriendshipStatus status)
+        public async Task<bool> UpdateStatus(long friendshipId, FriendshipStatus status)
         {
             string sql = @"UPDATE friendships SET Status = @status WHERE Id = @friendshipId";
             int rows = await _connection.ExecuteAsync(sql, new { friendshipId, status });
