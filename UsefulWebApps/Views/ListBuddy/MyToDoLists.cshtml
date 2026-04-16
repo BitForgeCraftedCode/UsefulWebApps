@@ -5,13 +5,51 @@
 @model UsefulWebApps.Models.ViewModels.ListBuddy.MyToDoListsVM
 
 <div class="text-center container pb-3">
-    <h1 class="display-3 mt-3">My To Do Lists</h1>
-    <div class="list-group max-width-250 mx-auto">
-        @foreach(string list in Model.MyToDoLists)
-        {
-            <a asp-controller="ListBuddy" asp-action="ToDoList" asp-route-list="@list" class="list-group-item list-group-item-action">@list</a>
-        }
-    </div>
+    <h1 class="display-3 mt-3">To Do Lists</h1>
+    @if (Model.MyToDoLists.Any())
+    {
+        <h3 class="mt-4">My Lists</h3>
+        <div class="list-group max-width-350 mx-auto">
+            @foreach (var list in Model.MyToDoLists)
+            {
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <a asp-controller="ListBuddy" asp-action="ToDoList" asp-route-listId="@list.Id" class="text-decoration-none flex-grow-1">
+                        @list.ListTitle
+                    </a>
+                    @if (Model.SharedToFriends.ContainsKey(list.Id))
+                    {
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-primary rounded-pill"
+                                  title="Shared with: @string.Join(", ", Model.SharedToFriends[list.Id])">
+                                Shared
+                            </span>
+                            <form method="post" asp-action="UnshareList" class="unshare-list">
+                                <input type="hidden" name="listId" value="@list.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Unshare</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="mt-4">You don't have any lists yet.</p>
+    }
+        
+    @if (Model.SharedWithMeToDoLists.Any())
+    {
+        <h3 class="mt-4">Shared With Me</h3>
+        <div class="list-group max-width-350 mx-auto">
+            @foreach (var share in Model.SharedWithMeToDoLists)
+            {
+                <a asp-controller="ListBuddy" asp-action="ToDoList" asp-route-listId="@share.Id" class="list-group-item list-group-item-action">
+                    @share.ListTitle
+                </a>
+            }
+        </div>
+    }
     <div class="max-width-250 mx-auto mt-3">
         <div class="mb-3">
             <a asp-controller="ListBuddy" asp-action="CreateToDoList" class="btn w-100">Add New To Do List</a>

@@ -249,11 +249,18 @@ namespace UsefulWebApps.Controllers
         public async Task<IActionResult> MyToDoLists() 
         {
             ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<string> myToDoLists = await _unitOfWork.ToDoList.GetMyToDoLists(userId);
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            List<ToDoLists> myToDoLists = (List<ToDoLists>)await _unitOfWork.ToDoLists.GetAllWhere("UserId", userId);
+            List<ToDoLists> sharedWithMe = await _unitOfWork.ToDoListShares.GetToDoListsSharedWithUser(userId);
+            Dictionary<long, List<string>> sharedToMap = await _unitOfWork.ToDoListShares.GetSharedToMapForOwner(userId);
+
             MyToDoListsVM myToDoListsVM = new()
             {
                 MyToDoLists = myToDoLists,
+                SharedWithMeToDoLists = sharedWithMe,
+                SharedToFriends = sharedToMap
             };
             return View(myToDoListsVM); 
         }

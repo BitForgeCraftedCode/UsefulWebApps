@@ -76,10 +76,12 @@ namespace UsefulWebApps.Repository
 
         public IToDoListRepository ToDoList {  get; private set; }
         public IToDoListsRepository ToDoLists { get; private set; }
+        public IToDoListSharesRepository ToDoListShares { get; private set; } 
         public IGroceryListRepository GroceryList { get; private set; }
         public IRecipeRepository Recipe { get; private set; }
         public IManageAccountDataRepository ManageAccountData { get; private set; }
         public INotesRepository Notes { get; private set; }
+        public INoteSharesRepository NoteShares { get; private set; }
         public IQuickLinksRepository QuickLinks { get; private set; }
         public ISlideShowRepository SlideShow { get; private set; }
         public IQuotesRepository Quotes { get; private set; }
@@ -87,7 +89,6 @@ namespace UsefulWebApps.Repository
         public ICalendarEventsRepository CalendarEvents { get; private set; }
         public IFriendshipsRepository Friendships { get; private set; }
         public IUserProfilesRepository UserProfiles { get; private set; }
-        public INoteSharesRepository NoteShares { get; private set; }
         //other repos here
 
         public UnitOfWork(MySqlConnection connection)
@@ -97,10 +98,12 @@ namespace UsefulWebApps.Repository
             // Initialize repositories
             ToDoList = new  ToDoListRepository(_connection);
             ToDoLists = new ToDoListsRepository(_connection);
+            ToDoListShares = new ToDoListSharesRepository(_connection);
             GroceryList = new GroceryListRepository(_connection);
             Recipe = new RecipeRepository(_connection);
             ManageAccountData = new ManageAccountDataRepository(_connection);
             Notes = new NotesRepository(_connection);
+            NoteShares = new NoteSharesRepository(_connection);
             QuickLinks = new QuickLinksRepository(_connection);
             SlideShow = new SlideShowRepository(_connection);
             Quotes = new QuotesRepository(_connection);
@@ -108,7 +111,6 @@ namespace UsefulWebApps.Repository
             CalendarEvents = new CalendarEventsRepository(_connection);
             Friendships = new FriendshipsRepository(_connection);
             UserProfiles = new UserProfilesRepository(_connection);
-            NoteShares = new NoteSharesRepository(_connection);
         }
 
         public async Task OpenConnectionAsync()

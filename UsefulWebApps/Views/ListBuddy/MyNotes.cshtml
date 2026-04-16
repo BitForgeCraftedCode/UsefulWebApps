@@ -5,7 +5,8 @@
 @model UsefulWebApps.Models.ViewModels.ListBuddy.NotesVM
 
 <div class="text-center container pb-3">
-    <h1 class="display-3 mt-3">My Notes</h1>
+    <h1 class="display-3 mt-3">Notes</h1>
+    <h3 class="mt-4">My Notes</h3>
     <div class="list-group max-width-350 mx-auto">
         @foreach (var note in Model.MyNotes)
         {
@@ -32,7 +33,7 @@
     </div>
     @if (Model.SharedWithMeNotes.Any())
     {
-        <h1 class="display-3 mt-3">Shared With Me</h1>
+        <h3 class="mt-4">Shared With Me</h3>
         <div class="list-group max-width-350 mx-auto">
             @foreach (var note in Model.SharedWithMeNotes)
             {
