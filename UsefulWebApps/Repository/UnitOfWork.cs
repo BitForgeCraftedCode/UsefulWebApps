@@ -75,6 +75,7 @@ namespace UsefulWebApps.Repository
         private bool _disposed = false;
 
         public IToDoListRepository ToDoList {  get; private set; }
+        public IToDoListsRepository ToDoLists { get; private set; }
         public IGroceryListRepository GroceryList { get; private set; }
         public IRecipeRepository Recipe { get; private set; }
         public IManageAccountDataRepository ManageAccountData { get; private set; }
@@ -95,6 +96,7 @@ namespace UsefulWebApps.Repository
 
             // Initialize repositories
             ToDoList = new  ToDoListRepository(_connection);
+            ToDoLists = new ToDoListsRepository(_connection);
             GroceryList = new GroceryListRepository(_connection);
             Recipe = new RecipeRepository(_connection);
             ManageAccountData = new ManageAccountDataRepository(_connection);

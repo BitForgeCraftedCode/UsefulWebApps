@@ -11,6 +11,7 @@
 
         // Repositories
         IToDoListRepository ToDoList {  get; }
+        IToDoListsRepository ToDoLists { get; }
         IGroceryListRepository GroceryList { get; }
         IRecipeRepository Recipe { get; }
         IManageAccountDataRepository ManageAccountData { get; }
