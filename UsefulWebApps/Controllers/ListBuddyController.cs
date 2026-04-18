@@ -83,9 +83,6 @@ namespace UsefulWebApps.Controllers
             obj.Note = sanitizer.Sanitize(obj.Note);
             if (ModelState.IsValid)
             {
-                //fix generic repo to not insert db generated cols
-                obj.CreatedAt = DateTime.UtcNow;
-                obj.UpdatedAt = DateTime.UtcNow;
                 bool success = await _unitOfWork.Notes.Add(obj);
                 if (success)
                 {
@@ -418,9 +415,6 @@ namespace UsefulWebApps.Controllers
 
             if (ModelState.IsValid) 
             {
-                //fix generic repo to not insert db generated cols
-                toDoList.CreatedAt = DateTime.UtcNow;
-                toDoList.UpdatedAt = DateTime.UtcNow;
                 bool success = await _unitOfWork.ToDoLists.Add(toDoList);
                 if (success)
                 {

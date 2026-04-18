@@ -22,9 +22,11 @@ namespace UsefulWebApps.Models.Friends
         public FriendshipStatus Status { get; set; } = FriendshipStatus.Pending;
 
         [Column("CreatedAt")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; }
 
         [Column("UpdatedAt")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
     }
     public enum FriendshipStatus : byte

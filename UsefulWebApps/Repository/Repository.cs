@@ -179,19 +179,26 @@ namespace UsefulWebApps.Repository
             }
             return null;
         }
+        private static IEnumerable<PropertyInfo> GetScaffoldableProperties(bool excludeKey = false)
+        {
+            return typeof(T).GetProperties().Where(p =>
+            {
+                // Exclude key if requested
+                // p.IsDefined(typeof(KeyAttribute) returns true for key column and false otherwise
+                if (excludeKey && p.IsDefined(typeof(KeyAttribute)))
+                    return false;
 
+                // Exclude DB generated fields (Identity or Computed)
+                DatabaseGeneratedAttribute? dbGenerated = p.GetCustomAttribute<DatabaseGeneratedAttribute>();
+                if (dbGenerated != null && dbGenerated.DatabaseGeneratedOption != DatabaseGeneratedOption.None)
+                    return false;
+
+                return true;
+            });
+        }
         private static string GetColumns(bool excludeKey = false)
         {
-            //https://stackoverflow.com/questions/2439142/c-sharp-linq-statements-with-or-clauses
-            /*
-             * p.IsDefined(typeof(KeyAttribute) returns true for key column and false otherwise
-             * thus the Where() will return all non key column when exclued key is true
-             * 
-             * also builds string with propery names if Column attribute is not defined 
-             */
-            Type type = typeof(T);
-            string columns = string.Join(", ", type.GetProperties()
-                .Where(p => !excludeKey || !p.IsDefined(typeof(KeyAttribute)))
+            string columns = string.Join(", ", GetScaffoldableProperties(excludeKey)
                 .Select(p =>
                 {
                     var columnAttr = p.GetCustomAttribute<ColumnAttribute>();
@@ -200,16 +207,11 @@ namespace UsefulWebApps.Repository
 
             return columns;
         }
-
+        
         private static string GetPropertyNames(bool excludeKey = false)
         {
-            var properties = typeof(T).GetProperties()
-                .Where(p => !excludeKey || p.GetCustomAttribute<KeyAttribute>() == null);
-
-            var values = string.Join(", ", properties.Select(p =>
-            {
-                return $"@{p.Name}";
-            }));
+            string values = string.Join(", ", GetScaffoldableProperties(excludeKey)
+                .Select(p => $"@{p.Name}"));
 
             return values;
         }

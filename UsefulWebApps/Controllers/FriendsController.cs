@@ -106,9 +106,6 @@ namespace UsefulWebApps.Controllers
                 RequesterUserId = requesterId,
                 AddresseeUserId = userProfile.UserId,
                 Status = FriendshipStatus.Pending,
-                //fix generic repo to not insert db generated cols
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
             };
 
             bool success = await _unitOfWork.Friendships.Add(friendship);

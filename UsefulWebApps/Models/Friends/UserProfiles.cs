@@ -19,9 +19,11 @@ namespace UsefulWebApps.Models.Friends
         public string? AvatarPath { get; set; }
 
         [Column("CreatedAt")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; }
 
         [Column("UpdatedAt")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
     }
 }
