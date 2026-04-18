@@ -250,6 +250,70 @@ namespace UsefulWebApps.Controllers
 
         #region To Do List
 
+        public async Task<IActionResult> ShareToDoList(long? id)
+        {
+            if (id == null || id == 0) return NotFound();
+
+            ClaimsPrincipal currentUser = this.User;
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(id);
+
+            // Only the owner can share their list
+            if (toDoList.UserId != userId)
+            {
+                TempData["error"] = "You can only share your own lists.";
+                return RedirectToAction("MyToDoLists");
+            }
+
+            // Get friends to populate dropdown
+            (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetFriendsWithProfiles(userId);
+
+            IEnumerable<SelectListItem> friendsList = result.profiles.Select(p => new SelectListItem
+            {
+                //?? null-coalescing operator
+                Text = p.DisplayName ?? p.UserId,
+                Value = p.UserId
+            });
+
+            ShareToDoListVM vm = new()
+            {
+                ListId = toDoList.Id,
+                ListTitle = toDoList.ListTitle,
+                FriendsList = friendsList
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ShareToDoList(ShareToDoListVM vm)
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            // Server-side: verify these two users are actually friends
+            Friendships? friendship = await _unitOfWork.Friendships.GetExisting(userId, vm.SelectedFriendUserId);
+            if (friendship == null || friendship.Status != FriendshipStatus.Accepted)
+            {
+                TempData["error"] = "You can only share lists with friends.";
+                return RedirectToAction("MyToDoLists");
+            }
+            ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(vm.ListId);
+            // Verify the list belongs to the current user
+            if (toDoList.UserId != userId)
+            {
+                TempData["error"] = "You can only share your own lists.";
+                return RedirectToAction("MyToDoLists");
+            }
+            bool success = await _unitOfWork.ToDoListShares.ShareToDoList(vm.ListId, vm.SelectedFriendUserId);
+            TempData[success ? "success" : "error"] = success
+                ? "List shared successfully."
+                : "Could not share list. It may already be shared with this friend.";
+
+            return RedirectToAction("ToDoList", new { listId = vm.ListId });
+        }
         public async Task<IActionResult> MyToDoLists() 
         {
             ClaimsPrincipal currentUser = this.User;

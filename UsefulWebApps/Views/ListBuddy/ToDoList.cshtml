@@ -40,10 +40,19 @@
             <button type="submit" class="btn btn-danger mb-3 w-100">Delete All</button>
         </div>
         <div>
-            <a asp-controller="ListBuddy" asp-action="MyToDoLists" class="btn btn-outline-dark w-100">Back To My Lists</a>
+            <a asp-controller="ListBuddy" asp-action="MyToDoLists" class="btn btn-outline-dark mb-3 w-100">Back To My Lists</a>
         </div>
     </form>
-
+    @if (Model.ToDoList.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+    {
+        <div class="max-width-175 mx-auto row">
+            <div class="col-12 ps-0 pe-0">
+                <a asp-controller="ListBuddy" asp-action="ShareToDoList" asp-route-id="@Model.ToDoList.Id" class="btn btn-outline-dark mb-3 w-100">
+                    Share List
+                </a>
+            </div>
+        </div>
+    }
 </div>
 <!--Partial View scripts-->
 @section Scripts {

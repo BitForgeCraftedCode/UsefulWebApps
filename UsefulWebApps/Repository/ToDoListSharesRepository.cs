@@ -9,6 +9,15 @@ namespace UsefulWebApps.Repository
     {
         public ToDoListSharesRepository(MySqlConnection connection) : base(connection) { }
         //any ToDoListShares model specific database methods here
+
+        public async Task<bool> ShareToDoList(long listId, string sharedWithUserId)
+        {
+            //IGNORE so it will not throw duplicate key error if trying to share same list with same user twice
+            string sql = @"INSERT IGNORE INTO to_do_list_shares (ListId, SharedWithUserId) 
+                           VALUES (@listId, @sharedWithUserId)";
+            int rows = await _connection.ExecuteAsync(sql, new { listId, sharedWithUserId });
+            return rows > 0;
+        }
         public async Task<List<ToDoLists>> GetToDoListsSharedWithUser(string userId)
         {
             string sql = @"SELECT td.* FROM to_do_lists td
