@@ -4,7 +4,9 @@ namespace UsefulWebApps.Models.ViewModels.ListBuddy
 {
     public class ToDoListVM
     {
-        public ToDoList ToDoList { get; set; }
-        public List<ToDoList> ToDoListItems { get; set; }
+        public ToDoLists ToDoList { get; set; }
+        public List<ToDoItems> ToDoListItems { get; set; }
+
+        public ToDoItems ToDoItem { get; set; }
     }
 }

@@ -2,24 +2,25 @@
     ViewData["Title"] = "Edit To Do List";
 }
 
-@model UsefulWebApps.Models.ListBuddy.ToDoList
+@model UsefulWebApps.Models.ListBuddy.ToDoItems
 
 <div class="text-center max-width-550 mx-auto container pb-3">
     <h1 class="display-3 mt-3">Edit</h1>
     <form method="post">
         <div class="input-group mb-3 mt-3">
             <input asp-for="Id" hidden />
+            <input asp-for="ListId" hidden />
             <input asp-for="Complete" hidden />
-            <input asp-for="ListTitle" hidden />
+            <input asp-for="SortOrder" hidden />
             <input asp-for="ToDoItem" type="text" class="form-control" placeholder="New Item" />
-            <input asp-for="UserId" hidden />
+            
             <button class="btn btn-outline-dark" type="submit">Edit Item</button>
         </div>
         <div class="mb-3">
             <span asp-validation-for="ToDoItem" class="text-danger"></span>
         </div>
         <div>
-            <a asp-controller="ListBuddy" asp-action="ToDoList" asp-route-list="@Model.ListTitle" class="btn btn-outline-dark">Back to List</a>
+            <a asp-controller="ListBuddy" asp-action="ToDoList" asp-route-listId="@Model.ListId" class="btn btn-outline-dark">Back to List</a>
         </div>
     </form>
 </div>

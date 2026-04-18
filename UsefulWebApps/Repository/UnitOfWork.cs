@@ -74,8 +74,8 @@ namespace UsefulWebApps.Repository
         private MySqlTransaction? _transaction;
         private bool _disposed = false;
 
-        public IToDoListRepository ToDoList {  get; private set; }
         public IToDoListsRepository ToDoLists { get; private set; }
+        public IToDoItemsRepository ToDoItems { get; private set; }
         public IToDoListSharesRepository ToDoListShares { get; private set; } 
         public IGroceryListRepository GroceryList { get; private set; }
         public IRecipeRepository Recipe { get; private set; }
@@ -96,8 +96,8 @@ namespace UsefulWebApps.Repository
             _connection = connection;
 
             // Initialize repositories
-            ToDoList = new  ToDoListRepository(_connection);
             ToDoLists = new ToDoListsRepository(_connection);
+            ToDoItems = new ToDoItemsRepository(_connection);
             ToDoListShares = new ToDoListSharesRepository(_connection);
             GroceryList = new GroceryListRepository(_connection);
             Recipe = new RecipeRepository(_connection);
@@ -149,16 +149,21 @@ namespace UsefulWebApps.Repository
         // Propagate transaction to all repositories
         private void PropagateTransaction(MySqlTransaction? txn)
         {
-            ToDoList.SetTransaction(txn);
+            ToDoLists.SetTransaction(txn);
+            ToDoItems.SetTransaction(txn);
+            ToDoListShares.SetTransaction(txn);
             GroceryList.SetTransaction(txn);
             Recipe.SetTransaction(txn);
             ManageAccountData.SetTransaction(txn);
             Notes.SetTransaction(txn);
+            NoteShares.SetTransaction(txn);
             QuickLinks.SetTransaction(txn);
             SlideShow.SetTransaction(txn);
             Quotes.SetTransaction(txn);
             Locations.SetTransaction(txn);
             CalendarEvents.SetTransaction(txn);
+            Friendships.SetTransaction(txn);
+            UserProfiles.SetTransaction(txn);
         }
 
         // Async disposal -- DisposeAsync is called automatically by ASP.NET Core DI AddScoped

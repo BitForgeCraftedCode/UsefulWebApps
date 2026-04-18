@@ -1,4 +1,5 @@
 ﻿using Ganss.Xss;
+using Google.Protobuf.Collections;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -82,6 +83,9 @@ namespace UsefulWebApps.Controllers
             obj.Note = sanitizer.Sanitize(obj.Note);
             if (ModelState.IsValid)
             {
+                //fix generic repo to not insert db generated cols
+                obj.CreatedAt = DateTime.UtcNow;
+                obj.UpdatedAt = DateTime.UtcNow;
                 bool success = await _unitOfWork.Notes.Add(obj);
                 if (success)
                 {
@@ -265,28 +269,33 @@ namespace UsefulWebApps.Controllers
             return View(myToDoListsVM); 
         }
 
-        public async Task<IActionResult> ToDoList(string list)
+        public async Task<IActionResult> ToDoList(long? listId)
         {
+            if (listId == null || listId == 0)
+            {
+                return NotFound();
+            }
             ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            List<ToDoList> listItems = await _unitOfWork.ToDoList.GetAllItemsInList(userId, list);
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(listId);
+
+            List<ToDoItems> listItems = await _unitOfWork.ToDoLists.GetAllItemsInList(listId);
             ToDoListVM toDoListVM = new()
             {
+                ToDoList = toDoList,
                 ToDoListItems = listItems,
-                ToDoList = new ToDoList
-                {
-                    UserId = userId,
-                    ListTitle = list,
-                }
+                ToDoItem = new ToDoItems { ListId = (long)listId },
             };
             return View(toDoListVM);
         }
 
         //transaction method
         [HttpPost]
-        public async Task<IActionResult> ToDoListToggleComplete(long? id, string listTitle)
+        public async Task<IActionResult> ToDoListToggleComplete(long? id, long? listId)
         {
-            if (id == null || id == 0 || listTitle == "" || listTitle == null)
+            if (id == null || id == 0 || listId == 0 || listId == null)
             {
                 return NotFound();
             }
@@ -294,16 +303,13 @@ namespace UsefulWebApps.Controllers
             string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            List<ToDoList> listItems = await _unitOfWork.ToDoList.ToDoListToggleComplete(id, userId, listTitle);
+            (ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoLists.ToDoListToggleComplete((long)id, (long)listId);
             await _unitOfWork.CommitAsync();
             ToDoListVM toDoListVM = new()
             {
-                ToDoListItems = listItems,
-                ToDoList = new ToDoList
-                {
-                    UserId = userId,
-                    ListTitle = listTitle
-                }
+                ToDoList = result.toDoList,
+                ToDoListItems = result.listItems,
+                ToDoItem = new ToDoItems { ListId = (long)listId },
             };
             return PartialView("_ToDoListPartial", toDoListVM);
         }
@@ -311,8 +317,10 @@ namespace UsefulWebApps.Controllers
         public IActionResult CreateToDoList()
         {
             ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            ToDoList toDoList = new ToDoList
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            ToDoLists toDoList = new ToDoLists
             {
                 UserId = userId
             };
@@ -321,22 +329,24 @@ namespace UsefulWebApps.Controllers
         }
         //create a new ToDoList
         [HttpPost]
-        public async Task<IActionResult> CreateToDoList(ToDoList toDoList)
+        public async Task<IActionResult> CreateToDoList(ToDoLists toDoList)
         {
 
             if (ModelState.IsValid) 
             {
-                bool success = await _unitOfWork.ToDoList.Add(toDoList);
+                //fix generic repo to not insert db generated cols
+                toDoList.CreatedAt = DateTime.UtcNow;
+                toDoList.UpdatedAt = DateTime.UtcNow;
+                bool success = await _unitOfWork.ToDoLists.Add(toDoList);
                 if (success)
                 {
                     TempData["success"] = "To do list created successfully.";
-                    return RedirectToAction("ToDoList", new { list = toDoList.ListTitle });
                 }
                 else
                 {
                     TempData["error"] = "Create to do list error. Try again.";
-                    return RedirectToAction("MyToDoLists");
                 }
+                return RedirectToAction("MyToDoLists");
             }
             TempData["error"] = "Create to do list error. Try again.";
             return RedirectToAction("MyToDoLists");
@@ -345,22 +355,19 @@ namespace UsefulWebApps.Controllers
         //transaction method
         //add new item to already existing ToDoList
         [HttpPost]
-        public async Task<IActionResult> ToDoListAddItem(ToDoList toDoList)
+        public async Task<IActionResult> ToDoListAddItem(ToDoItems toDoItem)
         {
             if (ModelState.IsValid)
             {
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
-                List<ToDoList> listItems = await _unitOfWork.ToDoList.ToDoListAdd(toDoList);
+                (ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoItems.ToDoListAddItem(toDoItem);
                 await _unitOfWork.CommitAsync();
                 ToDoListVM toDoListVM = new()
                 {
-                    ToDoListItems = listItems,
-                    ToDoList = new ToDoList
-                    {
-                        UserId = toDoList.UserId,
-                        ListTitle= toDoList.ListTitle
-                    }
+                    ToDoList = result.toDoList,
+                    ToDoListItems = result.listItems,
+                    ToDoItem = new ToDoItems { ListId = toDoItem.ListId },
                 };
                 return PartialView("_ToDoListPartial", toDoListVM);
             }
@@ -374,7 +381,7 @@ namespace UsefulWebApps.Controllers
             {
                 return Json("error id was 0 or null");
             }
-            await _unitOfWork.ToDoList.Delete(id);
+            await _unitOfWork.ToDoItems.Delete(id);
             string jsonString = """
             { 
                 "deleteId": "ID"
@@ -386,14 +393,11 @@ namespace UsefulWebApps.Controllers
 
         [HttpPost]
         [Route("/ListBuddy/ToDoListDeleteAll", Name = "deleteAllToDoList")]
-        public async Task<IActionResult> ToDoListDeleteAll(ToDoList toDoList)
+        public async Task<IActionResult> ToDoListDeleteAll(ToDoLists toDoList)
         {
-            toDoList.ToDoItem = "dummy item";
-            ModelState.Clear();
-            TryValidateModel(toDoList);
             if (ModelState.IsValid) 
             {
-                bool success = await _unitOfWork.ToDoList.DeleteAllItemsInList(toDoList.UserId, toDoList.ListTitle);
+                bool success = await _unitOfWork.ToDoLists.Delete(toDoList.Id);
                 if (success)
                 {
                     TempData["success"] = "To do list deleted successfully.";
@@ -414,16 +418,16 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             } 
-            ToDoList toDoList = await _unitOfWork.ToDoList.GetById(id);
-            return View(toDoList);
+            ToDoItems toDoItem = await _unitOfWork.ToDoItems.GetById(id);
+            return View(toDoItem);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ToDoListEdit(ToDoList obj)
+        public async Task<IActionResult> ToDoListEdit(ToDoItems obj)
         {
             if (ModelState.IsValid)
             {
-                bool success = await _unitOfWork.ToDoList.Update(obj);
+                bool success = await _unitOfWork.ToDoItems.Update(obj);
                 if (success)
                 {
                     TempData["success"] = "To do item updated successfully.";
@@ -432,7 +436,7 @@ namespace UsefulWebApps.Controllers
                 {
                     TempData["error"] = "Update to do item error. Try again.";
                 }
-                return RedirectToAction("ToDoList", new { list = obj.ListTitle });
+                return RedirectToAction("ToDoList", new { listId = obj.ListId });
             }
             TempData["error"] = "Update to do item error. Try again.";
             return RedirectToAction("MyToDoLists");

@@ -6,7 +6,7 @@
                 form.submit();
             }
             else {
-                toastr.success("Item has NOT been deleted");
+                toastr.success("List has NOT been deleted");
             }
         });
     }
@@ -14,8 +14,8 @@
 
 $("#add-to-do-item").validate({
     rules: {
-        //ToDoList.ToDoItem is just the name of the html element
-        "ToDoList.ToDoItem": {
+        //ToDoItem.ToDoItem is just the name of the html element
+        "ToDoItem.ToDoItem": {
             required: true,
             minlength: 3,
             maxlength: 100,
@@ -29,7 +29,7 @@ $("#add-to-do-item").validate({
         }
     },
     messages: {
-        "ToDoList.ToDoItem": {
+        "ToDoItem.ToDoItem": {
             required: "To Do Item Is Required.",
             minlength: "Please Enter At Least 3 Characters.",
             maxlength: "No More Than 100 Characters."
@@ -49,7 +49,7 @@ $("#add-to-do-item").validate({
             success: function (response) {
                 $("#to-do-list-container").empty();
                 $("#to-do-list-container").append(response);
-                $("#ToDoList_ToDoItem").val("");
+                $("#ToDoItem_ToDoItem").val("");
             },
             error: function (request, status, error) {
                 console.log(request.responseText);
@@ -93,10 +93,10 @@ function deleteToDo(deleteId) {
         }
     });
 }
-function toggleComplete(toggleId, title) {
+function toggleComplete(id, listId) {
     var formData = {
-        id: toggleId,
-        listTitle: title
+        id: id,
+        listId: listId
     };
     $.ajax({
         url: "/ListBuddy/ToDoListToggleComplete",

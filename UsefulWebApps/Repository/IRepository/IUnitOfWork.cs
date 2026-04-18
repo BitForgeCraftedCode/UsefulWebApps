@@ -10,8 +10,8 @@
         void Dispose();
 
         // Repositories
-        IToDoListRepository ToDoList {  get; }
         IToDoListsRepository ToDoLists { get; }
+        IToDoItemsRepository ToDoItems { get; }
         IToDoListSharesRepository ToDoListShares { get; }
         IGroceryListRepository GroceryList { get; }
         IRecipeRepository Recipe { get; }

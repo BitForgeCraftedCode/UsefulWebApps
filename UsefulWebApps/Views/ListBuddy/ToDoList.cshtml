@@ -22,19 +22,20 @@
     <form method="post" class="max-width-550" id="add-to-do-item">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->
-            <input asp-for="ToDoList.ListTitle" hidden />
-            <input asp-for="ToDoList.Complete" hidden />
-            <input asp-for="ToDoList.UserId" hidden />
-            <input asp-for="ToDoList.ToDoItem" type="text" class="form-control" placeholder="New Item" minlength="3" maxlength="100" />
+            <input asp-for="ToDoItem.ListId" type="hidden" />
+            <input asp-for="ToDoItem.Complete" type="hidden" />
+            <input asp-for="ToDoItem.SortOrder" type="hidden" />
+            <input asp-for="ToDoItem.ToDoItem" type="text" class="form-control" placeholder="New Item" minlength="3" maxlength="100" />
             <button class="btn btn-outline-dark" type="submit">Add Item</button>
         </div>
         <div class="mb-3" id="new-to-do-error"></div>
     </form>
     <form method="post" asp-route="deleteAllToDoList" class="max-width-175 mx-auto" id="delete-all-to-do">
-        <input asp-for="ToDoList.ListTitle" hidden />
-        <input asp-for="ToDoList.Complete" hidden />
+        <input asp-for="ToDoList.Id" hidden />
         <input asp-for="ToDoList.UserId" hidden />
-        <input asp-for="ToDoList.ToDoItem" hidden />
+        <input asp-for="ToDoList.ListTitle" hidden />
+        <input asp-for="ToDoList.Version" hidden />
+      
         <div>
             <button type="submit" class="btn btn-danger mb-3 w-100">Delete All</button>
         </div>
