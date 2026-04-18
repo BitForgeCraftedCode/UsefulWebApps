@@ -86,20 +86,25 @@ namespace UsefulWebApps.Repository
             string keyColumn = GetKeyColumnName();
             string keyProperty = GetKeyPropertyName();
 
+            List<PropertyInfo> properties = GetScaffoldableProperties(excludeKey: true).ToList();
+            // Safety: avoid empty SET clause
+            if (!properties.Any())
+                throw new Exception("No updatable properties found.");
+
             StringBuilder query = new StringBuilder();
             query.Append($"UPDATE {tableName} SET ");
 
-            foreach (var property in GetProperties(true))
+            foreach (var property in properties)
             {
                 var columnAttr = property.GetCustomAttribute<ColumnAttribute>();
 
                 string propertyName = property.Name;
-                string columnName = columnAttr.Name;
+                string columnName = columnAttr?.Name ?? propertyName;
 
                 query.Append($"{columnName} = @{propertyName},");
             }
             //remove last , in query -- UPDATE table_name SET column1 = value1, column2 = value2, WHERE id = @id
-            query.Remove(query.Length - 1, 1);
+            query.Remove(query.Length - 1, 1); // remove last comma
 
             query.Append($" WHERE {keyColumn} = @{keyProperty}");
             //https://github.com/DapperLib/Dapper/issues/540
@@ -214,14 +219,6 @@ namespace UsefulWebApps.Repository
                 .Select(p => $"@{p.Name}"));
 
             return values;
-        }
-
-        private static IEnumerable<PropertyInfo> GetProperties(bool excludeKey = false)
-        {
-            var properties = typeof(T).GetProperties()
-                .Where(p => !excludeKey || p.GetCustomAttribute<KeyAttribute>() == null);
-
-            return properties;
         }
 
         private static string GetKeyPropertyName()
