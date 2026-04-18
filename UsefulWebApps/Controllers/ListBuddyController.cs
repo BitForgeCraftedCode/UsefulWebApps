@@ -249,7 +249,27 @@ namespace UsefulWebApps.Controllers
         #endregion
 
         #region To Do List
+        [HttpPost]
+        public async Task<IActionResult> UnshareToDoList(long listId)
+        {
+            ClaimsPrincipal currentUser = this.User;
+            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId)) return NotFound();
 
+            ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(listId);
+            // Only the owner can share their list
+            if (toDoList.UserId != userId)
+            {
+                TempData["error"] = "You can only manage sharing on your own lists.";
+                return RedirectToAction("MyToDoLists");
+            }
+            bool success = await _unitOfWork.ToDoListShares.UnshareToDoList(listId);
+            TempData[success ? "success" : "error"] = success
+                ? "List unshared."
+                : "Could not unshare list.";
+
+            return RedirectToAction("MyToDoLists");
+        }
         public async Task<IActionResult> ShareToDoList(long? id)
         {
             if (id == null || id == 0) return NotFound();

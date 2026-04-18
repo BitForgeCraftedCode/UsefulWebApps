@@ -23,7 +23,7 @@
                                   title="Shared with: @string.Join(", ", Model.SharedToFriends[list.Id])">
                                 Shared
                             </span>
-                            <form method="post" asp-action="UnshareList" class="unshare-list">
+                            <form method="post" asp-action="UnshareToDoList" class="unshare-list">
                                 <input type="hidden" name="listId" value="@list.Id" />
                                 <button type="submit" class="btn btn-sm btn-outline-danger">Unshare</button>
                             </form>
