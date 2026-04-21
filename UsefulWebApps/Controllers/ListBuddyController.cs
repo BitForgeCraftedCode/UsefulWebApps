@@ -372,19 +372,31 @@ namespace UsefulWebApps.Controllers
             return View(toDoListVM);
         }
 
-        //transaction method -- needs version check/concurrency
+        //transaction method -- Concurrent
         [HttpPost]
-        public async Task<IActionResult> ToDoListToggleComplete(long? id, long? listId)
+        public async Task<IActionResult> ToDoListToggleComplete(long? id, long? listId, int listVersion)
         {
             if (id == null || id == 0 || listId == 0 || listId == null)
-            {
                 return NotFound();
-            }
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            (ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoLists.ToDoListToggleComplete((long)id, (long)listId);
+            (bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoLists.ToDoListToggleComplete((long)id, (long)listId, listVersion);
+
+            if (!result.success)
+            {
+                await _unitOfWork.RollbackAsync();
+                ToDoListVM conflictVM = new()
+                {
+                    ToDoList = result.toDoList,
+                    ToDoListItems = result.listItems,
+                    ToDoItem = new ToDoItems { ListId = (long)listId },
+                };
+                // Return the refreshed list so JS can update the UI + signal the conflict
+                Response.Headers["X-Concurrency-Conflict"] = "true";
+                return PartialView("_ToDoListPartial", conflictVM);
+            }
+
             await _unitOfWork.CommitAsync();
             ToDoListVM toDoListVM = new()
             {
@@ -449,6 +461,7 @@ namespace UsefulWebApps.Controllers
                         ToDoListItems = result.listItems,
                         ToDoItem = new ToDoItems { ListId = toDoItem.ListId },
                     };
+                    // Return the refreshed list so JS can update the UI + signal the conflict
                     Response.Headers["X-Concurrency-Conflict"] = "true";
                     return PartialView("_ToDoListPartial", conflictVM);
                 }

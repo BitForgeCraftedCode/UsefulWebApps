@@ -7,6 +7,6 @@ namespace UsefulWebApps.Repository.IRepository
         //any ToDoLists model specific database methods here
         Task<List<ToDoItems>> GetAllItemsInList(long? listId);
 
-        Task<(ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListToggleComplete(long id, long listId);
+        Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListToggleComplete(long id, long listId, int expectedVersion);
     }
 }

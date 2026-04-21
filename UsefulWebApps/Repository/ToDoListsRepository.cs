@@ -18,28 +18,32 @@ namespace UsefulWebApps.Repository
         }
 
         //transaction method
-        public async Task<(ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListToggleComplete(long id, long listId)
+        public async Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListToggleComplete(long id, long listId, int expectedVersion)
         {
-            string sql = "SELECT * FROM to_do_lists WHERE Id = @listId";
-            ToDoLists toDoList = await _connection.QuerySingleAsync<ToDoLists>(sql, new { listId }, transaction: _transaction);
-            //toggle complete
-            string sql1 = "SELECT Complete FROM to_do_items WHERE Id = @id";
-            bool isComplete = await _connection.QuerySingleAsync<bool>(sql1, new { id }, transaction: _transaction);
-            string sql2 = String.Empty;
-            if (isComplete)
+            // Version check + bump
+            string sqlBump = @"UPDATE to_do_lists SET Version = Version + 1 
+                       WHERE Id = @listId AND Version = @expectedVersion";
+            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId, expectedVersion }, transaction: _transaction);
+            if (bumped == 0)
             {
-                sql2 = "UPDATE to_do_items SET Complete = False WHERE Id = @id";
+                ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
+                    "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
+                List<ToDoItems> currentItems = (List<ToDoItems>)await _connection.QueryAsync<ToDoItems>(
+                    "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder", new { listId }, transaction: _transaction);
+                return (false, true, current, currentItems);
             }
-            else
-            {
-                sql2 = "UPDATE to_do_items SET Complete = True WHERE Id = @id";
-            }
-            await _connection.ExecuteAsync(sql2, new { id }, transaction: _transaction);
-            //get all list tiems for listId
-            string sql3 = "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder";
-            List<ToDoItems> listItems = (List<ToDoItems>)await _connection.QueryAsync<ToDoItems>(sql3, new { listId }, transaction: _transaction);
-            return (toDoList, listItems);
-
+            // toggle
+            bool isComplete = await _connection.QuerySingleAsync<bool>(
+                "SELECT Complete FROM to_do_items WHERE Id = @id", new { id }, transaction: _transaction);
+            string sqlToggle = isComplete
+                ? "UPDATE to_do_items SET Complete = False WHERE Id = @id"
+                : "UPDATE to_do_items SET Complete = True WHERE Id = @id";
+            await _connection.ExecuteAsync(sqlToggle, new { id }, transaction: _transaction);
+            ToDoLists toDoList = await _connection.QuerySingleAsync<ToDoLists>(
+                "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
+            List<ToDoItems> listItems = (List<ToDoItems>)await _connection.QueryAsync<ToDoItems>(
+                "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder", new { listId }, transaction: _transaction);
+            return (true, false, toDoList, listItems);
         }
     }
 }
