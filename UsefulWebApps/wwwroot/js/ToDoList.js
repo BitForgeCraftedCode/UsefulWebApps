@@ -66,21 +66,22 @@ $("#add-to-do-item").validate({
         });
     }
 });
-function validateDeleteToDo(deleteId) {
+function validateDeleteToDo(deleteId, listId, listVersion) {
     //ask to confirm delete
     toastConfirm().then(deleteConfirm => {
         if (deleteConfirm == true) {
-            deleteToDo(deleteId);
+            deleteToDo(deleteId, listId, listVersion);
         }
         else {
             toastr.success("Item has NOT been deleted");
         }
     });
 }
-
-function deleteToDo(deleteId) {
+function deleteToDo(deleteId, listId, listVersion) {
     var formData = {
-        id: deleteId
+        id: deleteId,
+        listId: listId,
+        listVersion: listVersion
     };
     $.ajax({
         url: "/ListBuddy/ToDoListDeleteItem",
@@ -90,10 +91,18 @@ function deleteToDo(deleteId) {
                 $("#RequestVerificationToken")[0].value
         },
         data: formData,
-        dataType: "json",
-        success: function (response) {
-            var obj = JSON.parse(response);
-            $("#to-do-li-" + obj.deleteId).remove();
+        dataType: "html",
+        success: function (response, status, xhr) {
+            $("#to-do-list-container").empty();
+            $("#to-do-list-container").append(response);
+
+            // Sync the list version from the refreshed partial back to the add form
+            var newVersion = $("#to-do-list-container").find("#version-in-partial").val();
+            $("#version-add-form").val(newVersion);
+
+            if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
+                toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");
+            }
         },
         error: function (request, status, error) {
             console.log(request.responseText);

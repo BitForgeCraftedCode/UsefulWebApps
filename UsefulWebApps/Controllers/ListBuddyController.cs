@@ -478,22 +478,38 @@ namespace UsefulWebApps.Controllers
             return StatusCode(400);
         }
 
-        // needs version check/concurrency
+        //transaction method -- Concurrent
         [HttpPost]
-        public async Task<JsonResult> ToDoListDeleteItem(long? id)
+        public async Task<IActionResult> ToDoListDeleteItem(long? id, long? listId, int listVersion)
         {
-            if (id == null || id == 0)
+            if (id == null || id == 0 || listId == 0 || listId == null)
+                return NotFound();
+
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
+            (bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoItems.DeleteWithVersionCheck((long)id, (long)listId, listVersion);
+            if (!result.success) 
             {
-                return Json("error id was 0 or null");
+                await _unitOfWork.RollbackAsync();
+                ToDoListVM conflictVM = new()
+                {
+                    ToDoList = result.toDoList,
+                    ToDoListItems = result.listItems,
+                    ToDoItem = new ToDoItems { ListId = (long)listId },
+                };
+                // Return the refreshed list so JS can update the UI + signal the conflict
+                Response.Headers["X-Concurrency-Conflict"] = "true";
+                return PartialView("_ToDoListPartial", conflictVM);
+
             }
-            await _unitOfWork.ToDoItems.Delete(id);
-            string jsonString = """
-            { 
-                "deleteId": "ID"
-            }
-            """;
-            jsonString = jsonString.Replace("ID", $"{id}");
-            return Json(jsonString);
+            await _unitOfWork.CommitAsync();
+            ToDoListVM toDoListVM = new()
+            {
+                ToDoList = result.toDoList,
+                ToDoListItems = result.listItems,
+                ToDoItem = new ToDoItems { ListId = (long)listId },
+            };
+            return PartialView("_ToDoListPartial", toDoListVM);
         }
 
         [HttpPost]
