@@ -46,10 +46,18 @@ $("#add-to-do-item").validate({
             type: "POST",
             data: formData,
             dataType: "html",
-            success: function (response) {
+            success: function (response, status, xhr) {
                 $("#to-do-list-container").empty();
                 $("#to-do-list-container").append(response);
                 $("#ToDoItem_ToDoItem").val("");
+
+                // Sync the list version from the refreshed partial back to the add form
+                var newVersion = $("#to-do-list-container").find("#version-in-partial").val();
+                $("#version-add-form").val(newVersion);
+
+                if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
+                    toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");
+                }
             },
             error: function (request, status, error) {
                 console.log(request.responseText);

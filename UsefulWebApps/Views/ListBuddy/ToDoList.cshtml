@@ -22,6 +22,7 @@
     <form method="post" class="max-width-550" id="add-to-do-item">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->
+            <input asp-for="ToDoItem.ListVersion" value="@Model.ToDoList.Version" type="hidden" id="version-add-form" />
             <input asp-for="ToDoItem.ListId" type="hidden" />
             <input asp-for="ToDoItem.Complete" type="hidden" />
             <input asp-for="ToDoItem.SortOrder" type="hidden" />

@@ -25,5 +25,8 @@ namespace UsefulWebApps.Models.ListBuddy
 
         [Column("SortOrder")]
         public int SortOrder { get; set; } = 0;
+
+        [NotMapped]
+        public int ListVersion { get; set; } = 0;
     }
 }

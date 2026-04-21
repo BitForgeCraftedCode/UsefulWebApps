@@ -372,7 +372,7 @@ namespace UsefulWebApps.Controllers
             return View(toDoListVM);
         }
 
-        //transaction method
+        //transaction method -- needs version check/concurrency
         [HttpPost]
         public async Task<IActionResult> ToDoListToggleComplete(long? id, long? listId)
         {
@@ -430,8 +430,8 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("MyToDoLists");
         }
 
-        //transaction method
-        //add new item to already existing ToDoList
+        //transaction method -- Concurrent
+        //add new item to already existing ToDoList 
         [HttpPost]
         public async Task<IActionResult> ToDoListAddItem(ToDoItems toDoItem)
         {
@@ -439,7 +439,19 @@ namespace UsefulWebApps.Controllers
             {
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
-                (ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoItems.ToDoListAddItem(toDoItem);
+                (bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoItems.ToDoListAddItem(toDoItem);
+                if (!result.success)
+                {
+                    await _unitOfWork.RollbackAsync();
+                    ToDoListVM conflictVM = new()
+                    {
+                        ToDoList = result.toDoList,
+                        ToDoListItems = result.listItems,
+                        ToDoItem = new ToDoItems { ListId = toDoItem.ListId },
+                    };
+                    Response.Headers["X-Concurrency-Conflict"] = "true";
+                    return PartialView("_ToDoListPartial", conflictVM);
+                }
                 await _unitOfWork.CommitAsync();
                 ToDoListVM toDoListVM = new()
                 {
@@ -452,6 +464,7 @@ namespace UsefulWebApps.Controllers
             return StatusCode(400);
         }
 
+        // needs version check/concurrency
         [HttpPost]
         public async Task<JsonResult> ToDoListDeleteItem(long? id)
         {
@@ -500,6 +513,7 @@ namespace UsefulWebApps.Controllers
             return View(toDoItem);
         }
 
+        // needs version check/concurrency
         [HttpPost]
         public async Task<IActionResult> ToDoListEdit(ToDoItems obj)
         {
