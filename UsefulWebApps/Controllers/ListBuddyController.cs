@@ -372,6 +372,7 @@ namespace UsefulWebApps.Controllers
             return View(toDoListVM);
         }
 
+
         //transaction method -- Concurrent
         [HttpPost]
         public async Task<IActionResult> ToDoListToggleComplete(long? id, long? listId, int listVersion)
@@ -523,22 +524,38 @@ namespace UsefulWebApps.Controllers
                 return NotFound();
             } 
             ToDoItems toDoItem = await _unitOfWork.ToDoItems.GetById(id);
+            ToDoLists parentList = await _unitOfWork.ToDoLists.GetById(toDoItem.ListId);
+            toDoItem.ListVersion = parentList.Version;
             return View(toDoItem);
         }
 
-        // needs version check/concurrency
+        //transaction method -- Concurrent
         [HttpPost]
         public async Task<IActionResult> ToDoListEdit(ToDoItems obj)
         {
             if (ModelState.IsValid)
             {
-                bool success = await _unitOfWork.ToDoItems.Update(obj);
-                if (success)
+                await _unitOfWork.OpenConnectionAsync();
+                await _unitOfWork.BeginTxnAsync();
+                (bool success, bool wasConflict) result = await _unitOfWork.ToDoItems.UpdateWithVersionCheck(obj);
+                if (result.success == false && result.wasConflict == true)
                 {
+                    await _unitOfWork.RollbackAsync();
+                    ToDoItems latest = await _unitOfWork.ToDoItems.GetById(obj.Id);
+                    ToDoLists parentList = await _unitOfWork.ToDoLists.GetById(latest.ListId);
+                    latest.ListVersion = parentList.Version;
+                    ModelState.Clear();
+                    TempData["error"] = "This list was modified by someone else while you were editing. The current item is shown. Please re-apply your changes.";
+                    return View(latest);
+                }
+                if (result.success)
+                {
+                    await _unitOfWork.CommitAsync();
                     TempData["success"] = "To do item updated successfully.";
                 }
                 else
                 {
+                    await _unitOfWork.RollbackAsync();
                     TempData["error"] = "Update to do item error. Try again.";
                 }
                 return RedirectToAction("ToDoList", new { listId = obj.ListId });

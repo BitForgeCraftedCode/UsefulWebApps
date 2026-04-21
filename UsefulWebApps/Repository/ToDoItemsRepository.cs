@@ -41,5 +41,26 @@ namespace UsefulWebApps.Repository
                 "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder", new { listId = toDoItem.ListId }, transaction: _transaction);
             return (true, false, toDoList, listItems);
         }
+
+        public async Task<(bool success, bool wasConflict)> UpdateWithVersionCheck(ToDoItems toDoItem)
+        {
+            // Version check + bump on parent list
+            string sqlBump = @"UPDATE to_do_lists SET Version = Version + 1 
+                       WHERE Id = @listId AND Version = @listVersion";
+
+            int bumped = await _connection.ExecuteAsync(sqlBump,
+                new { listId = toDoItem.ListId, listVersion = toDoItem.ListVersion }, transaction: _transaction);
+
+            // conflict
+            if (bumped == 0) return (false, true);
+
+            string sql = @"UPDATE to_do_items SET ToDoItem = @newToDoItem WHERE Id = @id";
+            int rowCount = await _connection.ExecuteAsync(sql, new { newToDoItem = toDoItem.ToDoItem, id = toDoItem.Id }, transaction: _transaction);
+
+            // failed to update but no conflict
+            if (rowCount == 0) return (false, false);
+
+            return (true, false);
+        }
     }
 }
