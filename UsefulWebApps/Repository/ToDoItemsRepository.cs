@@ -26,6 +26,11 @@ namespace UsefulWebApps.Repository
                     "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId = toDoItem.ListId }, transaction: _transaction);
                 return (false, true, current, currentItems);
             }
+            //get row count 
+            //set SortOrder to Count of existing items so new items always land at the bottom cleanly
+            string countSql = @"SELECT COUNT(*) FROM to_do_items WHERE ListId = @listId";
+            int rowCount = await _connection.QuerySingleAsync<int>(countSql, new { listId = toDoItem.ListId }, transaction: _transaction);
+
             string sql = @"INSERT INTO to_do_items (ListId, ToDoItem, Complete, SortOrder) 
                    VALUES (@listId, @toDoItem, @complete, @sortOrder)";
             await _connection.ExecuteAsync(sql, new
@@ -33,7 +38,7 @@ namespace UsefulWebApps.Repository
                 listId = toDoItem.ListId,
                 toDoItem = toDoItem.ToDoItem,
                 complete = toDoItem.Complete,
-                sortOrder = toDoItem.SortOrder,
+                sortOrder = rowCount,
             }, transaction: _transaction);
             ToDoLists toDoList = await _connection.QuerySingleAsync<ToDoLists>(
                 "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId = toDoItem.ListId }, transaction: _transaction);
@@ -80,6 +85,20 @@ namespace UsefulWebApps.Repository
             }
             string sql = @"DELETE FROM to_do_items WHERE Id = @id";
             await _connection.ExecuteAsync(sql, new { id }, transaction: _transaction);
+
+            //get row count
+            string countSql = @"SELECT COUNT(*) FROM to_do_items WHERE ListId = @listId";
+            int rowCount = await _connection.QuerySingleAsync<int>(countSql, new { listId }, transaction: _transaction);
+            int newMax = rowCount == 0 ? 0 : rowCount - 1;
+
+            if (rowCount > 0)
+            {
+                //Ensure NO SortOrder value can exceed the maximum valid index after delete
+                string sqlRenormalize = @"UPDATE to_do_items SET SortOrder = LEAST(SortOrder, @newMax) WHERE ListId = @ListId;";
+                await _connection.ExecuteAsync(sqlRenormalize, new { newMax, listId }, transaction: _transaction);
+            }
+            
+
             ToDoLists toDoList = await _connection.QuerySingleAsync<ToDoLists>(
                 "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
             List<ToDoItems> listItems = (List<ToDoItems>)await _connection.QueryAsync<ToDoItems>(
