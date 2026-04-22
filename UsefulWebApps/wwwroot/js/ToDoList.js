@@ -144,6 +144,40 @@ function toggleComplete(id, listId, listVersion) {
     });
 }
 
+function sortToDoItem(id, listId, newSortOrder, listVersion) {
+    var formData = {
+        id: id,
+        listId: listId,
+        newSortOrder: newSortOrder,
+        listVersion: listVersion
+    };
+    $.ajax({
+        url: "/ListBuddy/ToDoListSortItem",
+        type: "POST",
+        headers: {
+            RequestVerificationToken:
+                $("#RequestVerificationToken")[0].value
+        },
+        data: formData,
+        dataType: "html",
+        success: function (response, status, xhr) {
+            $("#to-do-list-container").empty();
+            $("#to-do-list-container").append(response);
+
+            var newVersion = $("#to-do-list-container").find("#version-in-partial").val();
+            $("#version-add-form").val(newVersion);
+
+            if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
+                toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");
+            }
+        },
+        error: function (request, status, error) {
+            console.log(request.responseText);
+            toastr.error("Sort Error. Please Try Again.");
+        }
+    });
+}
+
 var loading = $('#spinner').hide();
 $(document).on("ajaxStart", function () {
     //$("#spinner").show();

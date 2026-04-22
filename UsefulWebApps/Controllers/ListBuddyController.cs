@@ -408,6 +408,42 @@ namespace UsefulWebApps.Controllers
             return PartialView("_ToDoListPartial", toDoListVM);
         }
 
+        //transaction method -- Concurrent
+        [HttpPost]
+        public async Task<IActionResult> ToDoListSortItem(long? id, long? listId, int newSortOrder, int listVersion)
+        {
+            if (id == null || id == 0 || listId == null || listId == 0)
+                return NotFound();
+
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
+            (bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoLists.ToDoListSortItem((long)id, (long)listId, newSortOrder, listVersion);
+
+            if (!result.success)
+            {
+                await _unitOfWork.RollbackAsync();
+                ToDoListVM conflictVM = new()
+                {
+                    ToDoList = result.toDoList,
+                    ToDoListItems = result.listItems,
+                    ToDoItem = new ToDoItems { ListId = (long)listId },
+                };
+                // Return the refreshed list so JS can update the UI + signal the conflict
+                Response.Headers["X-Concurrency-Conflict"] = "true";
+                return PartialView("_ToDoListPartial", conflictVM);
+            }
+
+            await _unitOfWork.CommitAsync();
+            ToDoListVM toDoListVM = new()
+            {
+                ToDoList = result.toDoList,
+                ToDoListItems = result.listItems,
+                ToDoItem = new ToDoItems { ListId = (long)listId },
+            };
+            return PartialView("_ToDoListPartial", toDoListVM);
+
+        }
+
         public IActionResult CreateToDoList()
         {
             ClaimsPrincipal currentUser = this.User;

@@ -8,5 +8,6 @@ namespace UsefulWebApps.Repository.IRepository
         Task<List<ToDoItems>> GetAllItemsInList(long? listId);
 
         Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListToggleComplete(long id, long listId, int expectedVersion);
+        Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListSortItem(long id, long listId, int sortOrder, int expectedVersion);
     }
 }
