@@ -23,7 +23,7 @@ namespace UsefulWebApps.Repository
                 ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
                     "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId = toDoItem.ListId }, transaction: _transaction);
                 List<ToDoItems> currentItems = (List<ToDoItems>)await _connection.QueryAsync<ToDoItems>(
-                    "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder", new { listId = toDoItem.ListId }, transaction: _transaction);
+                    "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId = toDoItem.ListId }, transaction: _transaction);
                 return (false, true, current, currentItems);
             }
             string sql = @"INSERT INTO to_do_items (ListId, ToDoItem, Complete, SortOrder) 
@@ -38,7 +38,7 @@ namespace UsefulWebApps.Repository
             ToDoLists toDoList = await _connection.QuerySingleAsync<ToDoLists>(
                 "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId = toDoItem.ListId }, transaction: _transaction);
             List<ToDoItems> listItems = (List<ToDoItems>)await _connection.QueryAsync<ToDoItems>(
-                "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder", new { listId = toDoItem.ListId }, transaction: _transaction);
+                "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId = toDoItem.ListId }, transaction: _transaction);
             return (true, false, toDoList, listItems);
         }
 
@@ -75,7 +75,7 @@ namespace UsefulWebApps.Repository
                 ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
                     "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
                 List<ToDoItems> currentItems = (List<ToDoItems>)await _connection.QueryAsync<ToDoItems>(
-                    "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder", new { listId }, transaction: _transaction);
+                    "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId }, transaction: _transaction);
                 return (false, true, current, currentItems);
             }
             string sql = @"DELETE FROM to_do_items WHERE Id = @id";
@@ -83,7 +83,7 @@ namespace UsefulWebApps.Repository
             ToDoLists toDoList = await _connection.QuerySingleAsync<ToDoLists>(
                 "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
             List<ToDoItems> listItems = (List<ToDoItems>)await _connection.QueryAsync<ToDoItems>(
-                "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder", new { listId }, transaction: _transaction);
+                "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId }, transaction: _transaction);
 
             return (true, false, toDoList, listItems);
         }
