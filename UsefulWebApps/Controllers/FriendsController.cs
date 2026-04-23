@@ -9,6 +9,7 @@ using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
 using System.Security.Claims;
+using UsefulWebApps.Helpers;
 using UsefulWebApps.IdentityModels;
 using UsefulWebApps.Models.Friends;
 using UsefulWebApps.Models.MyRecipes;
@@ -34,8 +35,7 @@ namespace UsefulWebApps.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetFriendsWithProfiles(userId);
@@ -65,8 +65,9 @@ namespace UsefulWebApps.Controllers
                 TempData["error"] = "Friend request error.";
                 return RedirectToAction("People");
             }
-            ClaimsPrincipal currentUser = this.User;
-            string? requesterId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            string? requesterId = User.GetUserId();
+
             if (string.IsNullOrEmpty(requesterId))
             {
                 TempData["error"] = "Unable to identify current user.";
@@ -119,8 +120,7 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> Requests()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string? addresseeUserId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? addresseeUserId = User.GetUserId();
             if (string.IsNullOrEmpty(addresseeUserId)) return NotFound();
 
             (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetPendingRequestsWithProfiles(addresseeUserId);
@@ -152,8 +152,7 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> MyProfile()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
             UserProfiles userProfile = await _unitOfWork.UserProfiles.GetByUserId(userId);
 
