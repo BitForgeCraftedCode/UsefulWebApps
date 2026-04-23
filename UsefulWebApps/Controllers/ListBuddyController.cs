@@ -1,5 +1,4 @@
 ﻿using Ganss.Xss;
-using Google.Protobuf.Collections;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -36,11 +35,15 @@ namespace UsefulWebApps.Controllers
             return View();
         }
 
+        private string? GetCurrentUserId()
+        {
+            return User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+
         #region Notes
         public async Task<IActionResult> MyNotes()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             List<Notes> myNotes = (List<Notes>)await _unitOfWork.Notes.GetAllWhere("UserId", userId);
@@ -68,8 +71,9 @@ namespace UsefulWebApps.Controllers
 
         public IActionResult CreateNote() 
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
             Notes note = new()
             {
                 UserId = userId
@@ -158,8 +162,7 @@ namespace UsefulWebApps.Controllers
         {
             if (id == null || id == 0) return NotFound();
 
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             Notes note = await _unitOfWork.Notes.GetById(id);
@@ -193,8 +196,7 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> ShareNote(ShareNoteVM vm)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             // Server-side: verify these two users are actually friends
@@ -224,8 +226,7 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> UnshareNote(long noteId)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             Notes note = await _unitOfWork.Notes.GetById(noteId);
@@ -249,8 +250,7 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> UnshareToDoList(long listId)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(listId);
@@ -271,8 +271,7 @@ namespace UsefulWebApps.Controllers
         {
             if (id == null || id == 0) return NotFound();
 
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(id);
@@ -306,8 +305,7 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> ShareToDoList(ShareToDoListVM vm)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             // Server-side: verify these two users are actually friends
@@ -333,8 +331,7 @@ namespace UsefulWebApps.Controllers
         }
         public async Task<IActionResult> MyToDoLists() 
         {
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             List<ToDoLists> myToDoLists = (List<ToDoLists>)await _unitOfWork.ToDoLists.GetAllWhere("UserId", userId);
@@ -356,8 +353,7 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(listId);
@@ -446,8 +442,7 @@ namespace UsefulWebApps.Controllers
 
         public IActionResult CreateToDoList()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string? userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             ToDoLists toDoList = new ToDoLists
@@ -663,8 +658,9 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> GroceryList()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
             (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories("UserId", userId);
 
             GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, userId);
@@ -797,8 +793,9 @@ namespace UsefulWebApps.Controllers
         [Route("/ListBuddy/GroceryListDeleteAll", Name = "deleteAllGroceryList")]
         public async Task<IActionResult> GroceryListDeleteAll()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
             await _unitOfWork.GroceryList.DeleteAllWhere("UserId", userId);
             return RedirectToAction("GroceryList");
         }
