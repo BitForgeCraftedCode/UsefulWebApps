@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
+using UsefulWebApps.Helpers;
 using UsefulWebApps.Models.Friends;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.ViewModels.ListBuddy;
@@ -36,11 +37,6 @@ namespace UsefulWebApps.Controllers
             return View();
         }
 
-        private string? GetCurrentUserId()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier);
-        }
-
         private async Task<IEnumerable<SelectListItem>> GetFriendsSelectListAsync(string userId)
         {
             // Get friends to populate dropdown
@@ -61,7 +57,7 @@ namespace UsefulWebApps.Controllers
         #region Notes
         public async Task<IActionResult> MyNotes()
         {
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             List<Notes> myNotes = (List<Notes>)await _unitOfWork.Notes.GetAllWhere("UserId", userId);
@@ -89,7 +85,7 @@ namespace UsefulWebApps.Controllers
 
         public IActionResult CreateNote() 
         {
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             Notes note = new()
@@ -180,7 +176,7 @@ namespace UsefulWebApps.Controllers
         {
             if (id == null || id == 0) return NotFound();
 
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             Notes note = await _unitOfWork.Notes.GetById(id);
@@ -206,7 +202,7 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> ShareNote(ShareNoteVM vm)
         {
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
@@ -234,7 +230,7 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> UnshareNote(long noteId)
         {
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             Notes note = await _unitOfWork.Notes.GetById(noteId);
@@ -258,7 +254,7 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> UnshareToDoList(long listId)
         {
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(listId);
@@ -279,7 +275,7 @@ namespace UsefulWebApps.Controllers
         {
             if (id == null || id == 0) return NotFound();
 
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(id);
@@ -305,7 +301,7 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> ShareToDoList(ShareToDoListVM vm)
         {
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
@@ -329,7 +325,7 @@ namespace UsefulWebApps.Controllers
         }
         public async Task<IActionResult> MyToDoLists() 
         {
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             List<ToDoLists> myToDoLists = (List<ToDoLists>)await _unitOfWork.ToDoLists.GetAllWhere("UserId", userId);
@@ -351,7 +347,7 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(listId);
@@ -421,7 +417,7 @@ namespace UsefulWebApps.Controllers
 
         public IActionResult CreateToDoList()
         {
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             ToDoLists toDoList = new ToDoLists
@@ -608,7 +604,7 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> GroceryList()
         {
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories("UserId", userId);
@@ -743,7 +739,7 @@ namespace UsefulWebApps.Controllers
         [Route("/ListBuddy/GroceryListDeleteAll", Name = "deleteAllGroceryList")]
         public async Task<IActionResult> GroceryListDeleteAll()
         {
-            string? userId = GetCurrentUserId();
+            string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             await _unitOfWork.GroceryList.DeleteAllWhere("UserId", userId);
