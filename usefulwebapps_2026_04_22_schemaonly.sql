@@ -1,15 +1,13 @@
-CREATE DATABASE  IF NOT EXISTS `usefulwebapps` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `usefulwebapps`;
--- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.45, for Linux (x86_64)
 --
 -- Host: localhost    Database: usefulwebapps
 -- ------------------------------------------------------
--- Server version	8.0.42
+-- Server version	8.0.45-0ubuntu0.24.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -189,7 +187,7 @@ CREATE TABLE `calendar_events` (
   KEY `idx_user` (`UserId`),
   KEY `idx_start` (`StartDate`),
   KEY `idx_user_start` (`UserId`,`StartDate`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -211,7 +209,7 @@ CREATE TABLE `friendships` (
   KEY `idx_addressee` (`AddresseeUserId`),
   CONSTRAINT `FK_friendships_addressee` FOREIGN KEY (`AddresseeUserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE,
   CONSTRAINT `FK_friendships_requester` FOREIGN KEY (`RequesterUserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -244,7 +242,7 @@ CREATE TABLE `grocery_list` (
   `SortOrder` int unsigned NOT NULL DEFAULT '1',
   `ShareUserId` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3783 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3934 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -299,10 +297,11 @@ CREATE TABLE `note_shares` (
   `SharedWithUserId` varchar(255) NOT NULL,
   PRIMARY KEY (`Id`),
   UNIQUE KEY `UQ_note_share` (`NoteId`,`SharedWithUserId`),
-  KEY `FK_note_shares_user` (`SharedWithUserId`),
+  KEY `IX_note_shares_user` (`SharedWithUserId`),
+  KEY `IX_note_shares_noteid` (`NoteId`),
   CONSTRAINT `FK_note_shares_note` FOREIGN KEY (`NoteId`) REFERENCES `notes` (`Id`) ON DELETE CASCADE,
   CONSTRAINT `FK_note_shares_user` FOREIGN KEY (`SharedWithUserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -317,8 +316,12 @@ CREATE TABLE `notes` (
   `Note` mediumtext NOT NULL,
   `UserId` varchar(255) NOT NULL,
   `NoteTitle` varchar(100) NOT NULL,
-  PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `Version` int unsigned NOT NULL DEFAULT '0',
+  `CreatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Id`),
+  KEY `IX_notes_userid` (`UserId`)
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -400,7 +403,7 @@ CREATE TABLE `recipe_comments` (
   PRIMARY KEY (`CommentId`),
   KEY `RecipeId` (`RecipeId`),
   CONSTRAINT `recipe_comments_ibfk_1` FOREIGN KEY (`RecipeId`) REFERENCES `recipes` (`RecipeId`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -461,7 +464,7 @@ CREATE TABLE `recipe_usersaved` (
   PRIMARY KEY (`UserSavedId`),
   KEY `RecipeId` (`RecipeId`),
   CONSTRAINT `recipe_usersaved_ibfk_1` FOREIGN KEY (`RecipeId`) REFERENCES `recipes` (`RecipeId`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -516,20 +519,62 @@ CREATE TABLE `slideshow_images` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `to_do_list`
+-- Table structure for table `to_do_items`
 --
 
-DROP TABLE IF EXISTS `to_do_list`;
+DROP TABLE IF EXISTS `to_do_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `to_do_list` (
+CREATE TABLE `to_do_items` (
   `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ListId` bigint unsigned NOT NULL,
   `ToDoItem` varchar(100) NOT NULL,
-  `Complete` tinyint(1) NOT NULL,
+  `Complete` tinyint(1) NOT NULL DEFAULT '0',
+  `SortOrder` int unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`Id`),
+  KEY `IX_items_listid` (`ListId`),
+  CONSTRAINT `FK_items_list` FOREIGN KEY (`ListId`) REFERENCES `to_do_lists` (`Id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `to_do_list_shares`
+--
+
+DROP TABLE IF EXISTS `to_do_list_shares`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `to_do_list_shares` (
+  `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `ListId` bigint unsigned NOT NULL,
+  `SharedWithUserId` varchar(255) NOT NULL,
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `UQ_todolist_share` (`ListId`,`SharedWithUserId`),
+  KEY `IX_shares_listid` (`ListId`),
+  KEY `IX_shares_user` (`SharedWithUserId`),
+  CONSTRAINT `FK_todolist_shares_list` FOREIGN KEY (`ListId`) REFERENCES `to_do_lists` (`Id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_todolist_shares_user` FOREIGN KEY (`SharedWithUserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `to_do_lists`
+--
+
+DROP TABLE IF EXISTS `to_do_lists`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `to_do_lists` (
+  `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `UserId` varchar(255) NOT NULL,
   `ListTitle` varchar(100) NOT NULL,
-  PRIMARY KEY (`Id`)
-) ENGINE=InnoDB AUTO_INCREMENT=213 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `Version` int unsigned NOT NULL DEFAULT '0',
+  `CreatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Id`),
+  KEY `FK_to_do_lists_user` (`UserId`),
+  CONSTRAINT `FK_to_do_lists_user` FOREIGN KEY (`UserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -595,4 +640,4 @@ CREATE TABLE `user_slideshow_images` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-13 16:27:17
+-- Dump completed on 2026-04-22 10:06:31
