@@ -51,6 +51,11 @@ namespace UsefulWebApps.Controllers
                 Value = p.UserId
             });
         }
+        private async Task<bool> AreFriendsAsync(string userId, string otherUserId)
+        {
+            Friendships? friendship = await _unitOfWork.Friendships.GetExisting(userId, otherUserId);
+            return friendship != null && friendship.Status == FriendshipStatus.Accepted;
+        }
 
         #region Notes
         public async Task<IActionResult> MyNotes()
@@ -203,9 +208,7 @@ namespace UsefulWebApps.Controllers
             string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            // Server-side: verify these two users are actually friends
-            Friendships? friendship = await _unitOfWork.Friendships.GetExisting(userId, vm.SelectedFriendUserId);
-            if (friendship == null || friendship.Status != FriendshipStatus.Accepted)
+            if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
                 TempData["error"] = "You can only share notes with friends.";
                 return RedirectToAction("MyNotes");
@@ -304,9 +307,7 @@ namespace UsefulWebApps.Controllers
             string? userId = GetCurrentUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            // Server-side: verify these two users are actually friends
-            Friendships? friendship = await _unitOfWork.Friendships.GetExisting(userId, vm.SelectedFriendUserId);
-            if (friendship == null || friendship.Status != FriendshipStatus.Accepted)
+            if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
                 TempData["error"] = "You can only share lists with friends.";
                 return RedirectToAction("MyToDoLists");
