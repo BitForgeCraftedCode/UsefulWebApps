@@ -40,6 +40,18 @@ namespace UsefulWebApps.Controllers
             return User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
+        private async Task<IEnumerable<SelectListItem>> GetFriendsSelectListAsync(string userId)
+        {
+            // Get friends to populate dropdown
+            (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetFriendsWithProfiles(userId);
+            return result.profiles.Select(p => new SelectListItem
+            {
+                //?? null-coalescing operator
+                Text = p.DisplayName ?? p.UserId,
+                Value = p.UserId
+            });
+        }
+
         #region Notes
         public async Task<IActionResult> MyNotes()
         {
@@ -174,15 +186,7 @@ namespace UsefulWebApps.Controllers
                 return RedirectToAction("MyNotes");
             }
 
-            // Get friends to populate dropdown
-            (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetFriendsWithProfiles(userId);
-
-            IEnumerable<SelectListItem> friendsList = result.profiles.Select(p => new SelectListItem
-            {
-                //?? null-coalescing operator
-                Text = p.DisplayName ?? p.UserId,
-                Value = p.UserId
-            });
+            IEnumerable<SelectListItem> friendsList = await GetFriendsSelectListAsync(userId);
 
             ShareNoteVM vm = new()
             {
@@ -283,15 +287,7 @@ namespace UsefulWebApps.Controllers
                 return RedirectToAction("MyToDoLists");
             }
 
-            // Get friends to populate dropdown
-            (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetFriendsWithProfiles(userId);
-
-            IEnumerable<SelectListItem> friendsList = result.profiles.Select(p => new SelectListItem
-            {
-                //?? null-coalescing operator
-                Text = p.DisplayName ?? p.UserId,
-                Value = p.UserId
-            });
+            IEnumerable<SelectListItem> friendsList = await GetFriendsSelectListAsync(userId);
 
             ShareToDoListVM vm = new()
             {
