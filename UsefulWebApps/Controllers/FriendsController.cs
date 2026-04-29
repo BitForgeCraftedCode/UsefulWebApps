@@ -183,7 +183,15 @@ namespace UsefulWebApps.Controllers
             if (ModelState.IsValid)
             {
                 string? oldFilePathDb = vm.UserProfile.AvatarPath;
-                (bool Success, string? FilePathDb, string? ErrorMessage) result = await ProcessAndSaveImageAsync(vm.ImageFile, vm.UserProfile.UserId);
+
+                (bool Success, string? FilePathDb, string? ErrorMessage) result = await ImageUpload.ProcessAndSaveImageAsync(
+                    vm.ImageFile,
+                    this._environment.WebRootPath, 
+                    $"images/users/{vm.UserProfile.UserId}", 
+                    maxWidth: 256, 
+                    preserveOriginalFormat: true
+                );
+
                 if (!result.Success)
                 {
                     TempData["error"] = $"Update user profile error. {result.ErrorMessage}";
@@ -214,68 +222,6 @@ namespace UsefulWebApps.Controllers
             TempData["error"] = "Update user profile error. Please try again.";
             return View(vm);
         }
-        private async Task<(bool Success, string? FilePathDb, string? ErrorMessage)> ProcessAndSaveImageAsync(IFormFile imageFile, string userId)
-        {
-            // max image size 10MB
-            const int maxFileSize = 10 * 1024 * 1024;
-
-            if (imageFile.Length == 0 ||
-                imageFile.Length > maxFileSize ||
-                !imageFile.ContentType.StartsWith("image/"))
-            {
-                return (false, null, "Invalid image file. Please try again.");
-            }
-            // Determine format from content type
-            /*
-             * switch expression
-             * The cast (IImageEncoder) on the first arm is needed because the compiler infers the tuple type from all arms together. 
-             * Since PngEncoder, GifEncoder, etc. are all different types, the compiler needs a hint that they should all be treated 
-             * as their shared interface IImageEncoder. Once the first arm establishes that type, the rest don't need the explicit cast.
-             */
-
-            (string extension, IImageEncoder encoder) = imageFile.ContentType switch
-            {
-                "image/png" => ("png", (IImageEncoder)new PngEncoder()),
-                "image/gif" => ("gif", new GifEncoder()),
-                "image/webp" => ("webp", new WebpEncoder { Quality = 75 }),
-                _ => ("jpg", new JpegEncoder { Quality = 75 }) // default jpeg for jpg, bmp, tiff, etc
-            };
-
-            // generate unique file name
-            string fileName = $"{Guid.NewGuid()}.{extension}";
-            string directory = Path.Combine(this._environment.WebRootPath, $"images/users/{userId}/");
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-            //get filepath for physical storage location
-            string storageFilePath = Path.Combine(directory, fileName);
-            //get filepath for database
-            string filePathDb = $"/images/users/{userId}/{fileName}";
-            try
-            {
-                //resize the image then save to storage location
-                using (Image image = await Image.LoadAsync(imageFile.OpenReadStream()))
-                {
-                    image.Mutate(x => x.AutoOrient());
-                    if (image.Width > 256)
-                    {
-                        image.Mutate(x => x.Resize(new ResizeOptions
-                        {
-                            Size = new Size(256, 0), // 0 for height auto
-                            Mode = ResizeMode.Max
-                        }));
-                    }
-                    //upload image -- copy/save image to wwwroot
-                    await image.SaveAsync(storageFilePath, encoder);
-                }
-            }
-            catch
-            {
-                return (false, null, "Invalid or corrupted image. Please try again.");
-            }
-
-            return (true, filePathDb, null);
-        }
+        
     }
 }
