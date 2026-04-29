@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
+using UsefulWebApps.Helpers;
 using UsefulWebApps.Helpers.Weather;
 using UsefulWebApps.Models.ViewModels.Weather;
 using UsefulWebApps.Models.Weather;
@@ -24,8 +25,9 @@ namespace UsefulWebApps.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
             List<Locations> locations = (List<Locations>)await _unitOfWork.Locations.GetAllWhere("UserId", userId);
             LocationsVM locationsVM = new() { Locations = locations };
             return View(locationsVM);
@@ -33,8 +35,9 @@ namespace UsefulWebApps.Controllers
 
         public IActionResult AddLocations()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
             Locations location = new() 
             { 
                 UserId = userId
