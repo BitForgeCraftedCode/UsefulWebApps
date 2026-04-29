@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using UsefulWebApps.Helpers;
 using UsefulWebApps.Models.MyHomePage;
 using UsefulWebApps.Models.ViewModels.MyHomePage;
 using UsefulWebApps.Repository.IRepository;
@@ -22,8 +23,8 @@ namespace UsefulWebApps.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
 
             //get users slideshow choice
             List<SlideShowImages> userSlideShowImages = await _unitOfWork.SlideShow.GetSlideShowImagesForUser(userId);
@@ -54,8 +55,8 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> SelectQuickLinks() 
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
 
             (
                 List<QuickLinks> userQuickLinks, 
@@ -85,9 +86,10 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> SelectQuickLinks(SelectQuickLinksVM selectQuickLinksVM)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            string userName = currentUser.FindFirstValue(ClaimTypes.Name);
+            string? userId = User.GetUserId();
+            string? userName = User.GetUserName();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            if (string.IsNullOrEmpty(userName)) return NotFound();
 
             if (ModelState.IsValid) 
             {
@@ -112,8 +114,9 @@ namespace UsefulWebApps.Controllers
         
         public async Task<IActionResult> SelectSlideShow()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
             (SlideShowFolder userSlideShowFolder, List<SlideShowFolder> allSlideShowFolders) result = await _unitOfWork.SlideShow.GetSlideShowFoldersEditDisplay(userId);
             SlideShowFolder userSlideShowFolder = result.userSlideShowFolder;
             List<SlideShowFolder> allSlideShowFolders = result.allSlideShowFolders;
@@ -137,8 +140,8 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> SelectSlideShow(SelectSlideShowVM selectSlideShowVM)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
 
             if (ModelState.IsValid)
             {
