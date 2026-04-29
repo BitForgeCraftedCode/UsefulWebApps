@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Claims;
+using UsefulWebApps.Helpers;
 using UsefulWebApps.Models.Calendar;
 using UsefulWebApps.Models.ViewModels.Calendar;
 using UsefulWebApps.Repository.IRepository;
@@ -40,8 +41,7 @@ namespace UsefulWebApps.Controllers
 
         private async Task LoadEventsForMonth(CalendarMonthVM vm)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
 
             //[ rangeStart , rangeEnd )
             //inclusive start, exclusive end
@@ -285,8 +285,9 @@ namespace UsefulWebApps.Controllers
 
         public IActionResult CreateEvent()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
             CalendarEventsVM calendarEvents = new()
             {
                 Event = new CalendarEvents 
