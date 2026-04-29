@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
-using System.Security.Claims;
+using UsefulWebApps.Helpers;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.MyRecipes;
 using UsefulWebApps.Models.ViewModels.MyRecipes;
@@ -152,9 +152,10 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            string userName = currentUser.FindFirstValue(ClaimTypes.Name);
+            string? userId = User.GetUserId();
+            string? userName = User.GetUserName();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            if (string.IsNullOrEmpty(userName)) return NotFound();
 
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
@@ -186,8 +187,8 @@ namespace UsefulWebApps.Controllers
         //in html asp-for="AddIngredientToGrocery.GroceryItem" so Bind Prefix AddIngredientToGrocery so model validates
         public async Task<JsonResult> AddIngredientToGroceryList([Bind(Prefix = "AddIngredientToGrocery")] AddRecipeIngredientToGroceryVM addIngredientToGroceryVM)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return Json(new { success = false, message = "Server error. Please try again." });
 
             if (!ModelState.IsValid)
             {
@@ -217,8 +218,8 @@ namespace UsefulWebApps.Controllers
         }
         public async Task<IActionResult> SavedRecipes(int page, string searchString = "", string categories = "", bool ascending = true)
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
             List<RecipeUserSaved> recipeUserSaved = await _unitOfWork.Recipe.GetUserSavedRecipes(userId);
             SavedRecipesVM savedRecipesVM = new SavedRecipesVM 
             { 
@@ -390,9 +391,11 @@ namespace UsefulWebApps.Controllers
                 RecipeDifficulties = recipeDifficulties
             };
 
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            string role = currentUser.FindFirstValue(ClaimTypes.Role);
+            string? userId = User.GetUserId();
+            string? role = User.GetUserRole();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            if (string.IsNullOrEmpty(role)) return NotFound();
+
 
             if (recipeVM.Recipe.UserId != userId && role != "Admin")
             {
@@ -537,9 +540,11 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> CreateRecipe()
         {
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            string userName = currentUser.FindFirstValue(ClaimTypes.Name);
+            string? userId = User.GetUserId();
+            string? userName = User.GetUserName();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            if (string.IsNullOrEmpty(userName)) return NotFound();
+
             (
                 List<RecipeCategories> recipeCategories,
                 List<RecipeCourses> recipeCourses,
@@ -643,9 +648,10 @@ namespace UsefulWebApps.Controllers
 
             Recipe recipe = await _unitOfWork.Recipe.GetRecipeById(id);
 
-            ClaimsPrincipal currentUser = this.User;
-            string userId = currentUser.FindFirstValue(ClaimTypes.NameIdentifier);
-            string role = currentUser.FindFirstValue(ClaimTypes.Role);
+            string? userId = User.GetUserId();
+            string? role = User.GetUserRole();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            if (string.IsNullOrEmpty(role)) return NotFound();
 
             if (recipe.UserId != userId && role != "Admin")
             {

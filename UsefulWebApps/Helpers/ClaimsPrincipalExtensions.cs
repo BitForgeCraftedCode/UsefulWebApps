@@ -8,5 +8,15 @@ namespace UsefulWebApps.Helpers
         {
             return principal.FindFirstValue(ClaimTypes.NameIdentifier);
         }
+
+        public static string? GetUserName(this ClaimsPrincipal principal)
+        {
+            return principal.FindFirstValue(ClaimTypes.Name);
+        }
+
+        public static string? GetUserRole(this ClaimsPrincipal principal)
+        {
+            return principal.FindFirstValue(ClaimTypes.Role);
+        }
     }
 }
