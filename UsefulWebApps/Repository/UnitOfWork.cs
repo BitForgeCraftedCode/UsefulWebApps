@@ -78,6 +78,9 @@ namespace UsefulWebApps.Repository
         public IToDoItemsRepository ToDoItems { get; private set; }
         public IToDoListSharesRepository ToDoListShares { get; private set; } 
         public IGroceryListRepository GroceryList { get; private set; }
+        public IGroceryListsRepository GroceryLists { get; private set; }
+        public IGroceryListItemsRepository GroceryListItems { get; private set; }
+        public IGroceryListSharesRepository GroceryListShares { get; private set; }
         public IRecipeRepository Recipe { get; private set; }
         public IManageAccountDataRepository ManageAccountData { get; private set; }
         public INotesRepository Notes { get; private set; }
@@ -100,6 +103,9 @@ namespace UsefulWebApps.Repository
             ToDoItems = new ToDoItemsRepository(_connection);
             ToDoListShares = new ToDoListSharesRepository(_connection);
             GroceryList = new GroceryListRepository(_connection);
+            GroceryLists = new GroceryListsRepository(_connection);
+            GroceryListItems = new GroceryListItemsRepository(_connection);
+            GroceryListShares = new GroceryListSharesRepository(_connection);
             Recipe = new RecipeRepository(_connection);
             ManageAccountData = new ManageAccountDataRepository(_connection);
             Notes = new NotesRepository(_connection);
@@ -153,6 +159,9 @@ namespace UsefulWebApps.Repository
             ToDoItems.SetTransaction(txn);
             ToDoListShares.SetTransaction(txn);
             GroceryList.SetTransaction(txn);
+            GroceryLists.SetTransaction(txn);
+            GroceryListItems.SetTransaction(txn);
+            GroceryListShares.SetTransaction(txn);
             Recipe.SetTransaction(txn);
             ManageAccountData.SetTransaction(txn);
             Notes.SetTransaction(txn);

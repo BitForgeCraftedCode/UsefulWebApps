@@ -323,6 +323,7 @@ namespace UsefulWebApps.Controllers
 
             return RedirectToAction("ToDoList", new { listId = vm.ListId });
         }
+
         public async Task<IActionResult> MyToDoLists() 
         {
             string? userId = User.GetUserId();
@@ -602,6 +603,23 @@ namespace UsefulWebApps.Controllers
             return groceryListVM;
         }
 
+        public async Task<IActionResult> MyGroceryLists()
+        {
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            List<GroceryLists> myGroceryLists = (List<GroceryLists>)await _unitOfWork.GroceryLists.GetAllWhere("UserId", userId);
+            List<GroceryLists> sharedWithMe = await _unitOfWork.GroceryListShares.GetGroceryListsSharedWithUser(userId);
+            Dictionary<long, List<string>> sharedToMap = await _unitOfWork.GroceryListShares.GetSharedToMapForOwner(userId);
+
+            MyGroceryListsVM myGroceryListVM = new()
+            {
+                MyGroceryLists = myGroceryLists,
+                SharedWithMeGroceryLists = sharedWithMe,
+                SharedToFriends = sharedToMap,
+            };
+            return View(myGroceryListVM);
+        }
         public async Task<IActionResult> GroceryList()
         {
             string? userId = User.GetUserId();

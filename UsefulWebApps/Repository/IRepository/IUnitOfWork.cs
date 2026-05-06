@@ -14,6 +14,9 @@
         IToDoItemsRepository ToDoItems { get; }
         IToDoListSharesRepository ToDoListShares { get; }
         IGroceryListRepository GroceryList { get; }
+        IGroceryListsRepository GroceryLists { get; }
+        IGroceryListItemsRepository GroceryListItems { get; }
+        IGroceryListSharesRepository GroceryListShares { get; }
         IRecipeRepository Recipe { get; }
         IManageAccountDataRepository ManageAccountData { get; }
         INotesRepository Notes { get; }
