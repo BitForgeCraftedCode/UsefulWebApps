@@ -397,6 +397,7 @@ namespace UsefulWebApps.Controllers
             return ToDoListPartialResult(result.success, result.toDoList, result.listItems, (long)listId);
         }
 
+
         //transaction method -- Concurrent
         [HttpPost]
         public async Task<IActionResult> ToDoListSortItem(long? id, long? listId, int newSortOrder, int listVersion)
@@ -678,7 +679,7 @@ namespace UsefulWebApps.Controllers
             return View(groceryListVM);
         }
 
-        //transaction method
+        //transaction method -- Concurrent (check it)
         [HttpPost]
         public async Task<IActionResult> GroceryListToggleComplete(long? id, long? listId, int listVersion)
         {
@@ -707,16 +708,32 @@ namespace UsefulWebApps.Controllers
             return PartialView("_GroceryListPartial", groceryListVM);
         }
 
-        //transaction method
+        //transaction method -- Concurrent (check it)
         [HttpPost]
-        public async Task<IActionResult> GroceryListSortCategories(int sortOrder, string category, string userId)
+        public async Task<IActionResult> GroceryListSortCategories(long? listId, int newSortOrder, int listVersion, string category)
         {
+            if (listId == 0 || listId == null)
+                return NotFound();
+
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GroceryListSortCategories(sortOrder, category, userId);
-            await _unitOfWork.CommitAsync();
-            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, userId);
+            (
+            bool success,
+            bool wasConflict,
+            GroceryLists groceryList,
+            List<GroceryListItems> groceryListItems,
+            IEnumerable<GroceryCategories> groceryCategoriesEnum,
+            List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryLists.GroceryListSortCategories(listId, newSortOrder, listVersion, category);
+            if (!result.success)
+            {
+                await _unitOfWork.RollbackAsync();
+                Response.Headers["X-Concurrency-Conflict"] = "true";
+            }
+            else
+                await _unitOfWork.CommitAsync();
 
+            GroceryListNewVM groceryListVM = NewFormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
+            groceryListVM.GroceryList = result.groceryList;
             return PartialView("_GroceryListPartial", groceryListVM);
         }
 

@@ -133,16 +133,16 @@ function saveUserListSubmit(userID) {
     });
 }
 
-function sortCategory(sortOrder, category, userId) {
-    
-    if (sortOrder == "") {
+function sortCategory(listId, newSortOrder, listVersion, category) {
+    if (newSortOrder == "") {
         toastr.error("Please Select A Sort Order");
         return;
     }
     var formData = {
-        sortOrder = sortOrder,
-        category = category,
-        userId = userId
+        listId: listId,
+        newSortOrder: newSortOrder,
+        listVersion: listVersion,
+        category: category
     };
     $.ajax({
         url: "/ListBuddy/GroceryListSortCategories",
@@ -153,9 +153,17 @@ function sortCategory(sortOrder, category, userId) {
         },
         data: formData,
         dataType: "html",
-        success: function (response) {
+        success: function (response, status, xhr) {
             $("#grocery-list-container").empty();
             $("#grocery-list-container").append(response);
+
+            // Sync the list version from the refreshed partial back to the add form
+            var newVersion = $("#grocery-list-container").find("#version-in-partial").val();
+            $("#version-add-form").val(newVersion);
+
+            if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
+                toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");
+            }
         },
         error: function (request, status, error) {
             console.log(request.responseText);

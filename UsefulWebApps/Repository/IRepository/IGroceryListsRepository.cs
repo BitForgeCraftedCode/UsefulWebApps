@@ -13,5 +13,12 @@ namespace UsefulWebApps.Repository.IRepository
             List<GroceryListItems> listItems, 
             IEnumerable<GroceryCategories> groceryCategoriesEnum, 
             List<UserGroceryCategories> userGroceryCategories)> GroceryListToggleComplete(long? id, long? listId, int expectedVersion);
+        Task<(
+            bool success,
+            bool wasConflict,
+            GroceryLists groceryList,
+            List<GroceryListItems> listItems,
+            IEnumerable<GroceryCategories> groceryCategoriesEnum,
+            List<UserGroceryCategories> userGroceryCategories)> GroceryListSortCategories(long? listId, int newSortOrder, int expectedVersion, string category);
     }
 }
