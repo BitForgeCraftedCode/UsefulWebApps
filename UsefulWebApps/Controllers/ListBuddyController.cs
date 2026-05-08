@@ -524,6 +524,7 @@ namespace UsefulWebApps.Controllers
             return View(toDoItem);
         }
 
+
         //transaction method -- Concurrent
         [HttpPost]
         public async Task<IActionResult> ToDoListEdit(ToDoItems obj)
@@ -743,38 +744,63 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
-            (GroceryList groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryList.GetGroceryListItemAndCategoriesAtId(id);
-            GroceryList groceryListItem = result.groceryListItem;
+            (GroceryListItems groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryListItems.GetGroceryListItemAndCategoriesAtId(id);
+            GroceryListItems groceryListItem = result.groceryListItem;
             IEnumerable<GroceryCategories> groceryCategoriesEnum = result.groceryCategoriesEnum;
             IEnumerable<SelectListItem> groceryListCategories = groceryCategoriesEnum.Select(u => new SelectListItem
             {
                 Text = u.Category,
                 Value = u.Category
             });
-
+            GroceryLists parentList = await _unitOfWork.GroceryLists.GetById(groceryListItem.ListId);
+            groceryListItem.ListVersion = parentList.Version;
             GroceryListEditVM groceryListEditVM = new()
             {
                 Category = groceryListItem.Category,
-                GroceryList = groceryListItem,
+                GroceryListItem = groceryListItem,
                 GroceryCategoriesList = groceryListCategories
             };
             return View(groceryListEditVM);
         }
 
-        //transaction method
+        //transaction method -- Concurrent (check it)
         [HttpPost]
-        public async Task<IActionResult> GroceryListEdit(GroceryList groceryList, GroceryListEditVM groceryListEditVM)
+        public async Task<IActionResult> GroceryListEdit(GroceryListItems groceryListItem, GroceryListEditVM groceryListEditVM)
         {
-            groceryList.Category = groceryListEditVM.Category;
+            groceryListItem.Category = groceryListEditVM.Category;
             ModelState.Clear();
-            TryValidateModel(groceryList);
+            TryValidateModel(groceryListItem);
 
             if (ModelState.IsValid)
             {
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
-                bool success = await _unitOfWork.GroceryList.GroceryListUpdate(groceryList);
-                if (success) 
+                (bool success, bool wasConflict) result = await _unitOfWork.GroceryListItems.GroceryListUpdate(groceryListItem);
+                if (result.success == false && result.wasConflict == true) 
+                {
+                    await _unitOfWork.RollbackAsync();
+                    (GroceryListItems groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum) resultB = await _unitOfWork.GroceryListItems.GetGroceryListItemAndCategoriesAtId(groceryListItem.Id);
+                    GroceryListItems latest = resultB.groceryListItem;
+                    IEnumerable<GroceryCategories> groceryCategoriesEnum = resultB.groceryCategoriesEnum;
+                    IEnumerable<SelectListItem> groceryListCategories = groceryCategoriesEnum.Select(u => new SelectListItem
+                    {
+                        Text = u.Category,
+                        Value = u.Category
+                    });
+                    GroceryLists parentList = await _unitOfWork.GroceryLists.GetById(latest.ListId);
+                    latest.ListVersion = parentList.Version;
+                    GroceryListEditVM latestVM = new()
+                    {
+                        Category = latest.Category,
+                        GroceryListItem = latest,
+                        GroceryCategoriesList = groceryListCategories
+                    };
+                    ModelState.Clear();
+                    TempData["error"] = "This list was modified by someone else while you were editing. The current item is shown. Please re-apply your changes.";
+                    return View(latestVM);
+                   
+                }
+                else if(result.success)
                 {
                     await _unitOfWork.CommitAsync();
                     TempData["success"] = "Grocery item updated successfully.";
@@ -784,10 +810,10 @@ namespace UsefulWebApps.Controllers
                     await _unitOfWork.RollbackAsync();
                     TempData["error"] = "Update grocery item error. Please try again.";
                 }
-                return RedirectToAction("GroceryList");
+                return RedirectToAction("GroceryList", new { listId = groceryListItem.ListId });
             }
             TempData["error"] = "Update grocery item error. Please try again.";
-            return RedirectToAction("GroceryListEdit");
+            return RedirectToAction("MyGroceryLists");
         }
 
         [HttpPost]

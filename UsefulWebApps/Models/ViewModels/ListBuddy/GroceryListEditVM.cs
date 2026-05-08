@@ -6,7 +6,7 @@ namespace UsefulWebApps.Models.ViewModels.ListBuddy
     public class GroceryListEditVM
     {
         public string Category { get; set; }
-        public GroceryList GroceryList { get; set; }
+        public GroceryListItems GroceryListItem { get; set; }
         public IEnumerable<SelectListItem> GroceryCategoriesList { get; set; }
     }
 }
