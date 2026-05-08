@@ -680,18 +680,30 @@ namespace UsefulWebApps.Controllers
 
         //transaction method
         [HttpPost]
-        public async Task<IActionResult> GroceryListToggleComplete(long? id, string userId)
+        public async Task<IActionResult> GroceryListToggleComplete(long? id, long? listId, int listVersion)
         {
-            if (id == null || id == 0 || userId == "")
-            {
+            if (id == null || id == 0 || listId == 0 || listId == null)
                 return NotFound();
-            }
+
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GroceryListToggleComplete(id, userId);
-            await _unitOfWork.CommitAsync();
-            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, userId);
+            (
+            bool success,
+            bool wasConflict,
+            GroceryLists groceryList,
+            List<GroceryListItems> groceryListItems,
+            IEnumerable<GroceryCategories> groceryCategoriesEnum,
+            List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryLists.GroceryListToggleComplete(id, listId, listVersion);
+            if (!result.success)
+            {
+                await _unitOfWork.RollbackAsync();
+                Response.Headers["X-Concurrency-Conflict"] = "true";
+            }
+            else
+                await _unitOfWork.CommitAsync();
 
+            GroceryListNewVM groceryListVM = NewFormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
+            groceryListVM.GroceryList = result.groceryList;
             return PartialView("_GroceryListPartial", groceryListVM);
         }
 

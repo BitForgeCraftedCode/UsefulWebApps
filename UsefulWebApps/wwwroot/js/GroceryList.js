@@ -66,10 +66,11 @@ function deleteGroceryItem(deleteId, category) {
     });
 }
 
-function toggleComplete(toggleId, userID) {
+function toggleComplete(id, listId, listVersion) {
     var formData = {
-        id: toggleId,
-        userId: userID
+        id: id,
+        listId: listId,
+        listVersion: listVersion
     };
     $.ajax({
         url: "/ListBuddy/GroceryListToggleComplete",
@@ -80,9 +81,17 @@ function toggleComplete(toggleId, userID) {
         },
         data: formData,
         dataType: "html",
-        success: function (response) {
+        success: function (response, status, xhr) {
             $("#grocery-list-container").empty();
             $("#grocery-list-container").append(response);
+
+            // Sync the list version from the refreshed partial back to the add form
+            var newVersion = $("#grocery-list-container").find("#version-in-partial").val();
+            $("#version-add-form").val(newVersion);
+
+            if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
+                toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");
+            }
         },
         error: function (request, status, error) {
             console.log(request.responseText);

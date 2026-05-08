@@ -6,5 +6,12 @@ namespace UsefulWebApps.Repository.IRepository
     {
         //any GroceryLists model specific database methods here
         Task<(List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GetAllItemsAndCategoriesInList(long? listId);
+        Task<(
+            bool success, 
+            bool wasConflict, 
+            GroceryLists groceryList, 
+            List<GroceryListItems> listItems, 
+            IEnumerable<GroceryCategories> groceryCategoriesEnum, 
+            List<UserGroceryCategories> userGroceryCategories)> GroceryListToggleComplete(long? id, long? listId, int expectedVersion);
     }
 }

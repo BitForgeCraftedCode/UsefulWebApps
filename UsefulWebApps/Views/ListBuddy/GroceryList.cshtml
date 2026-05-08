@@ -16,8 +16,10 @@
     <form method="post" class="max-width-550" id="add-grocery-list-item">
         <div class="input-group mb-3 mt-3">
             <!--Complete default value is False-->
-            <input asp-for="GroceryListItem.Complete" hidden />
-            <input asp-for="GroceryListItem.ListId" hidden />
+            <input asp-for="GroceryListItem.ListVersion" value="@Model.GroceryList.Version" type="hidden" id="version-add-form" />
+            <input asp-for="GroceryListItem.Complete" type="hidden" />
+            <input asp-for="GroceryListItem.SortOrder" type="hidden" />
+            <input asp-for="GroceryListItem.ListId" type="hidden" />
             <input asp-for="GroceryListItem.GroceryItem" type="text" class="form-control" placeholder="New Item" minlength="3" maxlength="100" />
             <button class="btn btn-outline-dark" type="submit">Add Item</button>
         </div>
