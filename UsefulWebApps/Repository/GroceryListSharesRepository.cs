@@ -9,6 +9,15 @@ namespace UsefulWebApps.Repository
     {
         public GroceryListSharesRepository(MySqlConnection connection) : base(connection) { }
         //any GroceryListShares model specific database methods here
+
+        public async Task<bool> ShareGroceryList(long listId, string sharedWithUserId)
+        {
+            //IGNORE so it will not throw duplicate key error if trying to share same list with same user twice
+            string sql = @"INSERT IGNORE INTO grocery_list_shares (ListId, SharedWithUserId) 
+                           VALUES (@listId, @sharedWithUserId)";
+            int rows = await _connection.ExecuteAsync(sql, new { listId, sharedWithUserId });
+            return rows > 0;
+        }
         public async Task<List<GroceryLists>> GetGroceryListsSharedWithUser(string userId)
         {
             string sql = @"SELECT gl.* FROM grocery_lists gl

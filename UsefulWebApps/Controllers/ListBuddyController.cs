@@ -979,41 +979,63 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("GroceryList");
         }
 
-        public IActionResult ShareGroceryList(string userId) 
+        public async Task<IActionResult> ShareGroceryList(long? id) 
         {
-            ShareGroceryListVM shareGroceryListVM = new()
+            if (id == null || id == 0) return NotFound();
+
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            GroceryLists groceryList = await _unitOfWork.GroceryLists.GetById(id);
+
+            // Only the owner can share their list
+            if (groceryList.UserId != userId)
             {
-                UserId = userId
+                TempData["error"] = "You can only share your own lists.";
+                return RedirectToAction("MyGroceryLists");
+            }
+
+            IEnumerable<SelectListItem> friendsList = await GetFriendsSelectListAsync(userId);
+
+            ShareGroceryListVM vm = new()
+            {
+                ListId = groceryList.Id,
+                ListTitle = groceryList.ListTitle,
+                FriendsList = friendsList
             };
-            return View(shareGroceryListVM);  
+            return View(vm);
         }
 
         //transaction method
         [HttpPost]
-        public async Task<IActionResult> ShareGroceryList(ShareGroceryListVM shareGroceryListVM)
+        public async Task<IActionResult> ShareGroceryList(ShareGroceryListVM vm)
         {
-            if (!ModelState.IsValid) { return View(); }
-            IdentityUser friend = await _userManager.FindByEmailAsync(shareGroceryListVM.Friend.Email.Trim());
-            
-            if (friend == null)
+            if (!ModelState.IsValid) 
             {
-                TempData["error"] = "Share list error. Please try again. Make sure you have the correct user name and email.";
-                return View();
-            };
-            await _unitOfWork.OpenConnectionAsync();
-            await _unitOfWork.BeginTxnAsync();
-            bool success = await _unitOfWork.GroceryList.ShareGroceryList(shareGroceryListVM.UserId, friend.Id);
-            if (success)
-            {
-                await _unitOfWork.CommitAsync();
-                TempData["success"] = "Grocery list shared.";
+                TempData["error"] = "Share list error. Try again.";
+                return RedirectToAction("MyGroceryLists");
             }
-            else
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
-                await _unitOfWork.RollbackAsync();
-                TempData["error"] = "Share list error. Please try again. Make sure your friend has a list.";
+                TempData["error"] = "You can only share lists with friends.";
+                return RedirectToAction("MyGroceryLists");
             }
-            return RedirectToAction("GroceryList");
+            GroceryLists groceryList = await _unitOfWork.GroceryLists.GetById(vm.ListId);
+            // Verify the list belongs to the current user
+            if (groceryList.UserId != userId)
+            {
+                TempData["error"] = "You can only share your own lists.";
+                return RedirectToAction("MyGroceryLists");
+            }
+            //share it
+            bool success = await _unitOfWork.GroceryListShares.ShareGroceryList(vm.ListId, vm.SelectedFriendUserId);
+            TempData[success ? "success" : "error"] = success
+                ? "List shared successfully."
+                : "Could not share list. It may already be shared with this friend.";
+            return RedirectToAction("GroceryList", new { listId = vm.ListId });
         }
 
         #endregion

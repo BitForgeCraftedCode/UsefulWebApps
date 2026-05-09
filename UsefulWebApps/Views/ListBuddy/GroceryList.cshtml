@@ -59,9 +59,12 @@
             </form>
         </div>
     </div>
-    <div class="max-width-250 mx-auto">
-        <a asp-controller="ListBuddy" asp-action="ShareGroceryList" asp-route-userId="@Model.GroceryListItem.ListId" class="btn btn-primary mb-3 w-100">Share List</a>
-    </div>
+    @if (Model.GroceryList.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+    {
+        <div class="max-width-250 mx-auto">
+            <a asp-controller="ListBuddy" asp-action="ShareGroceryList" asp-route-id="@Model.GroceryListItem.ListId" class="btn btn-primary mb-3 w-100">Share List</a>
+        </div>
+    }
     <p>
         You can save a grocery list as a template to your account.<br />
         Note: Using a saved list will delete your current list items and saving a new list template will delete the old one.

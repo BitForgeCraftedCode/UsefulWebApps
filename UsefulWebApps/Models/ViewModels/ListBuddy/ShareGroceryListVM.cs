@@ -1,10 +1,16 @@
-﻿using UsefulWebApps.IdentityModels;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace UsefulWebApps.Models.ViewModels.ListBuddy
 {
     public class ShareGroceryListVM
     {
-        public User Friend {  get; set; }
-        public string UserId { get; set; }
+        // The list being shared
+        public long ListId { get; set; }
+        public string ListTitle { get; set; }
+        // Selected friend's UserId from the dropdown
+        public string SelectedFriendUserId { get; set; } = string.Empty;
+
+        // Populates the dropdown
+        public IEnumerable<SelectListItem> FriendsList { get; set; } = new List<SelectListItem>();
     }
 }
