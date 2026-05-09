@@ -845,23 +845,38 @@ namespace UsefulWebApps.Controllers
 
         }
 
-        //transaction method
+        //transaction method -- Concurrent (check it)
         [HttpPost]
-        public async Task<IActionResult> GroceryListCreate(GroceryListVM groceryListVM)
+        public async Task<IActionResult> GroceryListAddItem(GroceryListItems groceryListItem, GroceryListNewVM groceryListVM)
         {
             //https://stackoverflow.com/questions/29309803/asp-net-mvc-modelstate-how-to-re-run-validation
             //add the VM Category to the GroceryList and re-validate
-            groceryListVM.GroceryList.Category = groceryListVM.Category;
+            groceryListItem.Category = groceryListVM.Category;
             ModelState.Clear();
-            TryValidateModel(groceryListVM.GroceryList);
+            TryValidateModel(groceryListItem);
             if (ModelState.IsValid)
             {
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
-                (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryList.GroceryListAdd(groceryListVM.GroceryList);
-                await _unitOfWork.CommitAsync();
-                GroceryListVM newGroceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, groceryListVM.GroceryList.UserId);
-                return PartialView("_GroceryListPartial", newGroceryListVM);
+                (
+                bool success,
+                bool wasConflict,
+                GroceryLists groceryList,
+                List<GroceryListItems> groceryListItems,
+                IEnumerable<GroceryCategories> groceryCategoriesEnum,
+                List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryListItems.GroceryListAddItem(groceryListItem);
+                if (!result.success)
+                {
+                    await _unitOfWork.RollbackAsync();
+                    Response.Headers["X-Concurrency-Conflict"] = "true";
+                }
+                else
+                    await _unitOfWork.CommitAsync();
+
+                GroceryListNewVM groceryListNewVM = NewFormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, groceryListItem.ListId);
+                groceryListNewVM.GroceryList = result.groceryList;
+                return PartialView("_GroceryListPartial", groceryListNewVM);
+
             }
             return StatusCode(400);
         }

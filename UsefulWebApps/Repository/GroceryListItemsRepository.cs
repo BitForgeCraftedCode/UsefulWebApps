@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Google.Protobuf.Collections;
 using MySqlConnector;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.ViewModels.ListBuddy;
@@ -110,6 +111,67 @@ namespace UsefulWebApps.Repository
                         SELECT DISTINCT Category, SortOrder FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category;
                         ";
             GridReader gridReader2 = await _connection.QueryMultipleAsync(sql2, new { listId }, transaction: _transaction);
+            GroceryLists groceryList = await gridReader2.ReadSingleAsync<GroceryLists>();
+            List<GroceryListItems> groceryListItems = (List<GroceryListItems>)await gridReader2.ReadAsync<GroceryListItems>();
+            IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader2.ReadAsync<GroceryCategories>();
+            List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader2.ReadAsync<UserGroceryCategories>();
+            return (true, false, groceryList, groceryListItems, groceryCategoriesEnum, userGroceryCategories);
+        }
+
+        //transaction method
+        public async Task<(
+            bool success,
+            bool wasConflict,
+            GroceryLists groceryList,
+            List<GroceryListItems> listItems,
+            IEnumerable<GroceryCategories> groceryCategoriesEnum,
+            List<UserGroceryCategories> userGroceryCategories)> GroceryListAddItem(GroceryListItems groceryListItem)
+        {
+            // Version check + bump
+            string sqlBump = @"UPDATE grocery_lists SET Version = Version + 1 
+                       WHERE Id = @listId AND Version = @expectedVersion";
+            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId = groceryListItem.ListId, expectedVersion = groceryListItem.ListVersion }, transaction: _transaction);
+            if (bumped == 0)
+            {
+                string sql = @"
+                        SELECT * FROM grocery_lists WHERE Id = @listId;
+                        SELECT * FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category, GroceryItem;
+                        SELECT * FROM grocery_categories ORDER BY Category;
+                        SELECT DISTINCT Category, SortOrder FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category;
+                        ";
+                GridReader gridReader = await _connection.QueryMultipleAsync(sql, new { listId = groceryListItem.ListId }, transaction: _transaction);
+                GroceryLists current = await gridReader.ReadSingleAsync<GroceryLists>();
+                List<GroceryListItems> currentItems = (List<GroceryListItems>)await gridReader.ReadAsync<GroceryListItems>();
+                IEnumerable<GroceryCategories> currentGroceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
+                List<UserGroceryCategories> currentUserGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
+
+                return (false, true, current, currentItems, currentGroceryCategoriesEnum, currentUserGroceryCategories);
+            }
+            //before insert get the sort order of the current category if no category yet set sort order to 1
+            string sortOrderSql = @"SELECT SortOrder FROM grocery_list_items WHERE Category = @category AND ListId = @listId";
+            int? sortOrder = await _connection.QueryFirstOrDefaultAsync<int?>(sortOrderSql, new { category = groceryListItem.Category, listId = groceryListItem.ListId }, transaction: _transaction);
+            if (sortOrder == null)
+            {
+                sortOrder = 1;
+            }
+            //insert
+            string insertSql = @"INSERT INTO grocery_list_items (ListId, GroceryItem, Category, Complete, SortOrder) VALUES (@listId, @groceryItem, @category, @complete, @sortOrder)";
+            int rowCount = await _connection.ExecuteAsync(insertSql, new
+            {
+                listId = groceryListItem.ListId,
+                groceryItem = groceryListItem.GroceryItem,
+                category = groceryListItem.Category,
+                complete = groceryListItem.Complete,
+                sortOrder = sortOrder
+            }, transaction: _transaction);
+
+            string sql2 = @"
+                        SELECT * FROM grocery_lists WHERE Id = @listId;
+                        SELECT * FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category, GroceryItem;
+                        SELECT * FROM grocery_categories ORDER BY Category;
+                        SELECT DISTINCT Category, SortOrder FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category;
+                        ";
+            GridReader gridReader2 = await _connection.QueryMultipleAsync(sql2, new { listId = groceryListItem.ListId }, transaction: _transaction);
             GroceryLists groceryList = await gridReader2.ReadSingleAsync<GroceryLists>();
             List<GroceryListItems> groceryListItems = (List<GroceryListItems>)await gridReader2.ReadAsync<GroceryListItems>();
             IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader2.ReadAsync<GroceryCategories>();

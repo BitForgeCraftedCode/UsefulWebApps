@@ -208,14 +208,22 @@ $("#add-grocery-list-item").validate({
     submitHandler: function (form) {
         var formData = $(form).serialize();
         $.ajax({
-            url: "/ListBuddy/GroceryListCreate",
+            url: "/ListBuddy/GroceryListAddItem",
             type: "POST",
             data: formData,
             dataType: "html",
-            success: function (response) {
+            success: function (response, status, xhr) {
                 $("#grocery-list-container").empty();
                 $("#grocery-list-container").append(response);
-                $("#GroceryList_GroceryItem").val("");
+                $("#GroceryListItem_GroceryItem").val("");
+
+                // Sync the list version from the refreshed partial back to the add form
+                var newVersion = $("#grocery-list-container").find("#version-in-partial").val();
+                $("#version-add-form").val(newVersion);
+
+                if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
+                    toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");
+                }
             },
             error: function (request, status, error) {
                 console.log(request.responseText);

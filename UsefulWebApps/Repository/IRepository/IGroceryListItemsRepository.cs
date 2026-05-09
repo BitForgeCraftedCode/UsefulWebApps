@@ -14,5 +14,12 @@ namespace UsefulWebApps.Repository.IRepository
             List<GroceryListItems> listItems, 
             IEnumerable<GroceryCategories> groceryCategoriesEnum, 
             List<UserGroceryCategories> userGroceryCategories)> DeleteGroceryListItem(long? id, long? listId, int expectedVersion);
+        Task<(
+            bool success,
+            bool wasConflict,
+            GroceryLists groceryList,
+            List<GroceryListItems> listItems,
+            IEnumerable<GroceryCategories> groceryCategoriesEnum,
+            List<UserGroceryCategories> userGroceryCategories)> GroceryListAddItem(GroceryListItems groceryListItem);
     }
 }
