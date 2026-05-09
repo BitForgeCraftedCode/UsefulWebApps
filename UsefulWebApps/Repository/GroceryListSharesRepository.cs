@@ -18,6 +18,12 @@ namespace UsefulWebApps.Repository
             int rows = await _connection.ExecuteAsync(sql, new { listId, sharedWithUserId });
             return rows > 0;
         }
+        public async Task<bool> UnshareGroceryList(long listId)
+        {
+            string sql = "DELETE FROM grocery_list_shares WHERE ListId = @listId";
+            int rows = await _connection.ExecuteAsync(sql, new { listId });
+            return rows > 0;
+        }
         public async Task<List<GroceryLists>> GetGroceryListsSharedWithUser(string userId)
         {
             string sql = @"SELECT gl.* FROM grocery_lists gl

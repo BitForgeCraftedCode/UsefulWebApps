@@ -1038,6 +1038,27 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("GroceryList", new { listId = vm.ListId });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UnShareGroceryList(long listId) 
+        {
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            GroceryLists groceryList = await _unitOfWork.GroceryLists.GetById(listId);
+            // Only the owner can share their list
+            if (groceryList.UserId != userId)
+            {
+                TempData["error"] = "You can only manage sharing on your own lists.";
+                return RedirectToAction("MyGroceryLists");
+            }
+            bool success = await _unitOfWork.GroceryListShares.UnshareGroceryList(listId);
+            TempData[success ? "success" : "error"] = success
+                ? "List unshared."
+                : "Could not unshare list.";
+
+            return RedirectToAction("MyGroceryLists");
+        } 
+
         #endregion
     }
 }

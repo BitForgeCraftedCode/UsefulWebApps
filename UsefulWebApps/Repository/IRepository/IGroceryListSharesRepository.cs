@@ -6,6 +6,7 @@ namespace UsefulWebApps.Repository.IRepository
     {
         //any GroceryListShares model specific database methods here
         Task<bool> ShareGroceryList(long listId, string sharedWithUserId);
+        Task<bool> UnshareGroceryList(long listId);
         Task<List<GroceryLists>> GetGroceryListsSharedWithUser(string userId);
         // Returns ListId -> list of friend DisplayNames this list is shared to
         Task<Dictionary<long, List<string>>> GetSharedToMapForOwner(string ownerUserId);
