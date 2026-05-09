@@ -36,7 +36,10 @@
     <div class="row">
         <div class="col-sm-12 col-md-6 col-lg-6 max-width-250 mx-auto">
             <form method="post" asp-route="deleteAllGroceryList" id="delete-all-grocery-list">
-                <input asp-for="GroceryList.Id" hidden />
+                <input asp-for="GroceryList.Id" type="hidden" />
+                <input asp-for="GroceryList.UserId" type="hidden" />
+                <input asp-for="GroceryList.ListTitle" type="hidden" />
+                <input asp-for="GroceryList.Version" type="hidden" />
                 <div>
                     <button type="submit" class="btn btn-danger mb-3 w-100">Delete All</button>
                 </div>

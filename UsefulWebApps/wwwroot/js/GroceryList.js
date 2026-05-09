@@ -6,7 +6,7 @@
                 form.submit();
             }
             else {
-                toastr.success("Item has NOT been deleted");
+                toastr.success("List has NOT been deleted");
             }
         });
     }

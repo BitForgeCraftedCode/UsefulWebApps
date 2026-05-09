@@ -883,13 +883,23 @@ namespace UsefulWebApps.Controllers
 
         [HttpPost]
         [Route("/ListBuddy/GroceryListDeleteAll", Name = "deleteAllGroceryList")]
-        public async Task<IActionResult> GroceryListDeleteAll()
+        public async Task<IActionResult> GroceryListDeleteAll(GroceryLists groceryList)
         {
-            string? userId = User.GetUserId();
-            if (string.IsNullOrEmpty(userId)) return NotFound();
-
-            await _unitOfWork.GroceryList.DeleteAllWhere("UserId", userId);
-            return RedirectToAction("GroceryList");
+            if (ModelState.IsValid)
+            {
+                bool success = await _unitOfWork.GroceryLists.Delete(groceryList.Id);
+                if (success)
+                {
+                    TempData["success"] = "Grocery list deleted successfully.";
+                }
+                else
+                {
+                    TempData["error"] = "Delete grocery list error. Try again.";
+                }
+                return RedirectToAction("MyGroceryLists");
+            }
+            TempData["error"] = "Delete grocery list error. Try again.";
+            return RedirectToAction("MyGroceryLists");
         }
 
         //transaction method
