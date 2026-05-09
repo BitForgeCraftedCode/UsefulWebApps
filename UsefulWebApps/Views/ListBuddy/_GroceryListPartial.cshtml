@@ -26,7 +26,7 @@
                             <a asp-controller="ListBuddy" asp-action="GroceryListEdit" asp-route-id="@grocerylist.Id" class="btn btn-dark btn-sm">Edit</a>
                         </div>
                         <div class="grocery-list-delete-item">
-                            <button type="button" class="btn btn-sm @(grocerylist.Complete == true ? "btn-outline-danger" : "btn-danger")" onclick="validateDeleteGroceryItem(@grocerylist.Id, `@grocerylist.Category`)">Delete</button>
+                            <button type="button" class="btn btn-sm @(grocerylist.Complete == true ? "btn-outline-danger" : "btn-danger")" onclick="validateDeleteGroceryItem(@grocerylist.Id, @grocerylist.ListId, @Model.GroceryList.Version)">Delete</button>
                         </div>
                     </div>
                 </li>

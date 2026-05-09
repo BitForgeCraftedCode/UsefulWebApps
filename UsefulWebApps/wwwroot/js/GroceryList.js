@@ -26,11 +26,11 @@ $("#use-saved-grocery-list").validate({
     }
 });
 
-function validateDeleteGroceryItem(deleteId, category) {
+function validateDeleteGroceryItem(id, listId, listVersion) {
     //ask to confirm delete
     toastConfirm().then(deleteConfirm => {
         if (deleteConfirm == true) {
-            deleteGroceryItem(deleteId, category);
+            deleteGroceryItem(id, listId, listVersion);
         }
         else {
             toastr.success("Item has NOT been deleted");
@@ -38,9 +38,11 @@ function validateDeleteGroceryItem(deleteId, category) {
     });
 }
 
-function deleteGroceryItem(deleteId, category) {
+function deleteGroceryItem(id, listId, listVersion) {
     var formData = {
-        id: deleteId
+        id: id,
+        listId: listId,
+        listVersion: listVersion
     };
     $.ajax({
         url: "/ListBuddy/GroceryListDeleteItem",
@@ -50,13 +52,17 @@ function deleteGroceryItem(deleteId, category) {
                 $("#RequestVerificationToken")[0].value
         },
         data: formData,
-        dataType: "json",
-        success: function (response) {
-            var obj = JSON.parse(response);
-            //remove the list item and if no more item in list remove the Category section
-            $("#grocery-list-item-li-" + obj.deleteId).remove();
-            if ($("#ul-" + category).children().length == 0) {
-                $("#section-" + category).remove();
+        dataType: "html",
+        success: function (response, status, xhr) {
+            $("#grocery-list-container").empty();
+            $("#grocery-list-container").append(response);
+
+            // Sync the list version from the refreshed partial back to the add form
+            var newVersion = $("#grocery-list-container").find("#version-in-partial").val();
+            $("#version-add-form").val(newVersion);
+
+            if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
+                toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");
             }
         },
         error: function (request, status, error) {

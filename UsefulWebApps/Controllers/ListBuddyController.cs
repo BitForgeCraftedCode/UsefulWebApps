@@ -524,7 +524,6 @@ namespace UsefulWebApps.Controllers
             return View(toDoItem);
         }
 
-
         //transaction method -- Concurrent
         [HttpPost]
         public async Task<IActionResult> ToDoListEdit(ToDoItems obj)
@@ -816,21 +815,34 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("MyGroceryLists");
         }
 
+        //transaction method -- Concurrent (check it)
         [HttpPost]
-        public async Task<JsonResult> GroceryListDeleteItem(long? id)
+        public async Task<IActionResult> GroceryListDeleteItem(long? id, long? listId, int listVersion)
         {
-            if (id == null || id == 0)
+            if (id == null || id == 0 || listId == 0 || listId == null)
+                return NotFound();
+
+            await _unitOfWork.OpenConnectionAsync();
+            await _unitOfWork.BeginTxnAsync();
+            (
+            bool success,
+            bool wasConflict,
+            GroceryLists groceryList,
+            List<GroceryListItems> groceryListItems,
+            IEnumerable<GroceryCategories> groceryCategoriesEnum,
+            List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryListItems.DeleteGroceryListItem(id, listId, listVersion);
+            if (!result.success)
             {
-                return Json("error id was 0 or null");
+                await _unitOfWork.RollbackAsync();
+                Response.Headers["X-Concurrency-Conflict"] = "true";
             }
-            await _unitOfWork.GroceryList.Delete(id);
-            string jsonString = """
-            { 
-                "deleteId": "ID"
-            }
-            """;
-            jsonString = jsonString.Replace("ID", $"{id}");
-            return Json(jsonString);
+            else
+                await _unitOfWork.CommitAsync();
+
+            GroceryListNewVM groceryListVM = NewFormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
+            groceryListVM.GroceryList = result.groceryList;
+            return PartialView("_GroceryListPartial", groceryListVM);
+
         }
 
         //transaction method
