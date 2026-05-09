@@ -1,10 +1,8 @@
 ﻿using Ganss.Xss;
-using Google.Protobuf.Collections;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Security.Claims;
 using UsefulWebApps.Helpers;
 using UsefulWebApps.Models.Friends;
 using UsefulWebApps.Models.ListBuddy;
@@ -677,6 +675,39 @@ namespace UsefulWebApps.Controllers
             GroceryListNewVM groceryListVM = NewFormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
             groceryListVM.GroceryList = groceryList;
             return View(groceryListVM);
+        }
+
+        public async Task<IActionResult> CreateGroceryList()
+        {
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            GroceryLists groceryList = new GroceryLists
+            {
+                UserId = userId
+            };
+
+            return View(groceryList);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateGroceryList(GroceryLists groceryList)
+        {
+            if (ModelState.IsValid)
+            {
+                bool success = await _unitOfWork.GroceryLists.Add(groceryList);
+                if (success)
+                {
+                    TempData["success"] = "Grocery list created successfully.";
+                }
+                else
+                {
+                    TempData["error"] = "Create grocery list error. Try again.";
+                }
+                return RedirectToAction("MyGroceryLists");
+            }
+            TempData["error"] = "Create grocery list error. Try again.";
+            return RedirectToAction("MyGroceryLists");
         }
 
         //transaction method -- Concurrent (check it)

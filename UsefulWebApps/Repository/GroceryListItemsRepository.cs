@@ -1,8 +1,6 @@
 ﻿using Dapper;
-using Google.Protobuf.Collections;
 using MySqlConnector;
 using UsefulWebApps.Models.ListBuddy;
-using UsefulWebApps.Models.ViewModels.ListBuddy;
 using UsefulWebApps.Repository.IRepository;
 using static Dapper.SqlMapper;
 
