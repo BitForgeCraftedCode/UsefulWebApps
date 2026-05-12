@@ -176,5 +176,41 @@ namespace UsefulWebApps.Repository
             List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader2.ReadAsync<UserGroceryCategories>();
             return (true, false, groceryList, groceryListItems, groceryCategoriesEnum, userGroceryCategories);
         }
+
+        //transaction method
+        public async Task<bool> SaveUserGroceryListTemplate(string userId, long? listId)
+        {
+            int rowsEffected = 0;
+            string sql = "DELETE FROM grocery_list_templates WHERE UserId = @userId";
+            await _connection.ExecuteAsync(sql, new { userId }, transaction: _transaction);
+            string sql1 = @"INSERT INTO grocery_list_templates (UserId, GroceryItem, Category, Complete, SortOrder) 
+                            SELECT @userId, GroceryItem, Category, Complete, SortOrder 
+                            FROM grocery_list_items WHERE ListId = @listId";
+            rowsEffected = await _connection.ExecuteAsync(sql1, new { userId, listId }, transaction: _transaction);
+            return rowsEffected > 0 ? true : false;
+        }
+
+        //transaction method
+        public async Task<bool> UseSavedGroceryListTemplate(string userId, long? listId)
+        {
+            int rowsEffected = 0;
+            //check there is a saved list
+            string sql1 = "SELECT COUNT(Id) FROM grocery_list_templates WHERE UserId = @userId";
+            int savedListRows = await _connection.QuerySingleAsync<int>(sql1, new { userId }, transaction: _transaction);
+            if (savedListRows == 0)
+            {
+                //false rollback
+                return rowsEffected > 0 ? true : false;
+            }
+            //delete current list
+            string sql2 = "DELETE FROM grocery_list_items WHERE ListId = @listId";
+            await _connection.ExecuteAsync(sql2, new { listId }, transaction: _transaction);
+            //insert saved list as current
+            string sql3 = @"INSERT INTO grocery_list_items (ListId, GroceryItem, Category, Complete, SortOrder) 
+                            SELECT @listId, GroceryItem, Category, Complete, SortOrder 
+                            FROM grocery_list_templates WHERE UserId = @userId";
+            rowsEffected = await _connection.ExecuteAsync(sql3, new { listId, userId }, transaction: _transaction);
+            return rowsEffected > 0 ? true : false;
+        }
     }
 }

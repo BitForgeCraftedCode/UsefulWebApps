@@ -935,16 +935,16 @@ namespace UsefulWebApps.Controllers
 
         //transaction method
         [HttpPost]
-        public async Task<JsonResult> SaveUserGroceryList(string userId)
+        public async Task<JsonResult> SaveUserGroceryList(string userId, long? listId)
         {
-            if (userId == null || userId == "")
+            if (userId == null || userId == "" || listId == null || listId == 0)
             {
                 return Json("error userId was null");
             }
             //jquery ajax handles the toast
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            bool success = await _unitOfWork.GroceryList.SaveUserGroceryList(userId);
+            bool success = await _unitOfWork.GroceryListItems.SaveUserGroceryListTemplate(userId, listId);
             if (!success)
             {
                 await _unitOfWork.RollbackAsync();  
@@ -956,13 +956,16 @@ namespace UsefulWebApps.Controllers
 
         //transaction method
         [HttpPost]
-        public async Task<IActionResult> UseSavedGroceryList(string userId)
+        public async Task<IActionResult> UseSavedGroceryList(string userId, long? listId)
         {
+            if (userId == null || userId == "" || listId == null || listId == 0)
+                return NotFound();
+
             if (ModelState.IsValid) 
             {
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
-                bool success = await _unitOfWork.GroceryList.UseSavedGroceryList(userId);
+                bool success = await _unitOfWork.GroceryListItems.UseSavedGroceryListTemplate(userId, listId);
                 if (success)
                 {
                     await _unitOfWork.CommitAsync();
@@ -973,10 +976,10 @@ namespace UsefulWebApps.Controllers
                     await _unitOfWork.RollbackAsync();
                     TempData["error"] = "You currently don't have a saved list. Save one first.";
                 }
-                return RedirectToAction("GroceryList");
+                return RedirectToAction("GroceryList", new { listId });
             }
             TempData["error"] = "Use grocery template error. Please try again.";
-            return RedirectToAction("GroceryList");
+            return RedirectToAction("MyGroceryLists");
         }
 
         public async Task<IActionResult> ShareGroceryList(long? id) 

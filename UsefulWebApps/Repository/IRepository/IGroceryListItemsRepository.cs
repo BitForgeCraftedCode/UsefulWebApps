@@ -21,5 +21,7 @@ namespace UsefulWebApps.Repository.IRepository
             List<GroceryListItems> listItems,
             IEnumerable<GroceryCategories> groceryCategoriesEnum,
             List<UserGroceryCategories> userGroceryCategories)> GroceryListAddItem(GroceryListItems groceryListItem);
+        Task<bool> SaveUserGroceryListTemplate(string userId, long? listId);
+        Task<bool> UseSavedGroceryListTemplate(string userId, long? listId);
     }
 }

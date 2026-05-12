@@ -43,6 +43,7 @@ CREATE TABLE `grocery_list_templates` (
   `UserId` varchar(255) NOT NULL,
   `GroceryItem` varchar(100) NOT NULL,
   `Category` varchar(50) NOT NULL,
+  `Complete` tinyint(1) NOT NULL DEFAULT '0',
   `SortOrder` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id`),
   KEY `IX_grocery_templates_user` (`UserId`),

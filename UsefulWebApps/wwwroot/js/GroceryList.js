@@ -106,20 +106,21 @@ function toggleComplete(id, listId, listVersion) {
     });
 }
 
-function saveUserList(userID) {
+function saveUserList(userID, listId) {
     //ask to confirm saving a list
     toastConfirmSaveList().then(savedListConfirm => {
         if (savedListConfirm == true) {
-            saveUserListSubmit(userID);
+            saveUserListSubmit(userID, listId);
         }
         else {
             toastr.success("List not saved");
         }
     });
 }
-function saveUserListSubmit(userID) {
+function saveUserListSubmit(userID, listId) {
     var formData = {
-        userId = userID
+        userId = userID,
+        listId = listId
     };
     $.ajax({
         url: "/ListBuddy/SaveUserGroceryList",

@@ -50,9 +50,9 @@
         </div>
         <div class="col-sm-12 col-md-6 col-lg-6 max-width-250 mx-auto">
             <div>
-                <button type="button" onclick="saveUserList(`@Model.GroceryListItem.ListId`)" class="btn btn-primary mb-3 w-100">Save List</button>
+                <button type="button" onclick="saveUserList(`@Model.GroceryList.UserId`, @Model.GroceryListItem.ListId)" class="btn btn-primary mb-3 w-100">Save List</button>
             </div>
-            <form method="post" asp-controller="ListBuddy" asp-action="UseSavedGroceryList" asp-route-userId="@Model.GroceryListItem.ListId" id="use-saved-grocery-list">
+            <form method="post" asp-controller="ListBuddy" asp-action="UseSavedGroceryList" asp-route-userId="@Model.GroceryList.UserId" asp-route-listId="@Model.GroceryListItem.ListId" id="use-saved-grocery-list">
                 <div>
                     <button class="btn btn-outline-dark mb-3 w-100">Use Saved List</button>
                 </div>
