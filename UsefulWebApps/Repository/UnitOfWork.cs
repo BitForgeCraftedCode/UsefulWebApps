@@ -77,7 +77,6 @@ namespace UsefulWebApps.Repository
         public IToDoListsRepository ToDoLists { get; private set; }
         public IToDoItemsRepository ToDoItems { get; private set; }
         public IToDoListSharesRepository ToDoListShares { get; private set; } 
-        public IGroceryListRepository GroceryList { get; private set; }
         public IGroceryListsRepository GroceryLists { get; private set; }
         public IGroceryListItemsRepository GroceryListItems { get; private set; }
         public IGroceryListSharesRepository GroceryListShares { get; private set; }
@@ -102,7 +101,6 @@ namespace UsefulWebApps.Repository
             ToDoLists = new ToDoListsRepository(_connection);
             ToDoItems = new ToDoItemsRepository(_connection);
             ToDoListShares = new ToDoListSharesRepository(_connection);
-            GroceryList = new GroceryListRepository(_connection);
             GroceryLists = new GroceryListsRepository(_connection);
             GroceryListItems = new GroceryListItemsRepository(_connection);
             GroceryListShares = new GroceryListSharesRepository(_connection);
@@ -158,7 +156,6 @@ namespace UsefulWebApps.Repository
             ToDoLists.SetTransaction(txn);
             ToDoItems.SetTransaction(txn);
             ToDoListShares.SetTransaction(txn);
-            GroceryList.SetTransaction(txn);
             GroceryLists.SetTransaction(txn);
             GroceryListItems.SetTransaction(txn);
             GroceryListShares.SetTransaction(txn);

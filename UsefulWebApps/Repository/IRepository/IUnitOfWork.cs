@@ -13,7 +13,6 @@
         IToDoListsRepository ToDoLists { get; }
         IToDoItemsRepository ToDoItems { get; }
         IToDoListSharesRepository ToDoListShares { get; }
-        IGroceryListRepository GroceryList { get; }
         IGroceryListsRepository GroceryLists { get; }
         IGroceryListItemsRepository GroceryListItems { get; }
         IGroceryListSharesRepository GroceryListShares { get; }
