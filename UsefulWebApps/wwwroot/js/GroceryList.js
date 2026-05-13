@@ -60,6 +60,7 @@ function deleteGroceryItem(id, listId, listVersion) {
             // Sync the list version from the refreshed partial back to the add form
             var newVersion = $("#grocery-list-container").find("#version-in-partial").val();
             $("#version-add-form").val(newVersion);
+            $("#version-use-saved-list").val(newVersion);
 
             if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
                 toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");
@@ -94,6 +95,7 @@ function toggleComplete(id, listId, listVersion) {
             // Sync the list version from the refreshed partial back to the add form
             var newVersion = $("#grocery-list-container").find("#version-in-partial").val();
             $("#version-add-form").val(newVersion);
+            $("#version-use-saved-list").val(newVersion);
 
             if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
                 toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");
@@ -167,6 +169,7 @@ function sortCategory(listId, newSortOrder, listVersion, category) {
             // Sync the list version from the refreshed partial back to the add form
             var newVersion = $("#grocery-list-container").find("#version-in-partial").val();
             $("#version-add-form").val(newVersion);
+            $("#version-use-saved-list").val(newVersion);
 
             if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
                 toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");
@@ -227,6 +230,7 @@ $("#add-grocery-list-item").validate({
                 // Sync the list version from the refreshed partial back to the add form
                 var newVersion = $("#grocery-list-container").find("#version-in-partial").val();
                 $("#version-add-form").val(newVersion);
+                $("#version-use-saved-list").val(newVersion);
 
                 if (xhr.getResponseHeader("X-Concurrency-Conflict") === "true") {
                     toastr.warning("The list was updated by someone else. Your view has been refreshed — please try again.");

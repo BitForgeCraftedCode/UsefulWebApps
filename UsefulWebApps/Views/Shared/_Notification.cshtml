@@ -10,3 +10,9 @@
         toastr.error('@TempData["error"]');
     </script>
 }
+@if (TempData["warning"] != null)
+{
+    <script type="text/javascript">
+        toastr.warning('@TempData["warning"]');
+    </script>
+}

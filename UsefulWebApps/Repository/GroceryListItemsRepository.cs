@@ -191,26 +191,31 @@ namespace UsefulWebApps.Repository
         }
 
         //transaction method
-        public async Task<bool> UseSavedGroceryListTemplate(string userId, long? listId)
+        public async Task<(bool success, bool wasConflict)> UseSavedGroceryListTemplate(string userId, long? listId, int expectedVersion)
         {
-            int rowsEffected = 0;
-            //check there is a saved list
-            string sql1 = "SELECT COUNT(Id) FROM grocery_list_templates WHERE UserId = @userId";
-            int savedListRows = await _connection.QuerySingleAsync<int>(sql1, new { userId }, transaction: _transaction);
+            // Version check + bump
+            string sqlBump = @"UPDATE grocery_lists SET Version = Version + 1 
+                       WHERE Id = @listId AND Version = @expectedVersion";
+            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId, expectedVersion }, transaction: _transaction);
+            if (bumped == 0)
+                return (false, true);
+            
+            //check if there is a saved list
+            string countSql = "SELECT COUNT(Id) FROM grocery_list_templates WHERE UserId = @userId";
+            int savedListRows = await _connection.QuerySingleAsync<int>(countSql, new { userId }, transaction: _transaction);
             if (savedListRows == 0)
-            {
-                //false rollback
-                return rowsEffected > 0 ? true : false;
-            }
+                return (false, false);
+            
             //delete current list
-            string sql2 = "DELETE FROM grocery_list_items WHERE ListId = @listId";
-            await _connection.ExecuteAsync(sql2, new { listId }, transaction: _transaction);
+            string deleteSql = "DELETE FROM grocery_list_items WHERE ListId = @listId";
+            await _connection.ExecuteAsync(deleteSql, new { listId }, transaction: _transaction);
             //insert saved list as current
-            string sql3 = @"INSERT INTO grocery_list_items (ListId, GroceryItem, Category, Complete, SortOrder) 
+            string insertSql = @"INSERT INTO grocery_list_items (ListId, GroceryItem, Category, Complete, SortOrder) 
                             SELECT @listId, GroceryItem, Category, Complete, SortOrder 
                             FROM grocery_list_templates WHERE UserId = @userId";
-            rowsEffected = await _connection.ExecuteAsync(sql3, new { listId, userId }, transaction: _transaction);
-            return rowsEffected > 0 ? true : false;
+            int rowsAffected = await _connection.ExecuteAsync(insertSql, new { listId, userId }, transaction: _transaction);
+            
+            return (rowsAffected > 0, false);
         }
     }
 }

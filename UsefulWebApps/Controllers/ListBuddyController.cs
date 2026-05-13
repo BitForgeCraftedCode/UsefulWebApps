@@ -915,7 +915,7 @@ namespace UsefulWebApps.Controllers
 
         //transaction method
         [HttpPost]
-        public async Task<IActionResult> UseSavedGroceryList(string userId, long? listId)
+        public async Task<IActionResult> UseSavedGroceryList(string userId, long? listId, int listVersion)
         {
             if (userId == null || userId == "" || listId == null || listId == 0)
                 return NotFound();
@@ -924,17 +924,21 @@ namespace UsefulWebApps.Controllers
             {
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
-                bool success = await _unitOfWork.GroceryListItems.UseSavedGroceryListTemplate(userId, listId);
-                if (success)
+                (bool success, bool wasConflict) result = await _unitOfWork.GroceryListItems.UseSavedGroceryListTemplate(userId, listId, listVersion);
+                if (result.wasConflict)
                 {
-                    await _unitOfWork.CommitAsync();
-                    TempData["success"] = "Grocery template loaded successfully.";
+                    await _unitOfWork.RollbackAsync();
+                    TempData["warning"] = "This grocery list was modified by someone else before the saved template could be loaded.";
+                    return RedirectToAction("GroceryList", new { listId });
                 }
-                else
+                if (!result.success)
                 {
                     await _unitOfWork.RollbackAsync();
                     TempData["error"] = "You currently don't have a saved list. Save one first.";
+                    return RedirectToAction("GroceryList", new { listId });
                 }
+                await _unitOfWork.CommitAsync();
+                TempData["success"] = "Grocery template loaded successfully.";
                 return RedirectToAction("GroceryList", new { listId });
             }
             TempData["error"] = "Use grocery template error. Please try again.";
