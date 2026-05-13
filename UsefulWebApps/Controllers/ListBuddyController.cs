@@ -669,7 +669,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("MyGroceryLists");
         }
 
-        //transaction method -- Concurrent (check it)
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> GroceryListToggleComplete(long? id, long? listId, int listVersion)
         {
@@ -698,7 +698,7 @@ namespace UsefulWebApps.Controllers
             return PartialView("_GroceryListPartial", groceryListVM);
         }
 
-        //transaction method -- Concurrent (check it)
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> GroceryListSortCategories(long? listId, int newSortOrder, int listVersion, string category)
         {
@@ -752,7 +752,7 @@ namespace UsefulWebApps.Controllers
             return View(groceryListEditVM);
         }
 
-        //transaction method -- Concurrent (check it)
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> GroceryListEdit(GroceryListItems groceryListItem, GroceryListEditVM groceryListEditVM)
         {
@@ -805,7 +805,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("MyGroceryLists");
         }
 
-        //transaction method -- Concurrent (check it)
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> GroceryListDeleteItem(long? id, long? listId, int listVersion)
         {
@@ -835,7 +835,7 @@ namespace UsefulWebApps.Controllers
 
         }
 
-        //transaction method -- Concurrent (check it)
+        //transaction method
         [HttpPost]
         public async Task<IActionResult> GroceryListAddItem(GroceryListItems groceryListItem, GroceryListVM groceryListVM)
         {
