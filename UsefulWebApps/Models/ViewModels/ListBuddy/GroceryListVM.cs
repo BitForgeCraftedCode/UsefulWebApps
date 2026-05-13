@@ -3,7 +3,7 @@ using UsefulWebApps.Models.ListBuddy;
 
 namespace UsefulWebApps.Models.ViewModels.ListBuddy
 {
-    public class GroceryListNewVM
+    public class GroceryListVM
     {
         public string Category { get; set; }
         public GroceryLists GroceryList { get; set; }

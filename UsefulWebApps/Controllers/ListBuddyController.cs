@@ -561,7 +561,7 @@ namespace UsefulWebApps.Controllers
 
         #region Grocery List
 
-        private static GroceryListNewVM FormatGroceryListForDisplay(List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories, long listId)
+        private static GroceryListVM FormatGroceryListForDisplay(List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories, long listId)
         {
             //for UI display we need a list of grocery items for each category
             //A list of lists where each individual list will contain the all items in a specific category
@@ -589,7 +589,7 @@ namespace UsefulWebApps.Controllers
                 }
             }
 
-            GroceryListNewVM groceryListVM = new()
+            GroceryListVM groceryListVM = new()
             {
                 GroceryListItem = new GroceryListItems
                 {
@@ -631,7 +631,7 @@ namespace UsefulWebApps.Controllers
 
             GroceryLists groceryList = await _unitOfWork.GroceryLists.GetById(listId);
             (List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryLists.GetAllItemsAndCategoriesInList(listId);
-            GroceryListNewVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
             groceryListVM.GroceryList = groceryList;
             return View(groceryListVM);
         }
@@ -693,7 +693,7 @@ namespace UsefulWebApps.Controllers
             else
                 await _unitOfWork.CommitAsync();
 
-            GroceryListNewVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
             groceryListVM.GroceryList = result.groceryList;
             return PartialView("_GroceryListPartial", groceryListVM);
         }
@@ -722,7 +722,7 @@ namespace UsefulWebApps.Controllers
             else
                 await _unitOfWork.CommitAsync();
 
-            GroceryListNewVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
             groceryListVM.GroceryList = result.groceryList;
             return PartialView("_GroceryListPartial", groceryListVM);
         }
@@ -829,7 +829,7 @@ namespace UsefulWebApps.Controllers
             else
                 await _unitOfWork.CommitAsync();
 
-            GroceryListNewVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
             groceryListVM.GroceryList = result.groceryList;
             return PartialView("_GroceryListPartial", groceryListVM);
 
@@ -837,7 +837,7 @@ namespace UsefulWebApps.Controllers
 
         //transaction method -- Concurrent (check it)
         [HttpPost]
-        public async Task<IActionResult> GroceryListAddItem(GroceryListItems groceryListItem, GroceryListNewVM groceryListVM)
+        public async Task<IActionResult> GroceryListAddItem(GroceryListItems groceryListItem, GroceryListVM groceryListVM)
         {
             //https://stackoverflow.com/questions/29309803/asp-net-mvc-modelstate-how-to-re-run-validation
             //add the VM Category to the GroceryList and re-validate
@@ -863,7 +863,7 @@ namespace UsefulWebApps.Controllers
                 else
                     await _unitOfWork.CommitAsync();
 
-                GroceryListNewVM groceryListNewVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, groceryListItem.ListId);
+                GroceryListVM groceryListNewVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, groceryListItem.ListId);
                 groceryListNewVM.GroceryList = result.groceryList;
                 return PartialView("_GroceryListPartial", groceryListNewVM);
 
