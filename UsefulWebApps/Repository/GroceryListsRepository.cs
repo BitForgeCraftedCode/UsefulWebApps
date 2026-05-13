@@ -11,6 +11,13 @@ namespace UsefulWebApps.Repository
         public GroceryListsRepository(MySqlConnection connection) : base(connection) { }
         //any GroceryLists model specific database methods here
 
+        public async Task<IEnumerable<GroceryCategories>> GetGroceryCategoriesEnum()
+        {
+            string sql = "SELECT * FROM grocery_categories ORDER BY Category";
+            IEnumerable<GroceryCategories> groceryCategoriesEnum = await _connection.QueryAsync<GroceryCategories>(sql);
+            return groceryCategoriesEnum;
+        }
+
         //return multiple types with a tuple https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-tuples 
         public async Task<(List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GetAllItemsAndCategoriesInList(long? listId)
         {

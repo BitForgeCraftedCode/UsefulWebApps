@@ -1,4 +1,5 @@
 ﻿using Ganss.Xss;
+using Google.Protobuf.Collections;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -170,16 +171,22 @@ namespace UsefulWebApps.Controllers
             RecipePageVM.ReturnCategories = categories;
             RecipePageVM.ReturnAscending = ascending;
 
-            (List<GroceryList> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) groceryResult = await _unitOfWork.GroceryList.GetGroceryListItemsAndCategories("UserId", userId);
-            RecipePageVM.GroceryCategoriesList = groceryResult.groceryCategoriesEnum.Select(u => new SelectListItem
+            List<GroceryLists> myGroceryLists = (List<GroceryLists>)await _unitOfWork.GroceryLists.GetAllWhere("UserId", userId);
+            List<GroceryLists> sharedWithMe = await _unitOfWork.GroceryListShares.GetGroceryListsSharedWithUser(userId);
+            myGroceryLists.AddRange(sharedWithMe);
+            //get categories
+            IEnumerable<GroceryCategories> groceryCategoriesEnum = await _unitOfWork.GroceryLists.GetGroceryCategoriesEnum();
+
+            RecipePageVM.AllMyGroceryLists = myGroceryLists.Select(u => new SelectListItem 
+            { 
+                Text = u.ListTitle,
+                Value = $"{u.Id}"
+            });
+            RecipePageVM.GroceryCategoriesList = groceryCategoriesEnum.Select(u => new SelectListItem
             {
                 Text = u.Category,
                 Value = u.Category
             });
-            RecipePageVM.AddIngredientToGrocery = new AddRecipeIngredientToGroceryVM
-            {
-                RecipeId = RecipePageVM.Recipe.RecipeId,
-            };
             return View(RecipePageVM);
         }
         [HttpPost]
@@ -194,22 +201,37 @@ namespace UsefulWebApps.Controllers
             {
                 return Json(new { success = false, message = "Invalid input." });
             }
-
-            GroceryList groceryList = new()
+            GroceryLists selectedList = await _unitOfWork.GroceryLists.GetById(addIngredientToGroceryVM.GroceryListId);
+            GroceryListItems groceryListItem = new()
             {
+                ListId = addIngredientToGroceryVM.GroceryListId,
                 GroceryItem = addIngredientToGroceryVM.GroceryItem.Trim(),
                 Category = addIngredientToGroceryVM.Category,
                 Complete = false,
-                UserId = userId
+                SortOrder = 1,
+                ListVersion = selectedList.Version,
             };
             try
             {
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
-                await _unitOfWork.GroceryList.GroceryListAdd(groceryList);
-                await _unitOfWork.CommitAsync();
-
-                return Json(new { success = true, message = "Ingredient added to grocery list." });
+                (
+                bool success,
+                bool wasConflict,
+                GroceryLists groceryList,
+                List<GroceryListItems> groceryListItems,
+                IEnumerable<GroceryCategories> groceryCategoriesEnum,
+                List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryListItems.GroceryListAddItem(groceryListItem);
+                if (!result.success)
+                {
+                    await _unitOfWork.RollbackAsync();
+                    return Json(new { success = false, message = "The list was updated by someone else. Please try again." });
+                }
+                else
+                {
+                    await _unitOfWork.CommitAsync();
+                    return Json(new { success = true, message = "Ingredient added to grocery list." });
+                }
             }
             catch (Exception ex) 
             {

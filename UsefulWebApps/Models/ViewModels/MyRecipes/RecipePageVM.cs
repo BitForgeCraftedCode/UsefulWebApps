@@ -21,5 +21,7 @@ namespace UsefulWebApps.Models.ViewModels.MyRecipes
         public AddRecipeIngredientToGroceryVM AddIngredientToGrocery { get; set; }
 
         public IEnumerable<SelectListItem> GroceryCategoriesList { get; set; }
+
+        public IEnumerable<SelectListItem> AllMyGroceryLists { get; set; }
     }
 }

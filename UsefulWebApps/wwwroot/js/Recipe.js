@@ -7,6 +7,9 @@
         },
         "AddIngredientToGrocery.Category": {
             required: true
+        },
+        "AddIngredientToGrocery.GroceryListId": {
+            required: true
         }
     },
     submitHandler: function (form) {
@@ -28,7 +31,7 @@
 
                     // clear inputs
                     $("#AddIngredientToGrocery_GroceryItem").val("");
-                    $("#AddIngredientToGrocery_Category").val("");
+                    //$("#AddIngredientToGrocery_Category").val("");
                 }
                 else {
                     toastr.error(response.message);

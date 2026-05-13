@@ -77,7 +77,6 @@
     <div class="mb-3 max-width-700">
         <h3>Add Ingredient To Grocery List</h3>
         <form method="post" asp-route="addIngredientToGroceryList" id="add-ingredient-form">
-            <input type="hidden" asp-for="AddIngredientToGrocery.RecipeId" />
             <div class="input-group mb-3">
                 <input asp-for="AddIngredientToGrocery.GroceryItem" type="text" class="form-control" placeholder="Ingredient to add" minlength="3" maxlength="100" />
                 <button class="btn btn-outline-dark" type="submit">Add</button>
@@ -85,6 +84,11 @@
             <div class="mb-2">
                 <select class="form-select" asp-for="AddIngredientToGrocery.Category" asp-items="@Model.GroceryCategoriesList" minlength="1" required>
                     <option disabled selected value="">Please Select a Category</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <select class="form-select" asp-for="AddIngredientToGrocery.GroceryListId" asp-items="@Model.AllMyGroceryLists" minlength="1" required>
+                    <option disabled selected value="">Please Select a List</option>
                 </select>
             </div>
             <div class="mb-1">
