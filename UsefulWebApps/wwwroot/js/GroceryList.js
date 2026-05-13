@@ -119,8 +119,8 @@ function saveUserList(userID, listId) {
 }
 function saveUserListSubmit(userID, listId) {
     var formData = {
-        userId = userID,
-        listId = listId
+        userId: userID,
+        listId: listId
     };
     $.ajax({
         url: "/ListBuddy/SaveUserGroceryList",
@@ -181,8 +181,8 @@ function sortCategory(listId, newSortOrder, listVersion, category) {
 
 $("#add-grocery-list-item").validate({
     rules: {
-        //GroceryList.GroceryItem is just the name of the html element
-        "GroceryList.GroceryItem": {
+        //GroceryListItem.GroceryItem is just the name of the html element
+        "GroceryListItem.GroceryItem": {
             required: true,
             minlength: 3,
             maxlength: 100,
@@ -193,13 +193,19 @@ $("#add-grocery-list-item").validate({
                 // the element itself.
                 return value.trim();
             }
+        },
+        "Category": {
+            required: true
         }
     },
     messages: {
-        "GroceryList.GroceryItem": {
+        "GroceryListItem.GroceryItem": {
             required: "Grocery Item Is Required.",
             minlength: "Please Enter At Least 3 Characters.",
             maxlength: "No More Than 100 Characters."
+        },
+        "Category": {
+            required: " Grocery Category Is Required."
         }
     },
     errorPlacement: function (error, element) {
