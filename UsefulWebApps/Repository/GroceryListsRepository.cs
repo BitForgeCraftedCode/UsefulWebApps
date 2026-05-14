@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MySqlConnector;
+using UsefulWebApps.DTO.ListBuddy;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Repository.Helpers;
 using UsefulWebApps.Repository.IRepository;
@@ -40,23 +41,14 @@ namespace UsefulWebApps.Repository
         }
 
         //transaction method
-        public async Task<(
-            bool success, 
-            bool wasConflict, 
-            GroceryLists groceryList, 
-            List<GroceryListItems> listItems, 
-            IEnumerable<GroceryCategories> groceryCategoriesEnum, 
-            List<UserGroceryCategories> userGroceryCategories)> GroceryListToggleComplete(long? id, long? listId, int expectedVersion)
+        public async Task<(bool success, bool wasConflict, GroceryListViewState viewState)> GroceryListToggleComplete(long? id, long? listId, int expectedVersion)
         {
             // Version check + bump
             bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
             if (!bumped)
             {
-                (GroceryLists groceryList,
-                List<GroceryListItems> listItems,
-                IEnumerable<GroceryCategories> groceryCategoriesEnum,
-                List<UserGroceryCategories> userGroceryCategories) conflictViewState = await _helper.GetListViewState(listId, _transaction);
-                return (false, true, conflictViewState.groceryList, conflictViewState.listItems, conflictViewState.groceryCategoriesEnum, conflictViewState.userGroceryCategories);
+                GroceryListViewState conflictViewState = await _helper.GetListViewState(listId, _transaction);
+                return (false, true, conflictViewState);
             }
             //toggle
             bool isComplete = await _connection.QuerySingleAsync<bool>(
@@ -65,39 +57,24 @@ namespace UsefulWebApps.Repository
                 ? "UPDATE grocery_list_items SET Complete = False WHERE Id = @id"
                 : "UPDATE grocery_list_items SET Complete = True WHERE Id = @id";
             await _connection.ExecuteAsync(sqlToggle, new { id }, transaction: _transaction);
-            (GroceryLists groceryList,
-            List<GroceryListItems> listItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories) viewState = await _helper.GetListViewState(listId, _transaction);
-            return (true, false, viewState.groceryList, viewState.listItems, viewState.groceryCategoriesEnum, viewState.userGroceryCategories);
+            GroceryListViewState viewState = await _helper.GetListViewState(listId, _transaction);
+            return (true, false, viewState);
         }
 
         //transaction method
-        public async Task<(
-           bool success,
-           bool wasConflict,
-           GroceryLists groceryList,
-           List<GroceryListItems> listItems,
-           IEnumerable<GroceryCategories> groceryCategoriesEnum,
-           List<UserGroceryCategories> userGroceryCategories)> GroceryListSortCategories(long? listId, int newSortOrder, int expectedVersion, string category)
+        public async Task<(bool success, bool wasConflict, GroceryListViewState viewState)> GroceryListSortCategories(long? listId, int newSortOrder, int expectedVersion, string category)
         {
             // Version check + bump;
             bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
             if (!bumped)
             {
-                (GroceryLists groceryList,
-                List<GroceryListItems> listItems,
-                IEnumerable<GroceryCategories> groceryCategoriesEnum,
-                List<UserGroceryCategories> userGroceryCategories) conflictViewState = await _helper.GetListViewState(listId, _transaction);
-                return (false, true, conflictViewState.groceryList, conflictViewState.listItems, conflictViewState.groceryCategoriesEnum, conflictViewState.userGroceryCategories);
+                GroceryListViewState conflictViewState = await _helper.GetListViewState(listId, _transaction);
+                return (false, true, conflictViewState);
             }
             string updateSql = @"UPDATE grocery_list_items SET SortOrder = @newSortOrder WHERE ListId = @listId AND Category = @category";
             await _connection.ExecuteAsync(updateSql, new { newSortOrder, listId, category }, transaction: _transaction);
-            (GroceryLists groceryList,
-            List<GroceryListItems> listItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories) viewState = await _helper.GetListViewState(listId, _transaction);
-            return (true, false, viewState.groceryList, viewState.listItems, viewState.groceryCategoriesEnum, viewState.userGroceryCategories);
+            GroceryListViewState viewState = await _helper.GetListViewState(listId, _transaction);
+            return (true, false, viewState);
         }
     }
 }

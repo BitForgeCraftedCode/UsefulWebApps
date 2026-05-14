@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MySqlConnector;
+using UsefulWebApps.DTO.ListBuddy;
 using UsefulWebApps.Models.ListBuddy;
 using static Dapper.SqlMapper;
 
@@ -33,11 +34,7 @@ namespace UsefulWebApps.Repository.Helpers
             return rows > 0;
         }
 
-        public async Task<(
-            GroceryLists groceryList,
-            List<GroceryListItems> listItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories)> GetListViewState(long? listId, MySqlTransaction? transaction)
+        public async Task<GroceryListViewState> GetListViewState(long? listId, MySqlTransaction? transaction)
         {
             string sql = @"
                 SELECT * FROM grocery_lists WHERE Id = @listId;
@@ -61,7 +58,13 @@ namespace UsefulWebApps.Repository.Helpers
             IEnumerable<GroceryCategories> currentGroceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
             List<UserGroceryCategories> currentUserGroceryCategories = (await gridReader.ReadAsync<UserGroceryCategories>()).ToList();
 
-            return (current, currentItems, currentGroceryCategoriesEnum, currentUserGroceryCategories);
+            return new GroceryListViewState 
+            { 
+                GroceryList = current,
+                ListItems = currentItems,
+                GroceryCategoriesEnum = currentGroceryCategoriesEnum,
+                UserGroceryCategories = currentUserGroceryCategories
+            };
         }
     }
 }

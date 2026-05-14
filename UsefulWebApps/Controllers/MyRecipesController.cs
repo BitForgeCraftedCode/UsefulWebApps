@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Processing;
+using UsefulWebApps.DTO.ListBuddy;
 using UsefulWebApps.Helpers;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.MyRecipes;
@@ -215,13 +216,7 @@ namespace UsefulWebApps.Controllers
             {
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
-                (
-                bool success,
-                bool wasConflict,
-                GroceryLists groceryList,
-                List<GroceryListItems> groceryListItems,
-                IEnumerable<GroceryCategories> groceryCategoriesEnum,
-                List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryListItems.GroceryListAddItem(groceryListItem);
+                (bool success, bool wasConflict, GroceryListViewState viewState) result = await _unitOfWork.GroceryListItems.GroceryListAddItem(groceryListItem);
                 if (!result.success)
                 {
                     await _unitOfWork.RollbackAsync();

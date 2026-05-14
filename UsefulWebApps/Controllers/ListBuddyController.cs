@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using UsefulWebApps.DTO.ListBuddy;
 using UsefulWebApps.Helpers;
 using UsefulWebApps.Models.Friends;
 using UsefulWebApps.Models.ListBuddy;
@@ -701,13 +702,7 @@ namespace UsefulWebApps.Controllers
 
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            (
-            bool success,
-            bool wasConflict,
-            GroceryLists groceryList,
-            List<GroceryListItems> groceryListItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryLists.GroceryListToggleComplete(id, listId, listVersion);
+            (bool success, bool wasConflict, GroceryListViewState viewState) result = await _unitOfWork.GroceryLists.GroceryListToggleComplete(id, listId, listVersion);
             if (!result.success)
                 await _unitOfWork.RollbackAsync();
             else
@@ -715,10 +710,10 @@ namespace UsefulWebApps.Controllers
 
             return GroceryListPartialResult(
                 result.success,
-                result.groceryList,
-                result.groceryListItems,
-                result.groceryCategoriesEnum,
-                result.userGroceryCategories,
+                result.viewState.GroceryList,
+                result.viewState.ListItems,
+                result.viewState.GroceryCategoriesEnum,
+                result.viewState.UserGroceryCategories,
                 (long)listId);
         }
 
@@ -731,13 +726,7 @@ namespace UsefulWebApps.Controllers
 
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            (
-            bool success,
-            bool wasConflict,
-            GroceryLists groceryList,
-            List<GroceryListItems> groceryListItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryLists.GroceryListSortCategories(listId, newSortOrder, listVersion, category);
+            (bool success, bool wasConflict, GroceryListViewState viewState) result = await _unitOfWork.GroceryLists.GroceryListSortCategories(listId, newSortOrder, listVersion, category);
             if (!result.success)
                 await _unitOfWork.RollbackAsync();
             else
@@ -745,10 +734,10 @@ namespace UsefulWebApps.Controllers
 
             return GroceryListPartialResult(
                 result.success,
-                result.groceryList,
-                result.groceryListItems,
-                result.groceryCategoriesEnum,
-                result.userGroceryCategories,
+                result.viewState.GroceryList,
+                result.viewState.ListItems,
+                result.viewState.GroceryCategoriesEnum,
+                result.viewState.UserGroceryCategories,
                 (long)listId);
         }
 
@@ -839,13 +828,7 @@ namespace UsefulWebApps.Controllers
 
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            (
-            bool success,
-            bool wasConflict,
-            GroceryLists groceryList,
-            List<GroceryListItems> groceryListItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryListItems.DeleteGroceryListItem(id, listId, listVersion);
+            (bool success, bool wasConflict, GroceryListViewState viewState) result = await _unitOfWork.GroceryListItems.DeleteGroceryListItem(id, listId, listVersion);
             if (!result.success)
                 await _unitOfWork.RollbackAsync();
             else
@@ -853,10 +836,10 @@ namespace UsefulWebApps.Controllers
 
             return GroceryListPartialResult(
                 result.success,
-                result.groceryList,
-                result.groceryListItems,
-                result.groceryCategoriesEnum,
-                result.userGroceryCategories,
+                result.viewState.GroceryList,
+                result.viewState.ListItems,
+                result.viewState.GroceryCategoriesEnum,
+                result.viewState.UserGroceryCategories,
                 (long)listId);
         }
 
@@ -873,13 +856,7 @@ namespace UsefulWebApps.Controllers
             {
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
-                (
-                bool success,
-                bool wasConflict,
-                GroceryLists groceryList,
-                List<GroceryListItems> groceryListItems,
-                IEnumerable<GroceryCategories> groceryCategoriesEnum,
-                List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryListItems.GroceryListAddItem(groceryListItem);
+                (bool success, bool wasConflict, GroceryListViewState viewState) result = await _unitOfWork.GroceryListItems.GroceryListAddItem(groceryListItem);
                 if (!result.success)
                     await _unitOfWork.RollbackAsync();
                 else
@@ -887,10 +864,10 @@ namespace UsefulWebApps.Controllers
 
                 return GroceryListPartialResult(
                     result.success,
-                    result.groceryList,
-                    result.groceryListItems,
-                    result.groceryCategoriesEnum,
-                    result.userGroceryCategories,
+                    result.viewState.GroceryList,
+                    result.viewState.ListItems,
+                    result.viewState.GroceryCategoriesEnum,
+                    result.viewState.UserGroceryCategories,
                     groceryListItem.ListId);
             }
             return StatusCode(400);

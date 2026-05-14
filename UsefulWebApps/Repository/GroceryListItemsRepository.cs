@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MySqlConnector;
+using UsefulWebApps.DTO.ListBuddy;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Repository.Helpers;
 using UsefulWebApps.Repository.IRepository;
@@ -61,23 +62,14 @@ namespace UsefulWebApps.Repository
         }
 
         //transaction method
-        public async Task<(
-            bool success,
-            bool wasConflict,
-            GroceryLists groceryList,
-            List<GroceryListItems> listItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories)> DeleteGroceryListItem(long? id, long? listId, int expectedVersion)
+        public async Task<(bool success, bool wasConflict, GroceryListViewState viewState)> DeleteGroceryListItem(long? id, long? listId, int expectedVersion)
         {
             // Version check + bump
             bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
             if (!bumped)
             {
-                (GroceryLists groceryList, 
-                List<GroceryListItems> listItems, 
-                IEnumerable<GroceryCategories> groceryCategoriesEnum, 
-                List<UserGroceryCategories> userGroceryCategories) conflictViewState = await _helper.GetListViewState(listId, _transaction);
-                return (false, true, conflictViewState.groceryList, conflictViewState.listItems, conflictViewState.groceryCategoriesEnum, conflictViewState.userGroceryCategories);
+                GroceryListViewState conflictViewState = await _helper.GetListViewState(listId, _transaction);
+                return (false, true, conflictViewState);
             }
             string deleteSql = @"DELETE FROM grocery_list_items WHERE Id = @id";
             await _connection.ExecuteAsync(deleteSql, new { id }, transaction: _transaction);
@@ -93,31 +85,19 @@ namespace UsefulWebApps.Repository
                 string sqlRenormalize = @"UPDATE grocery_list_items SET SortOrder = LEAST(SortOrder, @newMax) WHERE ListId = @ListId;";
                 await _connection.ExecuteAsync(sqlRenormalize, new { newMax, listId }, transaction: _transaction);
             }
-            (GroceryLists groceryList,
-            List<GroceryListItems> listItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories) viewState = await _helper.GetListViewState(listId, _transaction);
-            return (true, false, viewState.groceryList, viewState.listItems, viewState.groceryCategoriesEnum, viewState.userGroceryCategories);
+            GroceryListViewState viewState = await _helper.GetListViewState(listId, _transaction);
+            return (true, false, viewState);
         }
 
         //transaction method
-        public async Task<(
-            bool success,
-            bool wasConflict,
-            GroceryLists groceryList,
-            List<GroceryListItems> listItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories)> GroceryListAddItem(GroceryListItems groceryListItem)
+        public async Task<(bool success, bool wasConflict, GroceryListViewState viewState)> GroceryListAddItem(GroceryListItems groceryListItem)
         {
             // Version check + bump
             bool bumped = await _helper.TryBumpVersion(groceryListItem.ListId, groceryListItem.ListVersion, _transaction);
             if (!bumped)
             {
-                (GroceryLists groceryList,
-                List<GroceryListItems> listItems,
-                IEnumerable<GroceryCategories> groceryCategoriesEnum,
-                List<UserGroceryCategories> userGroceryCategories) conflictViewState = await _helper.GetListViewState(groceryListItem.ListId, _transaction);
-                return (false, true, conflictViewState.groceryList, conflictViewState.listItems, conflictViewState.groceryCategoriesEnum, conflictViewState.userGroceryCategories);
+                GroceryListViewState conflictViewState = await _helper.GetListViewState(groceryListItem.ListId, _transaction);
+                return (false, true, conflictViewState);
             }
             //before insert get the sort order of the current category if no category yet set sort order to 1
             string sortOrderSql = @"SELECT SortOrder FROM grocery_list_items WHERE Category = @category AND ListId = @listId";
@@ -137,11 +117,8 @@ namespace UsefulWebApps.Repository
                 sortOrder = sortOrder
             }, transaction: _transaction);
 
-            (GroceryLists groceryList,
-            List<GroceryListItems> listItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories) viewState = await _helper.GetListViewState(groceryListItem.ListId, _transaction);
-            return (true, false, viewState.groceryList, viewState.listItems, viewState.groceryCategoriesEnum, viewState.userGroceryCategories);
+            GroceryListViewState viewState = await _helper.GetListViewState(groceryListItem.ListId, _transaction);
+            return (true, false, viewState);
         }
 
         //transaction method
