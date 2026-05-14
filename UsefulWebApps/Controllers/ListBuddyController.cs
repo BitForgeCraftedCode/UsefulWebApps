@@ -1,4 +1,5 @@
 ﻿using Ganss.Xss;
+using Google.Protobuf.Collections;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -602,6 +603,28 @@ namespace UsefulWebApps.Controllers
             return groceryListVM;
         }
 
+        private IActionResult GroceryListPartialResult(
+            bool success,
+            GroceryLists groceryList,
+            List<GroceryListItems> groceryListItems,
+            IEnumerable<GroceryCategories> groceryCategoriesEnum,
+            List<UserGroceryCategories> userGroceryCategories,
+            long listId)
+        {
+            GroceryListVM vm = FormatGroceryListForDisplay(
+                groceryListItems,
+                groceryCategoriesEnum,
+                userGroceryCategories,
+                listId);
+
+            vm.GroceryList = groceryList;
+
+            if (!success)
+                Response.Headers["X-Concurrency-Conflict"] = "true";
+
+            return PartialView("_GroceryListPartial", vm);
+        }
+
         public async Task<IActionResult> MyGroceryLists()
         {
             string? userId = User.GetUserId();
@@ -686,16 +709,17 @@ namespace UsefulWebApps.Controllers
             IEnumerable<GroceryCategories> groceryCategoriesEnum,
             List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryLists.GroceryListToggleComplete(id, listId, listVersion);
             if (!result.success)
-            {
                 await _unitOfWork.RollbackAsync();
-                Response.Headers["X-Concurrency-Conflict"] = "true";
-            }
             else
                 await _unitOfWork.CommitAsync();
 
-            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
-            groceryListVM.GroceryList = result.groceryList;
-            return PartialView("_GroceryListPartial", groceryListVM);
+            return GroceryListPartialResult(
+                result.success,
+                result.groceryList,
+                result.groceryListItems,
+                result.groceryCategoriesEnum,
+                result.userGroceryCategories,
+                (long)listId);
         }
 
         //transaction method -- Concurrent
@@ -715,16 +739,17 @@ namespace UsefulWebApps.Controllers
             IEnumerable<GroceryCategories> groceryCategoriesEnum,
             List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryLists.GroceryListSortCategories(listId, newSortOrder, listVersion, category);
             if (!result.success)
-            {
                 await _unitOfWork.RollbackAsync();
-                Response.Headers["X-Concurrency-Conflict"] = "true";
-            }
             else
                 await _unitOfWork.CommitAsync();
 
-            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
-            groceryListVM.GroceryList = result.groceryList;
-            return PartialView("_GroceryListPartial", groceryListVM);
+            return GroceryListPartialResult(
+                result.success,
+                result.groceryList,
+                result.groceryListItems,
+                result.groceryCategoriesEnum,
+                result.userGroceryCategories,
+                (long)listId);
         }
 
         public async Task<IActionResult> GroceryListEdit(long? id)
@@ -822,17 +847,17 @@ namespace UsefulWebApps.Controllers
             IEnumerable<GroceryCategories> groceryCategoriesEnum,
             List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryListItems.DeleteGroceryListItem(id, listId, listVersion);
             if (!result.success)
-            {
                 await _unitOfWork.RollbackAsync();
-                Response.Headers["X-Concurrency-Conflict"] = "true";
-            }
             else
                 await _unitOfWork.CommitAsync();
 
-            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
-            groceryListVM.GroceryList = result.groceryList;
-            return PartialView("_GroceryListPartial", groceryListVM);
-
+            return GroceryListPartialResult(
+                result.success,
+                result.groceryList,
+                result.groceryListItems,
+                result.groceryCategoriesEnum,
+                result.userGroceryCategories,
+                (long)listId);
         }
 
         //transaction method -- Concurrent
@@ -856,17 +881,17 @@ namespace UsefulWebApps.Controllers
                 IEnumerable<GroceryCategories> groceryCategoriesEnum,
                 List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryListItems.GroceryListAddItem(groceryListItem);
                 if (!result.success)
-                {
                     await _unitOfWork.RollbackAsync();
-                    Response.Headers["X-Concurrency-Conflict"] = "true";
-                }
                 else
                     await _unitOfWork.CommitAsync();
 
-                GroceryListVM groceryListNewVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, groceryListItem.ListId);
-                groceryListNewVM.GroceryList = result.groceryList;
-                return PartialView("_GroceryListPartial", groceryListNewVM);
-
+                return GroceryListPartialResult(
+                    result.success,
+                    result.groceryList,
+                    result.groceryListItems,
+                    result.groceryCategoriesEnum,
+                    result.userGroceryCategories,
+                    groceryListItem.ListId);
             }
             return StatusCode(400);
         }
