@@ -1,14 +1,19 @@
-﻿using UsefulWebApps.Models.ListBuddy;
-using UsefulWebApps.Repository.IRepository;
+﻿using Dapper;
 using MySqlConnector;
-using Dapper;
+using UsefulWebApps.Models.ListBuddy;
+using UsefulWebApps.Repository.Helpers;
+using UsefulWebApps.Repository.IRepository;
 using static Dapper.SqlMapper;
 
 namespace UsefulWebApps.Repository
 {
     public class GroceryListsRepository : Repository<GroceryLists>, IGroceryListsRepository
     {
-        public GroceryListsRepository(MySqlConnection connection) : base(connection) { }
+        private readonly GroceryListRepositoryHelper _helper;
+        public GroceryListsRepository(MySqlConnection connection) : base(connection) 
+        {
+            _helper = new GroceryListRepositoryHelper(connection);
+        }
         //any GroceryLists model specific database methods here
 
         public async Task<IEnumerable<GroceryCategories>> GetGroceryCategoriesEnum()
@@ -44,10 +49,8 @@ namespace UsefulWebApps.Repository
             List<UserGroceryCategories> userGroceryCategories)> GroceryListToggleComplete(long? id, long? listId, int expectedVersion)
         {
             // Version check + bump
-            string sqlBump = @"UPDATE grocery_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @expectedVersion";
-            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId, expectedVersion }, transaction: _transaction);
-            if (bumped == 0)
+            bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
+            if (!bumped)
             {
                 string sql = @"
                         SELECT * FROM grocery_lists WHERE Id = @listId;
@@ -93,11 +96,9 @@ namespace UsefulWebApps.Repository
            IEnumerable<GroceryCategories> groceryCategoriesEnum,
            List<UserGroceryCategories> userGroceryCategories)> GroceryListSortCategories(long? listId, int newSortOrder, int expectedVersion, string category)
         {
-            // Version check + bump
-            string sqlBump = @"UPDATE grocery_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @expectedVersion";
-            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId, expectedVersion }, transaction: _transaction);
-            if (bumped == 0)
+            // Version check + bump;
+            bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
+            if (!bumped)
             {
                 string sql = @"
                         SELECT * FROM grocery_lists WHERE Id = @listId;

@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using MySqlConnector;
 using UsefulWebApps.Models.ListBuddy;
+using UsefulWebApps.Repository.Helpers;
 using UsefulWebApps.Repository.IRepository;
 using static Dapper.SqlMapper;
 
@@ -8,7 +9,11 @@ namespace UsefulWebApps.Repository
 {
     public class GroceryListItemsRepository : Repository<GroceryListItems>, IGroceryListItemsRepository
     {
-        public GroceryListItemsRepository(MySqlConnection connection) : base(connection) { }
+        private readonly GroceryListRepositoryHelper _helper;
+        public GroceryListItemsRepository(MySqlConnection connection) : base(connection) 
+        {
+            _helper = new GroceryListRepositoryHelper(connection);
+        }
 
         //any GroceryListItems model specific database methods here
 
@@ -28,12 +33,9 @@ namespace UsefulWebApps.Repository
         public async Task<(bool success, bool wasConflict)> GroceryListUpdate(GroceryListItems groceryListItem)
         {
             // Version check + bump
-            string sqlBump = @"UPDATE grocery_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @expectedVersion";
-            int bumped = await _connection.ExecuteAsync(sqlBump,
-                new { listId = groceryListItem.ListId, expectedVersion = groceryListItem.ListVersion }, transaction: _transaction);
+            bool bumped = await _helper.TryBumpVersion(groceryListItem.ListId, groceryListItem.ListVersion, _transaction);
             // conflict
-            if (bumped == 0) return (false, true);
+            if (!bumped) return (false, true);
 
             //before update get the sort order of the category if no category yet set sort order to 1
             string sql = "SELECT SortOrder FROM grocery_list_items WHERE Category = @category AND ListId = @listId";
@@ -68,10 +70,8 @@ namespace UsefulWebApps.Repository
             List<UserGroceryCategories> userGroceryCategories)> DeleteGroceryListItem(long? id, long? listId, int expectedVersion)
         {
             // Version check + bump
-            string sqlBump = @"UPDATE grocery_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @expectedVersion";
-            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId, expectedVersion }, transaction: _transaction);
-            if (bumped == 0)
+            bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
+            if (!bumped)
             {
                 string sql = @"
                         SELECT * FROM grocery_lists WHERE Id = @listId;
@@ -126,10 +126,8 @@ namespace UsefulWebApps.Repository
             List<UserGroceryCategories> userGroceryCategories)> GroceryListAddItem(GroceryListItems groceryListItem)
         {
             // Version check + bump
-            string sqlBump = @"UPDATE grocery_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @expectedVersion";
-            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId = groceryListItem.ListId, expectedVersion = groceryListItem.ListVersion }, transaction: _transaction);
-            if (bumped == 0)
+            bool bumped = await _helper.TryBumpVersion(groceryListItem.ListId, groceryListItem.ListVersion, _transaction);
+            if (!bumped)
             {
                 string sql = @"
                         SELECT * FROM grocery_lists WHERE Id = @listId;
@@ -194,10 +192,8 @@ namespace UsefulWebApps.Repository
         public async Task<(bool success, bool wasConflict)> UseSavedGroceryListTemplate(string userId, long? listId, int expectedVersion)
         {
             // Version check + bump
-            string sqlBump = @"UPDATE grocery_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @expectedVersion";
-            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId, expectedVersion }, transaction: _transaction);
-            if (bumped == 0)
+            bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
+            if (!bumped)
                 return (false, true);
             
             //check if there is a saved list
