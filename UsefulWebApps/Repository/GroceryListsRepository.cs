@@ -52,19 +52,11 @@ namespace UsefulWebApps.Repository
             bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
             if (!bumped)
             {
-                string sql = @"
-                        SELECT * FROM grocery_lists WHERE Id = @listId;
-                        SELECT * FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category, GroceryItem;
-                        SELECT * FROM grocery_categories ORDER BY Category;
-                        SELECT DISTINCT Category, SortOrder FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category;
-                        ";
-                GridReader gridReader = await _connection.QueryMultipleAsync(sql, new { listId }, transaction: _transaction);
-                GroceryLists current = await gridReader.ReadSingleAsync<GroceryLists>();
-                List<GroceryListItems> currentItems = (List<GroceryListItems>)await gridReader.ReadAsync<GroceryListItems>();
-                IEnumerable<GroceryCategories> currentGroceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
-                List<UserGroceryCategories> currentUserGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
-
-                return (false, true, current, currentItems, currentGroceryCategoriesEnum, currentUserGroceryCategories);
+                (GroceryLists groceryList,
+                List<GroceryListItems> listItems,
+                IEnumerable<GroceryCategories> groceryCategoriesEnum,
+                List<UserGroceryCategories> userGroceryCategories) conflictViewState = await _helper.GetListViewState(listId, _transaction);
+                return (false, true, conflictViewState.groceryList, conflictViewState.listItems, conflictViewState.groceryCategoriesEnum, conflictViewState.userGroceryCategories);
             }
             //toggle
             bool isComplete = await _connection.QuerySingleAsync<bool>(
@@ -73,18 +65,11 @@ namespace UsefulWebApps.Repository
                 ? "UPDATE grocery_list_items SET Complete = False WHERE Id = @id"
                 : "UPDATE grocery_list_items SET Complete = True WHERE Id = @id";
             await _connection.ExecuteAsync(sqlToggle, new { id }, transaction: _transaction);
-            string sql2 = @"
-                        SELECT * FROM grocery_lists WHERE Id = @listId;
-                        SELECT * FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category, GroceryItem;
-                        SELECT * FROM grocery_categories ORDER BY Category;
-                        SELECT DISTINCT Category, SortOrder FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category;
-                        ";
-            GridReader gridReader2 = await _connection.QueryMultipleAsync(sql2, new { listId }, transaction: _transaction);
-            GroceryLists groceryList = await gridReader2.ReadSingleAsync<GroceryLists>();
-            List<GroceryListItems> groceryListItems = (List<GroceryListItems>)await gridReader2.ReadAsync<GroceryListItems>();
-            IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader2.ReadAsync<GroceryCategories>();
-            List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader2.ReadAsync<UserGroceryCategories>();
-            return (true, false, groceryList, groceryListItems, groceryCategoriesEnum, userGroceryCategories);
+            (GroceryLists groceryList,
+            List<GroceryListItems> listItems,
+            IEnumerable<GroceryCategories> groceryCategoriesEnum,
+            List<UserGroceryCategories> userGroceryCategories) viewState = await _helper.GetListViewState(listId, _transaction);
+            return (true, false, viewState.groceryList, viewState.listItems, viewState.groceryCategoriesEnum, viewState.userGroceryCategories);
         }
 
         //transaction method
@@ -100,34 +85,19 @@ namespace UsefulWebApps.Repository
             bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
             if (!bumped)
             {
-                string sql = @"
-                        SELECT * FROM grocery_lists WHERE Id = @listId;
-                        SELECT * FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category, GroceryItem;
-                        SELECT * FROM grocery_categories ORDER BY Category;
-                        SELECT DISTINCT Category, SortOrder FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category;
-                        ";
-                GridReader gridReader = await _connection.QueryMultipleAsync(sql, new { listId }, transaction: _transaction);
-                GroceryLists current = await gridReader.ReadSingleAsync<GroceryLists>();
-                List<GroceryListItems> currentItems = (List<GroceryListItems>)await gridReader.ReadAsync<GroceryListItems>();
-                IEnumerable<GroceryCategories> currentGroceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
-                List<UserGroceryCategories> currentUserGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
-
-                return (false, true, current, currentItems, currentGroceryCategoriesEnum, currentUserGroceryCategories);
+                (GroceryLists groceryList,
+                List<GroceryListItems> listItems,
+                IEnumerable<GroceryCategories> groceryCategoriesEnum,
+                List<UserGroceryCategories> userGroceryCategories) conflictViewState = await _helper.GetListViewState(listId, _transaction);
+                return (false, true, conflictViewState.groceryList, conflictViewState.listItems, conflictViewState.groceryCategoriesEnum, conflictViewState.userGroceryCategories);
             }
             string updateSql = @"UPDATE grocery_list_items SET SortOrder = @newSortOrder WHERE ListId = @listId AND Category = @category";
             await _connection.ExecuteAsync(updateSql, new { newSortOrder, listId, category }, transaction: _transaction);
-            string sql2 = @"
-                        SELECT * FROM grocery_lists WHERE Id = @listId;
-                        SELECT * FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category, GroceryItem;
-                        SELECT * FROM grocery_categories ORDER BY Category;
-                        SELECT DISTINCT Category, SortOrder FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category;
-                        ";
-            GridReader gridReader2 = await _connection.QueryMultipleAsync(sql2, new { listId }, transaction: _transaction);
-            GroceryLists groceryList = await gridReader2.ReadSingleAsync<GroceryLists>();
-            List <GroceryListItems> groceryListItems = (List<GroceryListItems>)await gridReader2.ReadAsync<GroceryListItems>();
-            IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader2.ReadAsync<GroceryCategories>();
-            List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader2.ReadAsync<UserGroceryCategories>();
-            return (true, false, groceryList, groceryListItems, groceryCategoriesEnum, userGroceryCategories);
+            (GroceryLists groceryList,
+            List<GroceryListItems> listItems,
+            IEnumerable<GroceryCategories> groceryCategoriesEnum,
+            List<UserGroceryCategories> userGroceryCategories) viewState = await _helper.GetListViewState(listId, _transaction);
+            return (true, false, viewState.groceryList, viewState.listItems, viewState.groceryCategoriesEnum, viewState.userGroceryCategories);
         }
     }
 }
