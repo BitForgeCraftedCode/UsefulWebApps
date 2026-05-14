@@ -604,21 +604,15 @@ namespace UsefulWebApps.Controllers
             return groceryListVM;
         }
 
-        private IActionResult GroceryListPartialResult(
-            bool success,
-            GroceryLists groceryList,
-            List<GroceryListItems> groceryListItems,
-            IEnumerable<GroceryCategories> groceryCategoriesEnum,
-            List<UserGroceryCategories> userGroceryCategories,
-            long listId)
+        private IActionResult GroceryListPartialResult(bool success, GroceryListViewState viewState, long listId)
         {
             GroceryListVM vm = FormatGroceryListForDisplay(
-                groceryListItems,
-                groceryCategoriesEnum,
-                userGroceryCategories,
+                viewState.ListItems,
+                viewState.GroceryCategoriesEnum,
+                viewState.UserGroceryCategories,
                 listId);
 
-            vm.GroceryList = groceryList;
+            vm.GroceryList = viewState.GroceryList;
 
             if (!success)
                 Response.Headers["X-Concurrency-Conflict"] = "true";
@@ -708,13 +702,7 @@ namespace UsefulWebApps.Controllers
             else
                 await _unitOfWork.CommitAsync();
 
-            return GroceryListPartialResult(
-                result.success,
-                result.viewState.GroceryList,
-                result.viewState.ListItems,
-                result.viewState.GroceryCategoriesEnum,
-                result.viewState.UserGroceryCategories,
-                (long)listId);
+            return GroceryListPartialResult(result.success, result.viewState, (long)listId);
         }
 
         //transaction method -- Concurrent
@@ -732,13 +720,7 @@ namespace UsefulWebApps.Controllers
             else
                 await _unitOfWork.CommitAsync();
 
-            return GroceryListPartialResult(
-                result.success,
-                result.viewState.GroceryList,
-                result.viewState.ListItems,
-                result.viewState.GroceryCategoriesEnum,
-                result.viewState.UserGroceryCategories,
-                (long)listId);
+            return GroceryListPartialResult(result.success, result.viewState, (long)listId);
         }
 
         public async Task<IActionResult> GroceryListEdit(long? id)
@@ -834,13 +816,7 @@ namespace UsefulWebApps.Controllers
             else
                 await _unitOfWork.CommitAsync();
 
-            return GroceryListPartialResult(
-                result.success,
-                result.viewState.GroceryList,
-                result.viewState.ListItems,
-                result.viewState.GroceryCategoriesEnum,
-                result.viewState.UserGroceryCategories,
-                (long)listId);
+            return GroceryListPartialResult(result.success, result.viewState, (long)listId);
         }
 
         //transaction method -- Concurrent
@@ -862,13 +838,7 @@ namespace UsefulWebApps.Controllers
                 else
                     await _unitOfWork.CommitAsync();
 
-                return GroceryListPartialResult(
-                    result.success,
-                    result.viewState.GroceryList,
-                    result.viewState.ListItems,
-                    result.viewState.GroceryCategoriesEnum,
-                    result.viewState.UserGroceryCategories,
-                    groceryListItem.ListId);
+                return GroceryListPartialResult(result.success, result.viewState, groceryListItem.ListId);
             }
             return StatusCode(400);
         }
