@@ -24,22 +24,40 @@ namespace UsefulWebApps.Repository
             return groceryCategoriesEnum;
         }
 
-        //return multiple types with a tuple https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-tuples 
-        public async Task<(List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories)> GetAllItemsAndCategoriesInList(long? listId)
+        public async Task<GroceryListViewState> GetAllItemsAndCategoriesInList(long? listId)
         {
             string sql = @"
-                        SELECT * FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category, GroceryItem;
-                        SELECT * FROM grocery_categories ORDER BY Category;
-                        SELECT DISTINCT Category, SortOrder FROM grocery_list_items WHERE ListId = @listId ORDER BY SortOrder, Category;
-                        ";
-            GridReader gridReader = await _connection.QueryMultipleAsync(sql, new { listId });
-            List<GroceryListItems> groceryListItems = (List<GroceryListItems>)await gridReader.ReadAsync<GroceryListItems>();
-            IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
-            List<UserGroceryCategories> userGroceryCategories = (List<UserGroceryCategories>)await gridReader.ReadAsync<UserGroceryCategories>();
+                SELECT * FROM grocery_lists WHERE Id = @listId;
 
-            return (groceryListItems, groceryCategoriesEnum, userGroceryCategories);
+                SELECT * FROM grocery_list_items 
+                WHERE ListId = @listId 
+                ORDER BY SortOrder, Category, GroceryItem;
+
+                SELECT * FROM grocery_categories 
+                ORDER BY Category;
+
+                SELECT DISTINCT Category, SortOrder 
+                FROM grocery_list_items
+                WHERE ListId = @listId 
+                ORDER BY SortOrder, Category;
+            ";
+            GridReader gridReader = await _connection.QueryMultipleAsync(sql, new { listId });
+
+            GroceryLists groceryList = await gridReader.ReadSingleAsync<GroceryLists>();
+            List<GroceryListItems> groceryListItems = (await gridReader.ReadAsync<GroceryListItems>()).ToList();
+            IEnumerable<GroceryCategories> groceryCategoriesEnum = await gridReader.ReadAsync<GroceryCategories>();
+            List<UserGroceryCategories> userGroceryCategories = (await gridReader.ReadAsync<UserGroceryCategories>()).ToList();
+
+            return new GroceryListViewState
+            {
+                GroceryList = groceryList,
+                ListItems = groceryListItems,
+                GroceryCategoriesEnum = groceryCategoriesEnum,
+                UserGroceryCategories = userGroceryCategories
+            };
         }
 
+        //return multiple types with a tuple https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-tuples 
         //transaction method
         public async Task<(bool success, bool wasConflict, GroceryListViewState viewState)> GroceryListToggleComplete(long? id, long? listId, int expectedVersion)
         {

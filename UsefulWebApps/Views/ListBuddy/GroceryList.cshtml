@@ -39,6 +39,7 @@
                 <input asp-for="GroceryList.Id" type="hidden" />
                 <input asp-for="GroceryList.UserId" type="hidden" />
                 <input asp-for="GroceryList.ListTitle" type="hidden" />
+                <!--Delete All is not concurrent so version # doesnt need to match here-->
                 <input asp-for="GroceryList.Version" type="hidden" />
                 <div>
                     <button type="submit" class="btn btn-danger mb-3 w-100">Delete All</button>

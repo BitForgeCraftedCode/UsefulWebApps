@@ -563,7 +563,7 @@ namespace UsefulWebApps.Controllers
 
         #region Grocery List
 
-        private static GroceryListVM FormatGroceryListForDisplay(List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories, long listId)
+        private static GroceryListVM FormatGroceryListForDisplay(GroceryLists grocerylist, List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories, long listId)
         {
             //for UI display we need a list of grocery items for each category
             //A list of lists where each individual list will contain the all items in a specific category
@@ -593,6 +593,7 @@ namespace UsefulWebApps.Controllers
 
             GroceryListVM groceryListVM = new()
             {
+                GroceryList = grocerylist,
                 GroceryListItem = new GroceryListItems
                 {
                     ListId = listId,
@@ -607,12 +608,11 @@ namespace UsefulWebApps.Controllers
         private IActionResult GroceryListPartialResult(bool success, GroceryListViewState viewState, long listId)
         {
             GroceryListVM vm = FormatGroceryListForDisplay(
+                viewState.GroceryList,
                 viewState.ListItems,
                 viewState.GroceryCategoriesEnum,
                 viewState.UserGroceryCategories,
                 listId);
-
-            vm.GroceryList = viewState.GroceryList;
 
             if (!success)
                 Response.Headers["X-Concurrency-Conflict"] = "true";
@@ -647,10 +647,8 @@ namespace UsefulWebApps.Controllers
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            GroceryLists groceryList = await _unitOfWork.GroceryLists.GetById(listId);
-            (List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories) result = await _unitOfWork.GroceryLists.GetAllItemsAndCategoriesInList(listId);
-            GroceryListVM groceryListVM = FormatGroceryListForDisplay(result.groceryListItems, result.groceryCategoriesEnum, result.userGroceryCategories, (long)listId);
-            groceryListVM.GroceryList = groceryList;
+            GroceryListViewState viewState = await _unitOfWork.GroceryLists.GetAllItemsAndCategoriesInList(listId);
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(viewState.GroceryList, viewState.ListItems, viewState.GroceryCategoriesEnum, viewState.UserGroceryCategories, (long)listId);
             return View(groceryListVM);
         }
 
