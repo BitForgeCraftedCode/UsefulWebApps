@@ -605,6 +605,25 @@ namespace UsefulWebApps.Controllers
             return groceryListVM;
         }
 
+        private static GroceryListEditVM FormatGroceryListEditForDisplay(GroceryLists parentList, GroceryListItems groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum)
+        {
+            IEnumerable<SelectListItem> groceryListCategories = groceryCategoriesEnum.Select(u => new SelectListItem
+            {
+                Text = u.Category,
+                Value = u.Category
+            });
+
+            groceryListItem.ListVersion = parentList.Version;
+
+            GroceryListEditVM vm = new()
+            {
+                Category = groceryListItem.Category,
+                GroceryListItem = groceryListItem,
+                GroceryCategoriesList = groceryListCategories
+            };
+
+            return vm;
+        }
         private IActionResult GroceryListPartialResult(bool success, GroceryListViewState viewState, long listId)
         {
             GroceryListVM vm = FormatGroceryListForDisplay(
@@ -721,29 +740,14 @@ namespace UsefulWebApps.Controllers
             return GroceryListPartialResult(result.success, result.viewState, (long)listId);
         }
 
-        public async Task<IActionResult> GroceryListEdit(long? id)
+        public async Task<IActionResult> GroceryListEdit(long? id, long? listId)
         {
-            if (id == null || id == 0)
-            {
+            if (id == null || id == 0 || listId == null || listId == 0)
                 return NotFound();
-            }
-            (GroceryListItems groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryListItems.GetGroceryListItemAndCategoriesAtId(id);
-            GroceryListItems groceryListItem = result.groceryListItem;
-            IEnumerable<GroceryCategories> groceryCategoriesEnum = result.groceryCategoriesEnum;
-            IEnumerable<SelectListItem> groceryListCategories = groceryCategoriesEnum.Select(u => new SelectListItem
-            {
-                Text = u.Category,
-                Value = u.Category
-            });
-            GroceryLists parentList = await _unitOfWork.GroceryLists.GetById(groceryListItem.ListId);
-            groceryListItem.ListVersion = parentList.Version;
-            GroceryListEditVM groceryListEditVM = new()
-            {
-                Category = groceryListItem.Category,
-                GroceryListItem = groceryListItem,
-                GroceryCategoriesList = groceryListCategories
-            };
-            return View(groceryListEditVM);
+            
+            (GroceryLists parentList, GroceryListItems groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum) result = await _unitOfWork.GroceryListItems.GetGroceryListItemAndCategoriesAtId(id, listId);
+            GroceryListEditVM vm = FormatGroceryListEditForDisplay(result.parentList, result.groceryListItem, result.groceryCategoriesEnum);
+            return View(vm);
         }
 
         //transaction method -- Concurrent
@@ -762,22 +766,8 @@ namespace UsefulWebApps.Controllers
                 if (result.success == false && result.wasConflict == true) 
                 {
                     await _unitOfWork.RollbackAsync();
-                    (GroceryListItems groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum) resultB = await _unitOfWork.GroceryListItems.GetGroceryListItemAndCategoriesAtId(groceryListItem.Id);
-                    GroceryListItems latest = resultB.groceryListItem;
-                    IEnumerable<GroceryCategories> groceryCategoriesEnum = resultB.groceryCategoriesEnum;
-                    IEnumerable<SelectListItem> groceryListCategories = groceryCategoriesEnum.Select(u => new SelectListItem
-                    {
-                        Text = u.Category,
-                        Value = u.Category
-                    });
-                    GroceryLists parentList = await _unitOfWork.GroceryLists.GetById(latest.ListId);
-                    latest.ListVersion = parentList.Version;
-                    GroceryListEditVM latestVM = new()
-                    {
-                        Category = latest.Category,
-                        GroceryListItem = latest,
-                        GroceryCategoriesList = groceryListCategories
-                    };
+                    (GroceryLists parentList, GroceryListItems groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum) resultB = await _unitOfWork.GroceryListItems.GetGroceryListItemAndCategoriesAtId(groceryListItem.Id, groceryListItem.ListId);
+                    GroceryListEditVM latestVM = FormatGroceryListEditForDisplay(resultB.parentList, resultB.groceryListItem, resultB.groceryCategoriesEnum);
                     ModelState.Clear();
                     TempData["error"] = "This list was modified by someone else while you were editing. The current item is shown. Please re-apply your changes.";
                     return View(latestVM);
