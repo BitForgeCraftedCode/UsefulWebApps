@@ -30,7 +30,7 @@ namespace UsefulWebApps.Repository
             string sql = @"SELECT n.* FROM notes n
                            INNER JOIN note_shares ns ON ns.NoteId = n.Id
                            WHERE ns.SharedWithUserId = @userId";
-            List<Notes> notes = (List<Notes>)await _connection.QueryAsync<Notes>(sql, new { userId });
+            List<Notes> notes = (await _connection.QueryAsync<Notes>(sql, new { userId })).ToList();
             return notes;
         }
         // Key: NoteId, Value: list of display names the note is shared with

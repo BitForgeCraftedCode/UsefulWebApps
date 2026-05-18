@@ -31,7 +31,7 @@ namespace UsefulWebApps.Repository
                             INNER JOIN to_do_list_shares tds ON tds.ListId = td.Id
                             WHERE tds.SharedWithUserId = @userId";
 
-            List<ToDoLists> lists = (List<ToDoLists>)await _connection.QueryAsync<ToDoLists>(sql, new { userId });
+            List<ToDoLists> lists = (await _connection.QueryAsync<ToDoLists>(sql, new { userId })).ToList();
             return lists;
         }
         // Key: ListId, Value: list of display names the list is shared with

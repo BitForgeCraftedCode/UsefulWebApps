@@ -30,7 +30,7 @@ namespace UsefulWebApps.Repository
                             INNER JOIN grocery_list_shares gls ON gls.ListId = gl.Id
                             WHERE gls.SharedWithUserId = @userId";
 
-            List<GroceryLists> lists = (List<GroceryLists>)await _connection.QueryAsync<GroceryLists>(sql, new { userId });
+            List<GroceryLists> lists = (await _connection.QueryAsync<GroceryLists>(sql, new { userId })).ToList();
             return lists;
         }
 

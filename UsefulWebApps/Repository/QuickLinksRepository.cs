@@ -17,7 +17,7 @@ namespace UsefulWebApps.Repository
                 SELECT QuickLInkId FROM user_quick_links WHERE UserId = @userId
             ) ORDER BY Category;";
 
-            List<QuickLinks> usersQuickLinks = (List<QuickLinks>)await _connection.QueryAsync<QuickLinks>(sql, new { userId });
+            List<QuickLinks> usersQuickLinks = (await _connection.QueryAsync<QuickLinks>(sql, new { userId })).ToList();
             return usersQuickLinks;
         }
 
@@ -32,8 +32,8 @@ namespace UsefulWebApps.Repository
             ";
 
             GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult, new { userId });
-            List<QuickLinks> userQuickLinks = (List<QuickLinks>)await gridReader.ReadAsync<QuickLinks>();
-            List<QuickLinks> allQuickLinks = (List<QuickLinks>)await gridReader.ReadAsync<QuickLinks>();
+            List<QuickLinks> userQuickLinks = (await gridReader.ReadAsync<QuickLinks>()).ToList();
+            List<QuickLinks> allQuickLinks = (await gridReader.ReadAsync<QuickLinks>()).ToList();
 
             return (userQuickLinks, allQuickLinks);
         }

@@ -17,7 +17,7 @@ namespace UsefulWebApps.Repository
                 SELECT SlideShowImageId FROM user_slideshow_images WHERE UserId = @userId
             )";
 
-            List<SlideShowImages> userSlideShowImages = (List<SlideShowImages>)await _connection.QueryAsync<SlideShowImages>(sql, new { userId });
+            List<SlideShowImages> userSlideShowImages = (await _connection.QueryAsync<SlideShowImages>(sql, new { userId })).ToList();
             return userSlideShowImages;
         }
 
@@ -34,7 +34,7 @@ namespace UsefulWebApps.Repository
             GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult, new { userId });
             //will be null if user has never picked a slideshow folder
             SlideShowFolder? userSlideShowFolder = await gridReader.ReadSingleOrDefaultAsync<SlideShowFolder>();
-            List<SlideShowFolder> allSlideShowFolders = (List<SlideShowFolder>)await gridReader.ReadAsync<SlideShowFolder>();
+            List<SlideShowFolder> allSlideShowFolders = (await gridReader.ReadAsync<SlideShowFolder>()).ToList();
 
             return (userSlideShowFolder, allSlideShowFolders);
         }
