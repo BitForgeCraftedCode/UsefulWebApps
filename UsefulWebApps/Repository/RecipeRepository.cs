@@ -52,7 +52,7 @@ namespace UsefulWebApps.Repository
 
             //count is the total number of recipes in database
             int count = await gridReader.ReadFirstAsync<int>();
-            List<Recipe> recipes = (List<Recipe>)await gridReader.ReadAsync<Recipe>();
+            List<Recipe> recipes = (await gridReader.ReadAsync<Recipe>()).ToList();
             return (count, recipes);
         }
 
@@ -73,7 +73,7 @@ namespace UsefulWebApps.Repository
             GridReader gridReader = await _connection.QueryMultipleAsync(sql, new { CategoryIds = selectedCategoryIds, Limit= limit, Offset = offset });
 
             int count = await gridReader.ReadFirstAsync<int>();
-            List<Recipe> recipes = (List<Recipe>)await gridReader.ReadAsync<Recipe>();
+            List<Recipe> recipes = (await gridReader.ReadAsync<Recipe>()).ToList();
             return (count, recipes);
         }
 
@@ -90,14 +90,14 @@ namespace UsefulWebApps.Repository
 
             //https://www.learndapper.com/relationships -- map the JOIN to C# objects
             //this is a list of 1 single recipe listed x times one for each category -- best to see this by running the above sql in workbench. 
-            List<Recipe> recipe = (List<Recipe>)await _connection.QueryAsync<Recipe, RecipeCategories, RecipeCourses, RecipeCuisines, RecipeDifficulties, Recipe>(sql,
+            List<Recipe> recipe = (await _connection.QueryAsync<Recipe, RecipeCategories, RecipeCourses, RecipeCuisines, RecipeDifficulties, Recipe>(sql,
                 (recipe, recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties) => {
                     recipe.Categories.Add(recipeCategories);
                     recipe.Course = recipeCourses;
                     recipe.Cuisine = recipeCuisines;
                     recipe.Difficulty = recipeDifficulties;
                     return recipe;
-                }, new { id }, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId");
+                }, new { id }, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId")).ToList();
 
             //since we sql SELECT on 1 id GroupBy returns 1 group with x num recipe rows
             //foreach group get the First recipe and add the categories to it
@@ -129,14 +129,14 @@ namespace UsefulWebApps.Repository
 
             //https://www.learndapper.com/relationships -- map the JOIN to C# objects
             //this is a list of 1 single recipe listed x times one for each category -- best to see this by running the above sql in workbench. 
-            List<Recipe> recipe = (List<Recipe>)await _connection.QueryAsync<Recipe, RecipeCategories, RecipeCourses, RecipeCuisines, RecipeDifficulties, Recipe>(sql,
+            List<Recipe> recipe = (await _connection.QueryAsync<Recipe, RecipeCategories, RecipeCourses, RecipeCuisines, RecipeDifficulties, Recipe>(sql,
                 (recipe, recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties) => {
                     recipe.Categories.Add(recipeCategories);
                     recipe.Course = recipeCourses;
                     recipe.Cuisine = recipeCuisines;
                     recipe.Difficulty = recipeDifficulties;
                     return recipe;
-                }, new { id }, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId", transaction: _transaction);
+                }, new { id }, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId", transaction: _transaction)).ToList();
 
             //since we sql SELECT on 1 id GroupBy returns 1 group with x num recipe rows
             //foreach group get the First recipe and add the categories to it
@@ -149,7 +149,7 @@ namespace UsefulWebApps.Repository
                 return singleRecipe;
             }).ToList();
 
-            List<RecipeComment> recipeComments = (List<RecipeComment>)await _connection.QueryAsync<RecipeComment>(sql2, new { id }, transaction: _transaction);
+            List<RecipeComment> recipeComments = (await _connection.QueryAsync<RecipeComment>(sql2, new { id }, transaction: _transaction)).ToList();
 
             RecipePageVM RecipePageVM = new RecipePageVM 
             { 
@@ -164,7 +164,7 @@ namespace UsefulWebApps.Repository
         public async Task<List<RecipeUserSaved>> GetUserSavedRecipes(string userId)
         {
             string sql = @"SELECT UserSavedId, RecipeId, RecipeTitle FROM recipe_usersaved WHERE UserId = @userId";
-            List<RecipeUserSaved> recipeUserSaved = (List<RecipeUserSaved>)await _connection.QueryAsync<RecipeUserSaved>(sql, new { userId });
+            List<RecipeUserSaved> recipeUserSaved = (await _connection.QueryAsync<RecipeUserSaved>(sql, new { userId })).ToList();
             return recipeUserSaved;
         }
 
@@ -194,21 +194,21 @@ namespace UsefulWebApps.Repository
             ";
             //https://www.learndapper.com/relationships -- map the JOIN to C# objects
             //this is a list of 1 single recipe listed x times one for each category -- best to see this by running the above sql in workbench. 
-            List<Recipe> recipe = (List<Recipe>)await _connection.QueryAsync<Recipe, RecipeCategories, RecipeCourses, RecipeCuisines, RecipeDifficulties, Recipe>(sql,
+            List<Recipe> recipe = (await _connection.QueryAsync<Recipe, RecipeCategories, RecipeCourses, RecipeCuisines, RecipeDifficulties, Recipe>(sql,
                 (recipe, recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties) => {
                     recipe.Categories.Add(recipeCategories);
                     recipe.Course = recipeCourses;
                     recipe.Cuisine = recipeCuisines;
                     recipe.Difficulty = recipeDifficulties;
                     return recipe;
-                }, new { id }, transaction: _transaction, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId");
+                }, new { id }, transaction: _transaction, splitOn: "CategoryId, CourseId, CuisineId, DifficultyId")).ToList();
 
             GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult, transaction: _transaction);
 
-            List<RecipeCategories> recipeCategories = (List<RecipeCategories>)await gridReader.ReadAsync<RecipeCategories>();
-            List<RecipeCourses> recipeCourses = (List<RecipeCourses>)await gridReader.ReadAsync<RecipeCourses>();
-            List<RecipeCuisines> recipeCuisines = (List<RecipeCuisines>)await gridReader.ReadAsync<RecipeCuisines>();
-            List<RecipeDifficulties> recipeDifficulties = (List<RecipeDifficulties>)await gridReader.ReadAsync<RecipeDifficulties>();
+            List<RecipeCategories> recipeCategories = (await gridReader.ReadAsync<RecipeCategories>()).ToList();
+            List<RecipeCourses> recipeCourses = (await gridReader.ReadAsync<RecipeCourses>()).ToList();
+            List<RecipeCuisines> recipeCuisines = (await gridReader.ReadAsync<RecipeCuisines>()).ToList();
+            List<RecipeDifficulties> recipeDifficulties = (await gridReader.ReadAsync<RecipeDifficulties>()).ToList();
 
             return (recipe, recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties);
         }
@@ -281,10 +281,10 @@ namespace UsefulWebApps.Repository
             ";
             GridReader gridReader = await _connection.QueryMultipleAsync(sqlMult);
 
-            List<RecipeCategories> recipeCategories = (List<RecipeCategories>)await gridReader.ReadAsync<RecipeCategories>();
-            List<RecipeCourses> recipeCourses = (List<RecipeCourses>)await gridReader.ReadAsync<RecipeCourses>();
-            List<RecipeCuisines> recipeCuisines = (List<RecipeCuisines>)await gridReader.ReadAsync<RecipeCuisines>();
-            List<RecipeDifficulties> recipeDifficulties = (List<RecipeDifficulties>)await gridReader.ReadAsync<RecipeDifficulties>();
+            List<RecipeCategories> recipeCategories = (await gridReader.ReadAsync<RecipeCategories>()).ToList();
+            List<RecipeCourses> recipeCourses = (await gridReader.ReadAsync<RecipeCourses>()).ToList();
+            List<RecipeCuisines> recipeCuisines = (await gridReader.ReadAsync<RecipeCuisines>()).ToList();
+            List<RecipeDifficulties> recipeDifficulties = (await gridReader.ReadAsync<RecipeDifficulties>()).ToList();
             return (recipeCategories, recipeCourses, recipeCuisines, recipeDifficulties);
         }
 

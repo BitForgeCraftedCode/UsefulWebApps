@@ -18,12 +18,12 @@ namespace UsefulWebApps.Repository
                 AND(RRule IS NOT NULL OR (StartDate < @endDate AND EndDate >= @startDate)) 
             ";
 
-            List<CalendarEvents> calendarEvents = (List<CalendarEvents>)await _connection.QueryAsync<CalendarEvents>(sql, new 
+            List<CalendarEvents> calendarEvents = (await _connection.QueryAsync<CalendarEvents>(sql, new
             { 
                 startDate,
                 endDate,
                 userId
-            });
+            })).ToList();
             return calendarEvents;
         }
     }
