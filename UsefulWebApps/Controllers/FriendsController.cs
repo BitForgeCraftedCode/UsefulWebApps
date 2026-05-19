@@ -76,7 +76,7 @@ namespace UsefulWebApps.Controllers
             // Prevent sending a friend request to yourself
             if (requesterId == userProfile.UserId)
             {
-                TempData["error"] = "You cannot send a friend request to yourself.";
+                TempData["warning"] = "You cannot send a friend request to yourself.";
                 return RedirectToAction("People");
             }
             // Check if a friendship/request already exists in either direction
@@ -85,12 +85,12 @@ namespace UsefulWebApps.Controllers
             {
                 if (existing.Status == FriendshipStatus.Accepted)
                 {
-                    TempData["error"] = "You are already friends with this user.";
+                    TempData["warning"] = "You are already friends with this user.";
                     return RedirectToAction("People");
                 }
                 if (existing.Status == FriendshipStatus.Pending)
                 {
-                    TempData["error"] = "A friend request already exists with this user.";
+                    TempData["warning"] = "A friend request already exists with this user.";
                     return RedirectToAction("People");
                 }
                 if (existing.Status == FriendshipStatus.Declined)

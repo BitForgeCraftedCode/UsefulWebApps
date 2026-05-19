@@ -193,7 +193,7 @@ namespace UsefulWebApps.Controllers
             // --- logical validation ---
             if (vm.Event.EndDate < vm.Event.StartDate)
             {
-                TempData["error"] = "End date cannot be before start date. Try again.";
+                TempData["warning"] = "End date cannot be before start date. Try again.";
                 return View(vm);
             }
 
@@ -313,7 +313,7 @@ namespace UsefulWebApps.Controllers
             // --- logical validation ---
             if (vm.Event.EndDate < vm.Event.StartDate)
             {
-                TempData["error"] = "End date cannot be before start date. Try again.";
+                TempData["warning"] = "End date cannot be before start date. Try again.";
                 return View(vm);
             }
 

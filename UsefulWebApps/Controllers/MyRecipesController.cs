@@ -296,7 +296,7 @@ namespace UsefulWebApps.Controllers
                 else
                 {
                     await _unitOfWork.RollbackAsync();
-                    TempData["error"] = "You can only save 10 recipes to your list";
+                    TempData["warning"] = "You can only save 10 recipes to your list";
                     return RedirectToAction("Recipe", new { id });
                 }
             }
@@ -416,7 +416,7 @@ namespace UsefulWebApps.Controllers
 
             if (recipeVM.Recipe.UserId != userId && role != "Admin")
             {
-                TempData["error"] = $"Only the author {recipeVM.Recipe.UserName} can edit this recipe";
+                TempData["warning"] = $"Only the author {recipeVM.Recipe.UserName} can edit this recipe";
                 return RedirectToAction("Recipe", new { id } );
             }
 
@@ -632,7 +632,7 @@ namespace UsefulWebApps.Controllers
 
             if (recipe.UserId != userId && role != "Admin")
             {
-                TempData["error"] = $"Only the author {recipe.UserName} can delete this recipe";
+                TempData["warning"] = $"Only the author {recipe.UserName} can delete this recipe";
                 return RedirectToAction("Recipe", new { id });
             }
 

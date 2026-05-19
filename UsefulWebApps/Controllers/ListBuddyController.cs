@@ -161,7 +161,7 @@ namespace UsefulWebApps.Controllers
                     Notes latest = await _unitOfWork.Notes.GetById(obj.Id);
                     //must clear model state for latest version to load up.
                     ModelState.Clear();
-                    TempData["error"] = "This note was modified by someone else while you were editing. The current version is shown below. Please re-apply your changes.";
+                    TempData["warning"] = "This note was modified by someone else while you were editing. The current version is shown below. Please re-apply your changes.";
                     return View(latest); // show them the current state
                 }
 
@@ -184,7 +184,7 @@ namespace UsefulWebApps.Controllers
             // Only the owner can share their note
             if (note.UserId != userId)
             {
-                TempData["error"] = "You can only share your own notes.";
+                TempData["warning"] = "You can only share your own notes.";
                 return RedirectToAction("MyNotes");
             }
 
@@ -207,7 +207,7 @@ namespace UsefulWebApps.Controllers
 
             if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
-                TempData["error"] = "You can only share notes with friends.";
+                TempData["warning"] = "You can only share notes with friends.";
                 return RedirectToAction("MyNotes");
             }
 
@@ -215,7 +215,7 @@ namespace UsefulWebApps.Controllers
             Notes note = await _unitOfWork.Notes.GetById(vm.NoteId);
             if (note.UserId != userId)
             {
-                TempData["error"] = "You can only share your own notes.";
+                TempData["warning"] = "You can only share your own notes.";
                 return RedirectToAction("MyNotes");
             }
 
@@ -236,7 +236,7 @@ namespace UsefulWebApps.Controllers
             Notes note = await _unitOfWork.Notes.GetById(noteId);
             if (note.UserId != userId)
             {
-                TempData["error"] = "You can only manage sharing on your own notes.";
+                TempData["warning"] = "You can only manage sharing on your own notes.";
                 return RedirectToAction("MyNotes");
             }
 
@@ -261,7 +261,7 @@ namespace UsefulWebApps.Controllers
             // Only the owner can share their list
             if (toDoList.UserId != userId)
             {
-                TempData["error"] = "You can only manage sharing on your own lists.";
+                TempData["warning"] = "You can only manage sharing on your own lists.";
                 return RedirectToAction("MyToDoLists");
             }
             bool success = await _unitOfWork.ToDoListShares.UnshareToDoList(listId);
@@ -283,7 +283,7 @@ namespace UsefulWebApps.Controllers
             // Only the owner can share their list
             if (toDoList.UserId != userId)
             {
-                TempData["error"] = "You can only share your own lists.";
+                TempData["warning"] = "You can only share your own lists.";
                 return RedirectToAction("MyToDoLists");
             }
 
@@ -306,14 +306,14 @@ namespace UsefulWebApps.Controllers
 
             if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
-                TempData["error"] = "You can only share lists with friends.";
+                TempData["warning"] = "You can only share lists with friends.";
                 return RedirectToAction("MyToDoLists");
             }
             ToDoLists toDoList = await _unitOfWork.ToDoLists.GetById(vm.ListId);
             // Verify the list belongs to the current user
             if (toDoList.UserId != userId)
             {
-                TempData["error"] = "You can only share your own lists.";
+                TempData["warning"] = "You can only share your own lists.";
                 return RedirectToAction("MyToDoLists");
             }
             bool success = await _unitOfWork.ToDoListShares.ShareToDoList(vm.ListId, vm.SelectedFriendUserId);
@@ -540,7 +540,7 @@ namespace UsefulWebApps.Controllers
                     ToDoLists parentList = await _unitOfWork.ToDoLists.GetById(latest.ListId);
                     latest.ListVersion = parentList.Version;
                     ModelState.Clear();
-                    TempData["error"] = "This list was modified by someone else while you were editing. The current item is shown. Please re-apply your changes.";
+                    TempData["warning"] = "This list was modified by someone else while you were editing. The current item is shown. Please re-apply your changes.";
                     return View(latest);
                 }
                 if (result.success)
@@ -769,7 +769,7 @@ namespace UsefulWebApps.Controllers
                     (GroceryLists parentList, GroceryListItems groceryListItem, IEnumerable<GroceryCategories> groceryCategoriesEnum) resultB = await _unitOfWork.GroceryListItems.GetGroceryListItemAndCategoriesAtId(groceryListItem.Id, groceryListItem.ListId);
                     GroceryListEditVM latestVM = FormatGroceryListEditForDisplay(resultB.parentList, resultB.groceryListItem, resultB.groceryCategoriesEnum);
                     ModelState.Clear();
-                    TempData["error"] = "This list was modified by someone else while you were editing. The current item is shown. Please re-apply your changes.";
+                    TempData["warning"] = "This list was modified by someone else while you were editing. The current item is shown. Please re-apply your changes.";
                     return View(latestVM);
                    
                 }
@@ -894,7 +894,7 @@ namespace UsefulWebApps.Controllers
                 if (!result.success)
                 {
                     await _unitOfWork.RollbackAsync();
-                    TempData["error"] = "You currently don't have a saved list. Save one first.";
+                    TempData["warning"] = "You currently don't have a saved list. Save one first.";
                     return RedirectToAction("GroceryList", new { listId });
                 }
                 await _unitOfWork.CommitAsync();
@@ -917,7 +917,7 @@ namespace UsefulWebApps.Controllers
             // Only the owner can share their list
             if (groceryList.UserId != userId)
             {
-                TempData["error"] = "You can only share your own lists.";
+                TempData["warning"] = "You can only share your own lists.";
                 return RedirectToAction("MyGroceryLists");
             }
 
@@ -946,14 +946,14 @@ namespace UsefulWebApps.Controllers
 
             if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
-                TempData["error"] = "You can only share lists with friends.";
+                TempData["warning"] = "You can only share lists with friends.";
                 return RedirectToAction("MyGroceryLists");
             }
             GroceryLists groceryList = await _unitOfWork.GroceryLists.GetById(vm.ListId);
             // Verify the list belongs to the current user
             if (groceryList.UserId != userId)
             {
-                TempData["error"] = "You can only share your own lists.";
+                TempData["warning"] = "You can only share your own lists.";
                 return RedirectToAction("MyGroceryLists");
             }
             //share it
@@ -974,7 +974,7 @@ namespace UsefulWebApps.Controllers
             // Only the owner can share their list
             if (groceryList.UserId != userId)
             {
-                TempData["error"] = "You can only manage sharing on your own lists.";
+                TempData["warning"] = "You can only manage sharing on your own lists.";
                 return RedirectToAction("MyGroceryLists");
             }
             bool success = await _unitOfWork.GroceryListShares.UnshareGroceryList(listId);

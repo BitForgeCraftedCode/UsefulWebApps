@@ -80,7 +80,7 @@ namespace UsefulWebApps.Controllers
                 }
                 else
                 {
-                    TempData["error"] = "Sorry that was an invalid input";
+                    TempData["warning"] = "Sorry that was an invalid input";
                     return View();
                 }
                 //always a list of lenght 1 -- limit 1 on api call above
@@ -88,7 +88,7 @@ namespace UsefulWebApps.Controllers
                 //if nothing in list the api didnt find the location.
                 if (locationList.Count == 0)
                 {
-                    TempData["error"] = "Sorry the api could not find that location";
+                    TempData["warning"] = "Sorry the api could not find that location";
                     return View();
                 }
                 Locations location = new()
