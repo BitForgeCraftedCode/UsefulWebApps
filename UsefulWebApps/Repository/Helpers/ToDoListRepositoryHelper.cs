@@ -1,5 +1,8 @@
 ﻿using Dapper;
 using MySqlConnector;
+using UsefulWebApps.DTO.ListBuddy;
+using UsefulWebApps.Models.ListBuddy;
+using static Dapper.SqlMapper;
 
 namespace UsefulWebApps.Repository.Helpers
 {
@@ -30,6 +33,25 @@ namespace UsefulWebApps.Repository.Helpers
                 transaction: transaction);
 
             return rows > 0;
+        }
+
+        public async Task<ToDoListViewState> GetListViewState(long? listId, MySqlTransaction? transaction)
+        {
+            string sql = @"
+                SELECT * FROM to_do_lists WHERE Id = @listId;
+
+                SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem;
+            ";
+            GridReader gridReader = await _connection.QueryMultipleAsync(sql, new { listId }, transaction: transaction);
+
+            ToDoLists current = await gridReader.ReadSingleAsync<ToDoLists>();
+            List<ToDoItems> currentItems = (await gridReader.ReadAsync<ToDoItems>()).ToList();
+
+            return new ToDoListViewState 
+            { 
+                ToDoList = current,
+                ListItems = currentItems
+            };
         }
     }
 }

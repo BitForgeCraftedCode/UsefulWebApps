@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MySqlConnector;
+using UsefulWebApps.DTO.ListBuddy;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Repository.Helpers;
 using UsefulWebApps.Repository.IRepository;
@@ -22,11 +23,8 @@ namespace UsefulWebApps.Repository
             bool bumped = await _helper.TryBumpVersion(toDoItem.ListId, toDoItem.ListVersion, _transaction);
             if (!bumped)
             {
-                ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
-                    "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId = toDoItem.ListId }, transaction: _transaction);
-                List<ToDoItems> currentItems = (await _connection.QueryAsync<ToDoItems>(
-                    "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId = toDoItem.ListId }, transaction: _transaction)).ToList();
-                return (false, true, current, currentItems);
+                ToDoListViewState conflictViewState = await _helper.GetListViewState(toDoItem.ListId, _transaction);
+                return (false, true, conflictViewState.ToDoList, conflictViewState.ListItems);
             }
             //get row count 
             //set SortOrder to Count of existing items so new items always land at the bottom cleanly
@@ -42,11 +40,9 @@ namespace UsefulWebApps.Repository
                 complete = toDoItem.Complete,
                 sortOrder = rowCount,
             }, transaction: _transaction);
-            ToDoLists toDoList = await _connection.QuerySingleAsync<ToDoLists>(
-                "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId = toDoItem.ListId }, transaction: _transaction);
-            List<ToDoItems> listItems = (await _connection.QueryAsync<ToDoItems>(
-                "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId = toDoItem.ListId }, transaction: _transaction)).ToList();
-            return (true, false, toDoList, listItems);
+
+            ToDoListViewState viewState = await _helper.GetListViewState(toDoItem.ListId, _transaction);
+            return (true, false, viewState.ToDoList, viewState.ListItems);
         }
 
         public async Task<(bool success, bool wasConflict)> UpdateWithVersionCheck(ToDoItems toDoItem)
@@ -72,11 +68,8 @@ namespace UsefulWebApps.Repository
             //conflict
             if(!bumped) 
             {
-                ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
-                    "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
-                List<ToDoItems> currentItems = (await _connection.QueryAsync<ToDoItems>(
-                    "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId }, transaction: _transaction)).ToList();
-                return (false, true, current, currentItems);
+                ToDoListViewState conflictViewState = await _helper.GetListViewState(listId, _transaction);
+                return (false, true, conflictViewState.ToDoList, conflictViewState.ListItems);
             }
             string sql = @"DELETE FROM to_do_items WHERE Id = @id";
             await _connection.ExecuteAsync(sql, new { id }, transaction: _transaction);
@@ -93,13 +86,8 @@ namespace UsefulWebApps.Repository
                 await _connection.ExecuteAsync(sqlRenormalize, new { newMax, listId }, transaction: _transaction);
             }
             
-
-            ToDoLists toDoList = await _connection.QuerySingleAsync<ToDoLists>(
-                "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
-            List<ToDoItems> listItems = (await _connection.QueryAsync<ToDoItems>(
-                "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId }, transaction: _transaction)).ToList();
-
-            return (true, false, toDoList, listItems);
+            ToDoListViewState viewState = await _helper.GetListViewState(listId, _transaction);
+            return (true, false, viewState.ToDoList, viewState.ListItems);
         }
     }
 }

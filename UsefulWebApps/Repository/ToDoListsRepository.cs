@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MySqlConnector;
+using UsefulWebApps.DTO.ListBuddy;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Repository.Helpers;
 using UsefulWebApps.Repository.IRepository;
@@ -29,11 +30,8 @@ namespace UsefulWebApps.Repository
             bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
             if (!bumped)
             {
-                ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
-                    "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
-                List<ToDoItems> currentItems = (await _connection.QueryAsync<ToDoItems>(
-                    "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId }, transaction: _transaction)).ToList();
-                return (false, true, current, currentItems);
+                ToDoListViewState conflictViewState = await _helper.GetListViewState(listId, _transaction);
+                return (false, true, conflictViewState.ToDoList, conflictViewState.ListItems);
             }
             // toggle
             bool isComplete = await _connection.QuerySingleAsync<bool>(
@@ -42,11 +40,9 @@ namespace UsefulWebApps.Repository
                 ? "UPDATE to_do_items SET Complete = False WHERE Id = @id"
                 : "UPDATE to_do_items SET Complete = True WHERE Id = @id";
             await _connection.ExecuteAsync(sqlToggle, new { id }, transaction: _transaction);
-            ToDoLists toDoList = await _connection.QuerySingleAsync<ToDoLists>(
-                "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
-            List<ToDoItems> listItems = (await _connection.QueryAsync<ToDoItems>(
-                "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId }, transaction: _transaction)).ToList();
-            return (true, false, toDoList, listItems);
+           
+            ToDoListViewState viewState = await _helper.GetListViewState(listId, _transaction);
+            return (true, false, viewState.ToDoList, viewState.ListItems);
         }
 
         //transaction method
@@ -56,19 +52,14 @@ namespace UsefulWebApps.Repository
             bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
             if (!bumped)
             {
-                ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
-                    "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
-                List<ToDoItems> currentItems = (await _connection.QueryAsync<ToDoItems>(
-                    "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId }, transaction: _transaction)).ToList();
-                return (false, true, current, currentItems);
+                ToDoListViewState conflictViewState = await _helper.GetListViewState(listId, _transaction);
+                return (false, true, conflictViewState.ToDoList, conflictViewState.ListItems);
             }
             string sql = @"UPDATE to_do_items SET SortOrder = @sortOrder WHERE Id = @id";
             await _connection.ExecuteAsync(sql, new { sortOrder, id }, transaction: _transaction);
-            ToDoLists toDoList = await _connection.QuerySingleAsync<ToDoLists>(
-                "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
-            List<ToDoItems> listItems = (await _connection.QueryAsync<ToDoItems>(
-                "SELECT * FROM to_do_items WHERE ListId = @listId ORDER BY SortOrder, ToDoItem", new { listId }, transaction: _transaction)).ToList();
-            return (true, false, toDoList, listItems);
+            
+            ToDoListViewState viewState = await _helper.GetListViewState(listId, _transaction);
+            return (true, false, viewState.ToDoList, viewState.ListItems);
         }
     }
 }
