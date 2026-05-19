@@ -17,14 +17,14 @@ namespace UsefulWebApps.Repository
         //any ToDoItems model specific database methods here
 
         //transaction method -- Concurrent
-        public async Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListAddItem(ToDoItems toDoItem)
+        public async Task<(bool success, bool wasConflict, ToDoListViewState viewState)> ToDoListAddItem(ToDoItems toDoItem)
         {
             // Version check + bump on parent list
             bool bumped = await _helper.TryBumpVersion(toDoItem.ListId, toDoItem.ListVersion, _transaction);
             if (!bumped)
             {
                 ToDoListViewState conflictViewState = await _helper.GetListViewState(toDoItem.ListId, _transaction);
-                return (false, true, conflictViewState.ToDoList, conflictViewState.ListItems);
+                return (false, true, conflictViewState);
             }
             //get row count 
             //set SortOrder to Count of existing items so new items always land at the bottom cleanly
@@ -42,7 +42,7 @@ namespace UsefulWebApps.Repository
             }, transaction: _transaction);
 
             ToDoListViewState viewState = await _helper.GetListViewState(toDoItem.ListId, _transaction);
-            return (true, false, viewState.ToDoList, viewState.ListItems);
+            return (true, false, viewState);
         }
 
         public async Task<(bool success, bool wasConflict)> UpdateWithVersionCheck(ToDoItems toDoItem)
@@ -61,7 +61,7 @@ namespace UsefulWebApps.Repository
             return (true, false);
         }
 
-        public async Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> DeleteWithVersionCheck(long id, long listId, int expectedVersion)
+        public async Task<(bool success, bool wasConflict, ToDoListViewState viewState)> DeleteWithVersionCheck(long id, long listId, int expectedVersion)
         {
             // Version check + bump
             bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
@@ -69,7 +69,7 @@ namespace UsefulWebApps.Repository
             if(!bumped) 
             {
                 ToDoListViewState conflictViewState = await _helper.GetListViewState(listId, _transaction);
-                return (false, true, conflictViewState.ToDoList, conflictViewState.ListItems);
+                return (false, true, conflictViewState);
             }
             string sql = @"DELETE FROM to_do_items WHERE Id = @id";
             await _connection.ExecuteAsync(sql, new { id }, transaction: _transaction);
@@ -87,7 +87,7 @@ namespace UsefulWebApps.Repository
             }
             
             ToDoListViewState viewState = await _helper.GetListViewState(listId, _transaction);
-            return (true, false, viewState.ToDoList, viewState.ListItems);
+            return (true, false, viewState);
         }
     }
 }

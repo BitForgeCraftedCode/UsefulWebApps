@@ -24,14 +24,14 @@ namespace UsefulWebApps.Repository
         }
 
         //transaction method
-        public async Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListToggleComplete(long id, long listId, int expectedVersion)
+        public async Task<(bool success, bool wasConflict, ToDoListViewState viewState)> ToDoListToggleComplete(long id, long listId, int expectedVersion)
         {
             // Version check + bump
             bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
             if (!bumped)
             {
                 ToDoListViewState conflictViewState = await _helper.GetListViewState(listId, _transaction);
-                return (false, true, conflictViewState.ToDoList, conflictViewState.ListItems);
+                return (false, true, conflictViewState);
             }
             // toggle
             bool isComplete = await _connection.QuerySingleAsync<bool>(
@@ -42,24 +42,24 @@ namespace UsefulWebApps.Repository
             await _connection.ExecuteAsync(sqlToggle, new { id }, transaction: _transaction);
            
             ToDoListViewState viewState = await _helper.GetListViewState(listId, _transaction);
-            return (true, false, viewState.ToDoList, viewState.ListItems);
+            return (true, false, viewState);
         }
 
         //transaction method
-        public async Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListSortItem(long id, long listId, int sortOrder, int expectedVersion)
+        public async Task<(bool success, bool wasConflict, ToDoListViewState viewState)> ToDoListSortItem(long id, long listId, int sortOrder, int expectedVersion)
         {
             // Version check + bump
             bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
             if (!bumped)
             {
                 ToDoListViewState conflictViewState = await _helper.GetListViewState(listId, _transaction);
-                return (false, true, conflictViewState.ToDoList, conflictViewState.ListItems);
+                return (false, true, conflictViewState);
             }
             string sql = @"UPDATE to_do_items SET SortOrder = @sortOrder WHERE Id = @id";
             await _connection.ExecuteAsync(sql, new { sortOrder, id }, transaction: _transaction);
             
             ToDoListViewState viewState = await _helper.GetListViewState(listId, _transaction);
-            return (true, false, viewState.ToDoList, viewState.ListItems);
+            return (true, false, viewState);
         }
     }
 }

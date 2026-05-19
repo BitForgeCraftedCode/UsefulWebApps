@@ -363,12 +363,12 @@ namespace UsefulWebApps.Controllers
             return View(toDoListVM);
         }
 
-        private IActionResult ToDoListPartialResult(bool success, ToDoLists toDoList, List<ToDoItems> listItems, long listId)
+        private IActionResult ToDoListPartialResult(bool success, ToDoListViewState viewState, long listId)
         {
             ToDoListVM vm = new ToDoListVM
             {
-                ToDoList = toDoList,
-                ToDoListItems = listItems,
+                ToDoList = viewState.ToDoList,
+                ToDoListItems = viewState.ListItems,
                 ToDoItem = new ToDoItems { ListId = listId }
             };
 
@@ -387,14 +387,14 @@ namespace UsefulWebApps.Controllers
 
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            (bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoLists.ToDoListToggleComplete((long)id, (long)listId, listVersion);
+            (bool success, bool wasConflict, ToDoListViewState viewState) result = await _unitOfWork.ToDoLists.ToDoListToggleComplete((long)id, (long)listId, listVersion);
 
             if(!result.success)
                 await _unitOfWork.RollbackAsync();
             else
                 await _unitOfWork.CommitAsync();
 
-            return ToDoListPartialResult(result.success, result.toDoList, result.listItems, (long)listId);
+            return ToDoListPartialResult(result.success, result.viewState, (long)listId);
         }
 
 
@@ -407,14 +407,14 @@ namespace UsefulWebApps.Controllers
 
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            (bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoLists.ToDoListSortItem((long)id, (long)listId, newSortOrder, listVersion);
+            (bool success, bool wasConflict, ToDoListViewState viewState) result = await _unitOfWork.ToDoLists.ToDoListSortItem((long)id, (long)listId, newSortOrder, listVersion);
 
             if (!result.success)
                 await _unitOfWork.RollbackAsync();
             else
                 await _unitOfWork.CommitAsync();
 
-            return ToDoListPartialResult(result.success, result.toDoList, result.listItems, (long)listId);
+            return ToDoListPartialResult(result.success, result.viewState, (long)listId);
         }
 
         public IActionResult CreateToDoList()
@@ -460,14 +460,14 @@ namespace UsefulWebApps.Controllers
             {
                 await _unitOfWork.OpenConnectionAsync();
                 await _unitOfWork.BeginTxnAsync();
-                (bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoItems.ToDoListAddItem(toDoItem);
+                (bool success, bool wasConflict, ToDoListViewState viewState) result = await _unitOfWork.ToDoItems.ToDoListAddItem(toDoItem);
 
                 if (!result.success)
                     await _unitOfWork.RollbackAsync();
                 else
                     await _unitOfWork.CommitAsync();
 
-                return ToDoListPartialResult(result.success, result.toDoList, result.listItems, toDoItem.ListId);
+                return ToDoListPartialResult(result.success, result.viewState, toDoItem.ListId);
             }
             return StatusCode(400);
         }
@@ -481,14 +481,14 @@ namespace UsefulWebApps.Controllers
 
             await _unitOfWork.OpenConnectionAsync();
             await _unitOfWork.BeginTxnAsync();
-            (bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems) result = await _unitOfWork.ToDoItems.DeleteWithVersionCheck((long)id, (long)listId, listVersion);
+            (bool success, bool wasConflict, ToDoListViewState viewState) result = await _unitOfWork.ToDoItems.DeleteWithVersionCheck((long)id, (long)listId, listVersion);
 
             if (!result.success)
                 await _unitOfWork.RollbackAsync();
             else
                 await _unitOfWork.CommitAsync();
 
-            return ToDoListPartialResult(result.success, result.toDoList, result.listItems, (long)listId);
+            return ToDoListPartialResult(result.success, result.viewState, (long)listId);
         }
 
         [HttpPost]
