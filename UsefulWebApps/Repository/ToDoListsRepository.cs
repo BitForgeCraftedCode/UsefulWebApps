@@ -1,13 +1,18 @@
 ﻿using Dapper;
 using MySqlConnector;
 using UsefulWebApps.Models.ListBuddy;
+using UsefulWebApps.Repository.Helpers;
 using UsefulWebApps.Repository.IRepository;
 
 namespace UsefulWebApps.Repository
 {
     public class ToDoListsRepository : Repository<ToDoLists>, IToDoListsRepository
     {
-        public ToDoListsRepository(MySqlConnection connection) : base(connection) { }
+        private readonly ToDoListRepositoryHelper _helper;
+        public ToDoListsRepository(MySqlConnection connection) : base(connection) 
+        {
+            _helper = new ToDoListRepositoryHelper(connection);
+        }
 
         //any ToDoLists model specific database methods here
         public async Task<List<ToDoItems>> GetAllItemsInList(long? listId)
@@ -21,10 +26,8 @@ namespace UsefulWebApps.Repository
         public async Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListToggleComplete(long id, long listId, int expectedVersion)
         {
             // Version check + bump
-            string sqlBump = @"UPDATE to_do_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @expectedVersion";
-            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId, expectedVersion }, transaction: _transaction);
-            if (bumped == 0)
+            bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
+            if (!bumped)
             {
                 ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
                     "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
@@ -50,10 +53,8 @@ namespace UsefulWebApps.Repository
         public async Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListSortItem(long id, long listId, int sortOrder, int expectedVersion)
         {
             // Version check + bump
-            string sqlBump = @"UPDATE to_do_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @expectedVersion";
-            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId, expectedVersion }, transaction: _transaction);
-            if (bumped == 0)
+            bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
+            if (!bumped)
             {
                 ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
                     "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);

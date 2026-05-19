@@ -52,14 +52,9 @@ namespace UsefulWebApps.Repository
         public async Task<(bool success, bool wasConflict)> UpdateWithVersionCheck(ToDoItems toDoItem)
         {
             // Version check + bump on parent list
-            string sqlBump = @"UPDATE to_do_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @listVersion";
-
-            int bumped = await _connection.ExecuteAsync(sqlBump,
-                new { listId = toDoItem.ListId, listVersion = toDoItem.ListVersion }, transaction: _transaction);
-
+            bool bumped = await _helper.TryBumpVersion(toDoItem.ListId, toDoItem.ListVersion, _transaction);
             // conflict
-            if (bumped == 0) return (false, true);
+            if (!bumped) return (false, true);
 
             string sql = @"UPDATE to_do_items SET ToDoItem = @newToDoItem WHERE Id = @id";
             int rowCount = await _connection.ExecuteAsync(sql, new { newToDoItem = toDoItem.ToDoItem, id = toDoItem.Id }, transaction: _transaction);
@@ -73,11 +68,9 @@ namespace UsefulWebApps.Repository
         public async Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> DeleteWithVersionCheck(long id, long listId, int expectedVersion)
         {
             // Version check + bump
-            string sqlBump = @"UPDATE to_do_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @expectedVersion";
-            int bumped = await _connection.ExecuteAsync(sqlBump, new { listId, expectedVersion }, transaction: _transaction);
+            bool bumped = await _helper.TryBumpVersion(listId, expectedVersion, _transaction);
             //conflict
-            if(bumped == 0) 
+            if(!bumped) 
             {
                 ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
                     "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId }, transaction: _transaction);
