@@ -28,7 +28,7 @@ namespace UsefulWebApps.Controllers
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            List<Locations> locations = (List<Locations>)await _unitOfWork.Locations.GetAllWhere("UserId", userId);
+            List<Locations> locations = (await _unitOfWork.Locations.GetAllWhere("UserId", userId)).ToList();
             LocationsVM locationsVM = new() { Locations = locations };
             return View(locationsVM);
         }

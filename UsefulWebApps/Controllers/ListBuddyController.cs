@@ -60,7 +60,7 @@ namespace UsefulWebApps.Controllers
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            List<Notes> myNotes = (List<Notes>)await _unitOfWork.Notes.GetAllWhere("UserId", userId);
+            List<Notes> myNotes = (await _unitOfWork.Notes.GetAllWhere("UserId", userId)).ToList();
             List<Notes> sharedWithMe = await _unitOfWork.NoteShares.GetNotesSharedWithUser(userId);
             Dictionary<long, List<string>> sharedToMap = await _unitOfWork.NoteShares.GetSharedToMapForOwner(userId);
 
@@ -329,7 +329,7 @@ namespace UsefulWebApps.Controllers
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            List<ToDoLists> myToDoLists = (List<ToDoLists>)await _unitOfWork.ToDoLists.GetAllWhere("UserId", userId);
+            List<ToDoLists> myToDoLists = (await _unitOfWork.ToDoLists.GetAllWhere("UserId", userId)).ToList();
             List<ToDoLists> sharedWithMe = await _unitOfWork.ToDoListShares.GetToDoListsSharedWithUser(userId);
             Dictionary<long, List<string>> sharedToMap = await _unitOfWork.ToDoListShares.GetSharedToMapForOwner(userId);
 
@@ -644,7 +644,7 @@ namespace UsefulWebApps.Controllers
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            List<GroceryLists> myGroceryLists = (List<GroceryLists>)await _unitOfWork.GroceryLists.GetAllWhere("UserId", userId);
+            List<GroceryLists> myGroceryLists = (await _unitOfWork.GroceryLists.GetAllWhere("UserId", userId)).ToList();
             List<GroceryLists> sharedWithMe = await _unitOfWork.GroceryListShares.GetGroceryListsSharedWithUser(userId);
             Dictionary<long, List<string>> sharedToMap = await _unitOfWork.GroceryListShares.GetSharedToMapForOwner(userId);
 

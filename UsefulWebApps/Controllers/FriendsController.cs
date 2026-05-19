@@ -49,7 +49,7 @@ namespace UsefulWebApps.Controllers
 
         public async Task<IActionResult> People()
         {
-            List<UserProfiles> userProfiles =  (List<UserProfiles>)await _unitOfWork.UserProfiles.GetAll();
+            List<UserProfiles> userProfiles =  (await _unitOfWork.UserProfiles.GetAll()).ToList();
             UserProfilesVM userProfilesVM = new()
             {
                 UserProfiles = userProfiles,

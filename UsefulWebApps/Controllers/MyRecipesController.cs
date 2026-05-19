@@ -172,7 +172,7 @@ namespace UsefulWebApps.Controllers
             RecipePageVM.ReturnCategories = categories;
             RecipePageVM.ReturnAscending = ascending;
 
-            List<GroceryLists> myGroceryLists = (List<GroceryLists>)await _unitOfWork.GroceryLists.GetAllWhere("UserId", userId);
+            List<GroceryLists> myGroceryLists = (await _unitOfWork.GroceryLists.GetAllWhere("UserId", userId)).ToList();
             List<GroceryLists> sharedWithMe = await _unitOfWork.GroceryListShares.GetGroceryListsSharedWithUser(userId);
             myGroceryLists.AddRange(sharedWithMe);
             //get categories
