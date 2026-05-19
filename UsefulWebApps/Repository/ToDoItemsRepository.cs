@@ -1,24 +1,26 @@
 ﻿using Dapper;
 using MySqlConnector;
 using UsefulWebApps.Models.ListBuddy;
+using UsefulWebApps.Repository.Helpers;
 using UsefulWebApps.Repository.IRepository;
 
 namespace UsefulWebApps.Repository
 {
     public class ToDoItemsRepository : Repository<ToDoItems>, IToDoItemsRepository
     {
-        public ToDoItemsRepository(MySqlConnection connection) : base(connection) { }
+        private readonly ToDoListRepositoryHelper _helper;
+        public ToDoItemsRepository(MySqlConnection connection) : base(connection) 
+        { 
+            _helper = new ToDoListRepositoryHelper(connection);
+        }
         //any ToDoItems model specific database methods here
 
         //transaction method -- Concurrent
         public async Task<(bool success, bool wasConflict, ToDoLists toDoList, List<ToDoItems> listItems)> ToDoListAddItem(ToDoItems toDoItem)
         {
             // Version check + bump on parent list
-            string sqlBump = @"UPDATE to_do_lists SET Version = Version + 1 
-                       WHERE Id = @listId AND Version = @listVersion";
-            int bumped = await _connection.ExecuteAsync(sqlBump,
-                new { listId = toDoItem.ListId, listVersion = toDoItem.ListVersion }, transaction: _transaction);
-            if (bumped == 0)
+            bool bumped = await _helper.TryBumpVersion(toDoItem.ListId, toDoItem.ListVersion, _transaction);
+            if (!bumped)
             {
                 ToDoLists current = await _connection.QuerySingleAsync<ToDoLists>(
                     "SELECT * FROM to_do_lists WHERE Id = @listId", new { listId = toDoItem.ListId }, transaction: _transaction);
