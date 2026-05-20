@@ -21,6 +21,48 @@ CREATE TABLE calendar_events (
     PRIMARY KEY (`Id`)
 );
 
+/*for improved feature set run this in production*/
+UPDATE `calendar_events`
+SET `UserId` = '251d80ae-93a3-401c-9be9-1ef83e30d541'
+WHERE `UserId` IS NULL;
+
+ALTER TABLE `calendar_events`
+    MODIFY COLUMN `UserId` varchar(255) NOT NULL,
+    ADD COLUMN `IsPrivate` tinyint(1) NOT NULL DEFAULT '0';
+
+/*will need a shares table as well*/
+CREATE TABLE `calendar_event_shares` (
+  `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `CalendarEventId` bigint unsigned NOT NULL,
+  `SharedWithUserId` varchar(255) NOT NULL,
+
+  PRIMARY KEY (`Id`),
+
+  UNIQUE KEY `UQ_calendar_event_share`
+    (`CalendarEventId`, `SharedWithUserId`),
+
+  KEY `IX_calendar_event_shares_user`
+    (`SharedWithUserId`),
+
+  KEY `IX_calendar_event_shares_eventid`
+    (`CalendarEventId`),
+
+  CONSTRAINT `FK_calendar_event_shares_event`
+    FOREIGN KEY (`CalendarEventId`)
+    REFERENCES `calendar_events` (`Id`)
+    ON DELETE CASCADE,
+
+  CONSTRAINT `FK_calendar_event_shares_user`
+    FOREIGN KEY (`SharedWithUserId`)
+    REFERENCES `aspnetusers` (`Id`)
+    ON DELETE CASCADE
+
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_0900_ai_ci;
+
+
+
 /*Federal Holidays RRule's inserted via web server command line*/
 
 /*New Year's Day*/
