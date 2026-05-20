@@ -14,7 +14,7 @@ namespace UsefulWebApps.Repository
             string sql = @$"
                 SELECT * 
                 FROM calendar_events 
-                WHERE(UserId = @userId OR UserId IS NULL)
+                WHERE(UserId = @userId OR IsPrivate = 0)
                 AND(RRule IS NOT NULL OR (StartDate < @endDate AND EndDate >= @startDate)) 
             ";
 

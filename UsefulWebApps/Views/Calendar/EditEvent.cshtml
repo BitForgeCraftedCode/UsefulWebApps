@@ -49,8 +49,8 @@
 
         <h3 class="mt-3 text-center">Event Privacy</h3>
         <div class="max-width-150 form-check mb-3 mx-auto">
-            <input asp-for="IsPrivateEvent" class="form-check-input" type="checkbox">
-            <label asp-for="IsPrivateEvent" class="form-check-label">Private Event</label>
+            <input asp-for="Event.IsPrivate" class="form-check-input" type="checkbox">
+            <label asp-for="Event.IsPrivate" class="form-check-label">Private Event</label>
         </div>
 
         <h3 class="mt-3 text-center">Event Recurrence</h3>
@@ -110,6 +110,7 @@
     <form method="post" asp-action="DeleteEvent" id="delete-event">
         <div class="max-width-200 mx-auto">
             <input type="hidden" name="id" asp-for="Event.Id" />
+            <input type="hidden" name="userID" asp-for="Event.UserId" />
             <button type="submit" class="btn btn-danger mb-3 mt-3 w-100">Delete Event</button>
         </div>
     </form>

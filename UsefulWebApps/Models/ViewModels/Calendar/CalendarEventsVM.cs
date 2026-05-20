@@ -6,8 +6,6 @@ namespace UsefulWebApps.Models.ViewModels.Calendar
     {
         public CalendarEvents Event { get; set; }
 
-        public bool IsPrivateEvent { get; set; }
-
         // Recurrence
         public bool IsRecurring { get; set; }
 

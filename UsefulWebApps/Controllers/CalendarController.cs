@@ -7,6 +7,7 @@ using Ical.Net.Evaluation;
 using Ical.Net.Serialization.DataTypes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Diagnostics;
 using System.Security.Claims;
 using UsefulWebApps.Helpers;
@@ -39,6 +40,206 @@ namespace UsefulWebApps.Controllers
             return View(vm);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> DeleteEvent(long? id, string? userID)
+        {
+            string? userId = User.GetUserId();
+            string? role = User.GetUserRole();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            if (string.IsNullOrEmpty(role)) return NotFound();
+
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            if (userId != userID && role != "Admin")
+            {
+                TempData["warning"] = "You can only delete events that belong to you";
+                return RedirectToAction("Index");
+            }
+            bool success = await _unitOfWork.CalendarEvents.Delete(id);
+            if (success)
+            {
+                TempData["success"] = "Event deleted successfully.";
+                return RedirectToAction("Index");
+            }
+            TempData["error"] = "Delete event error. Try again.";
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> EditEvent(long? id)
+        {
+            string? userId = User.GetUserId();
+            string? role = User.GetUserRole();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            if (string.IsNullOrEmpty(role)) return NotFound();
+
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            CalendarEvents calendarEvent = await _unitOfWork.CalendarEvents.GetById(id);
+            CalendarEventsVM calendarEventVM;
+            if(userId != calendarEvent.UserId && role != "Admin")
+            {
+                TempData["warning"] = "You can only edit events that belong to you";
+                return RedirectToAction("Index");
+            }
+            if (string.IsNullOrEmpty(calendarEvent.RRule))
+            {
+                calendarEventVM = new()
+                {
+                    Event = calendarEvent,
+                    IsRecurring = string.IsNullOrEmpty(calendarEvent.RRule) ? false : true,
+                };
+            }
+            else
+            {
+                RecurrencePattern pattern = GetRecurrencePattern(calendarEvent);
+                calendarEventVM = new()
+                {
+                    Event = calendarEvent,
+                    IsRecurring = string.IsNullOrEmpty(calendarEvent.RRule) ? false : true,
+                    Frequency = GetFrequencyFromPattern(pattern),
+                    Interval = pattern.Interval,
+                    DaysOfWeek = pattern.Frequency == FrequencyType.Weekly ? GetDayOfWeekFromPattern(pattern) : string.Empty,
+                    RecurrenceEndDate = pattern.Until?.Value
+
+                };
+            }
+            return View(calendarEventVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditEvent(CalendarEventsVM vm)
+        {
+            vm.Event.Description = sanitizer.Sanitize(vm.Event.Description);
+            if (!ModelState.IsValid)
+            {
+                TempData["error"] = "Edit event error. Try again.";
+                return View(vm);
+            }
+
+            // --- logical validation ---
+            if (vm.Event.EndDate < vm.Event.StartDate)
+            {
+                TempData["warning"] = "End date cannot be before start date. Try again.";
+                return View(vm);
+            }
+
+            //create CalendarEvents object
+            CalendarEvents calEvent = new CalendarEvents
+            {
+                Id = vm.Event.Id,
+                UserId = vm.Event.UserId,
+                Title = vm.Event.Title,
+                Description = vm.Event.Description,
+                StartDate = vm.Event.StartDate,
+                EndDate = vm.Event.EndDate,
+                IsAllDay = vm.Event.IsAllDay,
+                IsPrivate = vm.Event.IsPrivate,
+
+            };
+
+            // --- recurrence handling ---
+            if (vm.IsRecurring)
+            {
+                calEvent.RRule = BuildRRule(vm, calEvent.StartDate);
+            }
+            else
+            {
+                calEvent.RRule = null;
+            }
+
+            bool success = await _unitOfWork.CalendarEvents.Update(calEvent);
+            if (success)
+            {
+                TempData["success"] = "Event edited successfully.";
+            }
+            else
+            {
+                TempData["error"] = "Edit event error. Try again.";
+            }
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult CreateEvent()
+        {
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            CalendarEventsVM calendarEvents = new()
+            {
+                Event = new CalendarEvents
+                {
+                    UserId = userId,
+                    StartDate = DateTime.Today,
+                    EndDate = DateTime.Today
+                }
+            };
+            return View(calendarEvents);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateEvent(CalendarEventsVM vm)
+        {
+            vm.Event.Description = sanitizer.Sanitize(vm.Event.Description);
+            if (!ModelState.IsValid)
+            {
+                TempData["error"] = "Create event error. Try again.";
+                return View(vm);
+            }
+
+            // --- logical validation ---
+            if (vm.Event.EndDate < vm.Event.StartDate)
+            {
+                TempData["warning"] = "End date cannot be before start date. Try again.";
+                return View(vm);
+            }
+
+            //create CalendarEvents object
+            CalendarEvents calEvent = new CalendarEvents
+            {
+                UserId = vm.Event.UserId,
+                Title = vm.Event.Title,
+                Description = vm.Event.Description,
+                StartDate = vm.Event.StartDate,
+                EndDate = vm.Event.EndDate,
+                IsAllDay = vm.Event.IsAllDay,
+                IsPrivate = vm.Event.IsPrivate
+
+            };
+
+            // --- recurrence handling ---
+            if (vm.IsRecurring)
+            {
+                calEvent.RRule = BuildRRule(vm, calEvent.StartDate);
+            }
+
+            bool success = await _unitOfWork.CalendarEvents.Add(calEvent);
+            if (success)
+            {
+                TempData["success"] = "Event created successfully.";
+            }
+            else
+            {
+                TempData["error"] = "Create event error. Try again.";
+            }
+            return RedirectToAction("Index");
+        }
+
+        private RecurrencePattern GetRecurrencePattern(CalendarEvents calendarEvent)
+        {
+            // --- Serialize only RRULE ---
+            RecurrencePatternSerializer serializer = new RecurrencePatternSerializer();
+            RecurrencePattern pattern;
+            using (TextReader tr = new StringReader(calendarEvent.RRule))
+            {
+                pattern = (RecurrencePattern)serializer.Deserialize(tr);
+            }
+            return pattern;
+        }
+
         private async Task LoadEventsForMonth(CalendarMonthVM vm)
         {
             string? userId = User.GetUserId();
@@ -48,9 +249,9 @@ namespace UsefulWebApps.Controllers
             //TakeWhileBefore method is exclusive
             DateTime rangeStart = vm.Days.First().Date.Date;
             DateTime rangeEnd = vm.Days.Last().Date.Date.AddDays(1);
-            
+
             List<CalendarEvents> events = await _unitOfWork.CalendarEvents.GetUserCalendarEventsForDateRange(rangeStart, rangeEnd, userId);
-            
+
             ExpandAndAttachEvents(vm, events, rangeStart, rangeEnd);
         }
 
@@ -108,7 +309,7 @@ namespace UsefulWebApps.Controllers
 
             // Generate occurrences starting at rangeStart
             IEnumerable<Occurrence> occurrences = calEvent.GetOccurrences().TakeWhileBefore(new CalDateTime(rangeEnd));
-            
+
             // Filter to visible range
             foreach (Occurrence occurrence in occurrences)
             {
@@ -127,123 +328,6 @@ namespace UsefulWebApps.Controllers
                 }
             }
         }
-
-        [HttpPost]
-        public async Task<IActionResult> DeleteEvent(long? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-            bool success = await _unitOfWork.CalendarEvents.Delete(id);
-            if (success)
-            {
-                TempData["success"] = "Event deleted successfully.";
-                return RedirectToAction("Index");
-            }
-            TempData["error"] = "Delete event error. Try again.";
-            return RedirectToAction("Index");
-        }
-
-        public async Task<IActionResult> EditEvent(long? id)
-        {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-            CalendarEvents calendarEvent = await _unitOfWork.CalendarEvents.GetById(id);
-            CalendarEventsVM calendarEventVM;
-            if (string.IsNullOrEmpty(calendarEvent.RRule))
-            {
-                calendarEventVM = new()
-                {
-                    Event = calendarEvent,
-                    IsPrivateEvent = string.IsNullOrEmpty(calendarEvent.UserId) ? false : true,
-                    IsRecurring = string.IsNullOrEmpty(calendarEvent.RRule) ? false : true,
-                };
-            }
-            else
-            {
-                RecurrencePattern pattern = GetRecurrencePattern(calendarEvent);
-                calendarEventVM = new()
-                {
-                    Event = calendarEvent,
-                    IsPrivateEvent = string.IsNullOrEmpty(calendarEvent.UserId) ? false : true,
-                    IsRecurring = string.IsNullOrEmpty(calendarEvent.RRule) ? false : true,
-                    Frequency = GetFrequencyFromPattern(pattern),
-                    Interval = pattern.Interval,
-                    DaysOfWeek = pattern.Frequency == FrequencyType.Weekly ? GetDayOfWeekFromPattern(pattern) : string.Empty,
-                    RecurrenceEndDate = pattern.Until?.Value
-
-                };
-            }
-            return View(calendarEventVM);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EditEvent(CalendarEventsVM vm)
-        {
-            vm.Event.Description = sanitizer.Sanitize(vm.Event.Description);
-            if (!ModelState.IsValid)
-            {
-                TempData["error"] = "Edit event error. Try again.";
-                return View(vm);
-            }
-
-            // --- logical validation ---
-            if (vm.Event.EndDate < vm.Event.StartDate)
-            {
-                TempData["warning"] = "End date cannot be before start date. Try again.";
-                return View(vm);
-            }
-
-            //create CalendarEvents object
-            CalendarEvents calEvent = new CalendarEvents
-            {
-                Id = vm.Event.Id,
-                UserId = vm.IsPrivateEvent == true ? vm.Event.UserId : null,
-                Title = vm.Event.Title,
-                Description = vm.Event.Description,
-                StartDate = vm.Event.StartDate,
-                EndDate = vm.Event.EndDate,
-                IsAllDay = vm.Event.IsAllDay,
-
-            };
-
-            // --- recurrence handling ---
-            if (vm.IsRecurring)
-            {
-                calEvent.RRule = BuildRRule(vm, calEvent.StartDate);
-            }
-            else
-            {
-                calEvent.RRule = null;
-            }
-
-            bool success = await _unitOfWork.CalendarEvents.Update(calEvent);
-            if (success)
-            {
-                TempData["success"] = "Event edited successfully.";
-            }
-            else
-            {
-                TempData["error"] = "Edit event error. Try again.";
-            }
-            return RedirectToAction("Index");
-        }
-
-        private RecurrencePattern GetRecurrencePattern(CalendarEvents calendarEvent)
-        {
-            // --- Serialize only RRULE ---
-            RecurrencePatternSerializer serializer = new RecurrencePatternSerializer();
-            RecurrencePattern pattern;
-            using (TextReader tr = new StringReader(calendarEvent.RRule))
-            {
-                pattern = (RecurrencePattern)serializer.Deserialize(tr);
-            }
-            return pattern;
-        }
-
         private string GetDayOfWeekFromPattern(RecurrencePattern pattern)
         {
            
@@ -281,70 +365,6 @@ namespace UsefulWebApps.Controllers
                 _ => "Weekly"
             };
             return freq;
-        }
-
-        public IActionResult CreateEvent()
-        {
-            string? userId = User.GetUserId();
-            if (string.IsNullOrEmpty(userId)) return NotFound();
-
-            CalendarEventsVM calendarEvents = new()
-            {
-                Event = new CalendarEvents 
-                { 
-                    UserId = userId,
-                    StartDate = DateTime.Today,
-                    EndDate = DateTime.Today
-                }
-            };
-            return View(calendarEvents);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateEvent(CalendarEventsVM vm)
-        {
-            vm.Event.Description = sanitizer.Sanitize(vm.Event.Description);
-            if (!ModelState.IsValid) 
-            {
-                TempData["error"] = "Create event error. Try again.";
-                return View(vm);
-            }
-
-            // --- logical validation ---
-            if (vm.Event.EndDate < vm.Event.StartDate)
-            {
-                TempData["warning"] = "End date cannot be before start date. Try again.";
-                return View(vm);
-            }
-
-            //create CalendarEvents object
-            CalendarEvents calEvent = new CalendarEvents 
-            { 
-                UserId = vm.IsPrivateEvent == true ? vm.Event.UserId : null,
-                Title = vm.Event.Title,
-                Description = vm.Event.Description,
-                StartDate = vm.Event.StartDate,
-                EndDate = vm.Event.EndDate,
-                IsAllDay = vm.Event.IsAllDay,
-
-            };
-
-            // --- recurrence handling ---
-            if (vm.IsRecurring)
-            {
-                calEvent.RRule = BuildRRule(vm, calEvent.StartDate);
-            }
-           
-            bool success = await _unitOfWork.CalendarEvents.Add(calEvent);
-            if (success)
-            {
-                TempData["success"] = "Event created successfully.";
-            }
-            else 
-            {
-                TempData["error"] = "Create event error. Try again.";
-            }
-            return RedirectToAction("Index");
         }
 
         /*

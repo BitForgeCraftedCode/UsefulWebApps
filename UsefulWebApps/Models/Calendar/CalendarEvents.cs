@@ -23,7 +23,7 @@ namespace UsefulWebApps.Models.Calendar
         //allow null empty Description
         [ValidateNever]
         [StringLength(5000, MinimumLength = 0)]
-        public string Description {  get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
 
         [Column("StartDate")]
         [Required]
@@ -47,6 +47,10 @@ namespace UsefulWebApps.Models.Calendar
         //ExDate removes specific occurrences that would normally happen -- EXCLUDE
         [Column("ExDate")]
         public string? ExDate { get; set; } = string.Empty;
+
+        [Column("IsPrivate")]
+        [Required]
+        public bool IsPrivate { get; set; } = false;
 
     }
 }
