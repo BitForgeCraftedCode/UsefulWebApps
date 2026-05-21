@@ -34,5 +34,12 @@ namespace UsefulWebApps.Repository
             })).ToList();
             return calendarEvents;
         }
+
+        public async Task<bool> UnshareCalendarEvent(long eventId)
+        {
+            string sql = "DELETE FROM calendar_event_shares WHERE CalendarEventId = @eventId";
+            int rows = await _connection.ExecuteAsync(sql, new { eventId });
+            return rows > 0;
+        }
     }
 }

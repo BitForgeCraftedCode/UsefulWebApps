@@ -110,6 +110,14 @@
             </div>
         </div>
     </form>
+    <div class="max-width-200 mx-auto">
+        <div>
+            <form method="post" asp-controller="Calendar" asp-action="UnshareEvent" id="unshare-event">
+                <input type="hidden" name="eventId" value="@Model.Event.Id" />
+                <button type="submit" class="btn btn-danger w-100 mt-3">Unshare Event</button>
+            </form>
+        </div>
+    </div>
     <form method="post" asp-action="DeleteEvent" id="delete-event">
         <div class="max-width-200 mx-auto">
             <input type="hidden" name="id" asp-for="Event.Id" />
@@ -139,7 +147,19 @@
                 }
             });
         })();
-
+        $("#unshare-event").validate({
+            submitHandler: function (form) {
+                //ask to confirm unshare
+                toastConfirmUnshareEvent().then(unshareConfirm => {
+                    if (unshareConfirm == true) {
+                        form.submit();
+                    }
+                    else {
+                        toastr.success("Event has NOT been unshared");
+                    }
+                });
+            }
+        });
         $("#delete-event").validate({
             submitHandler: function (form) {
                 //ask to confirm delete

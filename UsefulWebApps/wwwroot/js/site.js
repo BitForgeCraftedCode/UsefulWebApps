@@ -24,6 +24,25 @@ function toastConfirm() {
     });
 }
 
+function toastConfirmUnshareEvent() {
+    return new Promise((resolve, reject) => {
+        toastr.warning("Are you sure you want to unshare the event with your friends?<br/><br/><button class='btn' id='unshareYes'>Yes</button><br/><br/><button class='btn' id='unshareNo'>No</button>", 'Unshare Confirm', {
+            closeButton: false,
+            allowHtml: true,
+            timeOut: 0,
+            extendedTimeOut: 0,
+            onShown: function (toast) {
+                $("#unshareYes").on("click", function () {
+                    resolve(true)
+                });
+                $("#unshareNo").on("click", function () {
+                    resolve(false)
+                });
+            }
+        });
+    });
+}
+
 function toastConfirmUnshareNote() {
     return new Promise((resolve, reject) => {
         toastr.warning("Are you sure you want to unshare the note with your friends?<br/><br/><button class='btn' id='unshareYes'>Yes</button><br/><br/><button class='btn' id='unshareNo'>No</button>", 'Unshare Confirm', {

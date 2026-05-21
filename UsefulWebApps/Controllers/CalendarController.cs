@@ -1,16 +1,12 @@
-﻿using AngleSharp.Dom;
-using Ganss.Xss;
+﻿using Ganss.Xss;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
-using Ical.Net.Evaluation;
 using Ical.Net.Serialization.DataTypes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
-using System.Diagnostics;
-using System.Security.Claims;
 using UsefulWebApps.Helpers;
 using UsefulWebApps.Models.Calendar;
 using UsefulWebApps.Models.Friends;
@@ -59,6 +55,28 @@ namespace UsefulWebApps.Controllers
             return View(vm);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UnshareEvent(long eventId)
+        {
+            string? userId = User.GetUserId();
+            string? role = User.GetUserRole();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            if (string.IsNullOrEmpty(role)) return NotFound();
+
+            CalendarEvents calendarEvent = await _unitOfWork.CalendarEvents.GetById(eventId);
+            if (calendarEvent.UserId != userId && role != "Admin")
+            {
+                TempData["warning"] = "You can only manage sharing on your own events.";
+                return RedirectToAction("EditEvent", new { id = eventId });
+            }
+
+            bool success = await _unitOfWork.CalendarEventShares.UnshareCalendarEvent(eventId);
+            TempData[success ? "success" : "error"] = success
+                ? "Event unshared."
+                : "Could not unshare event. It may not have been shared with anyone.";
+
+            return RedirectToAction("EditEvent", new { id = eventId });
+        }
         public async Task<IActionResult> ShareEvent(long? id)
         {
             if (id == null || id == 0) return NotFound();
