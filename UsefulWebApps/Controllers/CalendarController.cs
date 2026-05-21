@@ -89,7 +89,7 @@ namespace UsefulWebApps.Controllers
             if(calendarEvent.IsPrivate == false)
             {
                 TempData["warning"] = "You can only share private events.";
-                return RedirectToAction("Index");
+                return RedirectToAction("EditEvent", new { id });
             }
             // Only the owner can share their note
             if (calendarEvent.UserId != userId)
