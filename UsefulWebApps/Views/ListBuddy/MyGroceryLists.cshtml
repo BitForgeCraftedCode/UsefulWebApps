@@ -62,3 +62,24 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <script type="text/javascript">
+        $(".unshare-list").each(function () {
+            $(this).validate({
+                submitHandler: function (form) {
+                    //ask to confirm unshare
+                    toastConfirmUnshareGroceryList().then(unshareConfirm => {
+                        if (unshareConfirm == true) {
+                            form.submit();
+                        } else {
+                            toastr.success("Grocery list has NOT been unshared");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
