@@ -325,7 +325,8 @@ namespace UsefulWebApps.Controllers
             DateTime rangeEnd = vm.Days.Last().Date.Date.AddDays(1);
 
             List<CalendarEvents> events = await _unitOfWork.CalendarEvents.GetUserCalendarEventsForDateRange(rangeStart, rangeEnd, userId);
-
+            List<CalendarEvents> eventsSharedWithMe = await _unitOfWork.CalendarEventShares.GetCalendarEventsSharedWithUserForDateRange(rangeStart, rangeEnd, userId);
+            events.AddRange(eventsSharedWithMe);
             ExpandAndAttachEvents(vm, events, rangeStart, rangeEnd);
         }
 

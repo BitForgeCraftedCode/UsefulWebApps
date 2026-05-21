@@ -17,5 +17,22 @@ namespace UsefulWebApps.Repository
             int rows = await _connection.ExecuteAsync(sql, new { eventId, sharedWithUserId });
             return rows > 0;
         }
+
+        public async Task<List<CalendarEvents>> GetCalendarEventsSharedWithUserForDateRange(DateTime startDate, DateTime endDate, string userId)
+        {
+            string sql = @"
+                SELECT e.* FROM calendar_events e
+                INNER JOIN calendar_event_shares es ON es.CalendarEventId = e.Id
+                WHERE es.SharedWithUserId = @userId
+                AND(RRule IS NOT NULL OR (StartDate < @endDate AND EndDate >= @startDate))
+            ";
+            List<CalendarEvents> calendarEvents = (await _connection.QueryAsync<CalendarEvents>(sql, new
+            {
+                startDate,
+                endDate,
+                userId
+            })).ToList();
+            return calendarEvents;
+        }
     }
 }
