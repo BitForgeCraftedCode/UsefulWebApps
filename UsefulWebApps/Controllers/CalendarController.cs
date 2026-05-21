@@ -270,18 +270,21 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> CreateEvent()
+        public async Task<IActionResult> CreateEvent(DateTime? startDate, DateTime? endDate)
         {
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            DateTime selectedStartDate = (DateTime)(startDate == null ? DateTime.Today : startDate);
+            DateTime selectedEndDate = (DateTime)(endDate == null ? DateTime.Today : endDate);
 
             CalendarEventsVM calendarEvents = new()
             {
                 Event = new CalendarEvents
                 {
                     UserId = userId,
-                    StartDate = DateTime.Today,
-                    EndDate = DateTime.Today
+                    StartDate = selectedStartDate,
+                    EndDate = selectedEndDate
                 }
             };
             return View(calendarEvents);

@@ -32,7 +32,13 @@
         if (!day.IsCurrentMonth) css += " other-month";
         if (day.IsToday) css += " today";
 
-        <div class="@css">
+        <div class="@css position-relative">
+            <a asp-controller="Calendar"
+               asp-action="CreateEvent"
+               asp-route-startDate="@day.Date.ToString("yyyy-MM-dd")"
+               asp-route-endDate="@day.Date.ToString("yyyy-MM-dd")"
+               class="position-absolute top-0 end-0 pe-1 text-decoration-none"
+               title="Add event for @day.Date.ToString("MMMM d, yyyy")">+</a>
             <div>@day.Date.Day</div>
             @foreach (var ev in day.Events)
             {
@@ -52,7 +58,13 @@
         if (!day.IsCurrentMonth) css += " other-month";
         if (day.IsToday) css += " today";
 
-        <div class="@css agenda-day">
+        <div class="@css agenda-day position-relative">
+            <a asp-controller="Calendar"
+               asp-action="CreateEvent"
+               asp-route-startDate="@day.Date.ToString("yyyy-MM-dd")"
+               asp-route-endDate="@day.Date.ToString("yyyy-MM-dd")"
+               class="position-absolute top-0 end-0 pe-2 text-decoration-none"
+               title="Add event for @day.Date.ToString("MMMM d, yyyy")">+</a>
             <strong>@day.Date.ToString("dddd")</strong><br/>
             <strong>@day.Date.ToString("MMMM d")</strong>
             @foreach (var ev in day.Events)
