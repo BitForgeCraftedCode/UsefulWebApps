@@ -41,6 +41,14 @@ namespace UsefulWebApps.Repository
             int rows = await _connection.ExecuteAsync(sql, new { eventId });
             return rows > 0;
         }
+
+        public async Task<bool> HasShares(long eventId)
+        {
+            string sql = "SELECT 1 FROM calendar_event_shares WHERE CalendarEventId = @eventId LIMIT 1";
+            int? exists = await _connection.ExecuteScalarAsync<int?>(sql, new { eventId });
+            return exists.HasValue;
+        }
+
         public async Task<List<string>> GetSharedFriendNamesForEvent(long eventId, string ownerUserId)
         {
             /* gets the names of all users the event is shared with, but only if the event belongs to ownerUserId

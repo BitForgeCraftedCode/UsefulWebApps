@@ -221,6 +221,19 @@ namespace UsefulWebApps.Controllers
                 return View(vm);
             }
 
+            CalendarEvents existingEvent = await _unitOfWork.CalendarEvents.GetById(vm.Event.Id);
+            if (existingEvent.Id == 0)
+            {
+                TempData["error"] = "Edit event error. Try again.";
+                return RedirectToAction("Index");
+            }
+
+            if (existingEvent.IsPrivate != vm.Event.IsPrivate && await _unitOfWork.CalendarEventShares.HasShares(vm.Event.Id))
+            {
+                TempData["warning"] = "You cannot change privacy while this event is shared. Unshare it first.";
+                return RedirectToAction("EditEvent", new { id = vm.Event.Id });
+            }
+
             //create CalendarEvents object
             CalendarEvents calEvent = new CalendarEvents
             {
