@@ -7,11 +7,13 @@ using Ical.Net.Evaluation;
 using Ical.Net.Serialization.DataTypes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Data;
 using System.Diagnostics;
 using System.Security.Claims;
 using UsefulWebApps.Helpers;
 using UsefulWebApps.Models.Calendar;
+using UsefulWebApps.Models.Friends;
 using UsefulWebApps.Models.ViewModels.Calendar;
 using UsefulWebApps.Repository.IRepository;
 
@@ -28,6 +30,23 @@ namespace UsefulWebApps.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+        private async Task<IEnumerable<SelectListItem>> GetFriendsSelectListAsync(string userId)
+        {
+            // Get friends to populate dropdown
+            (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetFriendsWithProfiles(userId);
+            return result.profiles.Select(p => new SelectListItem
+            {
+                //?? null-coalescing operator
+                Text = p.DisplayName ?? p.UserId,
+                Value = p.UserId
+            });
+        }
+
+        private async Task<bool> AreFriendsAsync(string userId, string otherUserId)
+        {
+            Friendships? friendship = await _unitOfWork.Friendships.GetExisting(userId, otherUserId);
+            return friendship != null && friendship.Status == FriendshipStatus.Accepted;
+        }
         public async Task<IActionResult> Index(int? year, int? month)
         {
             DateTime firstOfMonth = new DateTime(
@@ -38,6 +57,61 @@ namespace UsefulWebApps.Controllers
             CalendarMonthVM vm = BuildCalendarMonth(firstOfMonth);
             await LoadEventsForMonth(vm);
             return View(vm);
+        }
+
+        public async Task<IActionResult> ShareEvent(long? id)
+        {
+            if (id == null || id == 0) return NotFound();
+
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            CalendarEvents calendarEvent = await _unitOfWork.CalendarEvents.GetById(id);
+
+            if(calendarEvent.IsPrivate == false)
+            {
+                TempData["warning"] = "You can only share private events.";
+                return RedirectToAction("Index");
+            }
+            // Only the owner can share their note
+            if (calendarEvent.UserId != userId)
+            {
+                TempData["warning"] = "You can only share your own events.";
+                return RedirectToAction("Index");
+            }
+            IEnumerable<SelectListItem> friendsList = await GetFriendsSelectListAsync(userId);
+            ShareEventVM vm = new()
+            {
+                EventId = calendarEvent.Id,
+                FriendsList = friendsList
+            };
+            return View(vm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ShareEvent(ShareEventVM vm)
+        {
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
+            {
+                TempData["warning"] = "You can only share events with friends.";
+                return RedirectToAction("Index");
+            }
+            //verify the event belongs to the current user
+            CalendarEvents calendarEvent = await _unitOfWork.CalendarEvents.GetById(vm.EventId);
+            if (calendarEvent.UserId != userId)
+            {
+                TempData["warning"] = "You can only share your own events.";
+                return RedirectToAction("Index");
+            }
+            bool success = await _unitOfWork.CalendarEventShares.ShareCalendarEvent(vm.EventId, vm.SelectedFriendUserId);
+            TempData[success ? "success" : "error"] = success
+                ? "Event shared successfully."
+                : "Could not share event. It may already be shared with this friend.";
+
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -163,7 +237,7 @@ namespace UsefulWebApps.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult CreateEvent()
+        public async Task<IActionResult> CreateEvent()
         {
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();

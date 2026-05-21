@@ -25,6 +25,7 @@
         IQuotesRepository Quotes { get; }
         ILocationsRepository Locations { get; }
         ICalendarEventsRepository CalendarEvents { get; }
+        ICalendarEventSharesRepository CalendarEventShares { get; }
         IFriendshipsRepository Friendships { get; }
         IUserProfilesRepository UserProfiles { get; }
     }

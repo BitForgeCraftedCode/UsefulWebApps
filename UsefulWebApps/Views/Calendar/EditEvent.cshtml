@@ -103,6 +103,9 @@
                 <button class="btn btn-primary mb-3 mt-3 w-100" type="submit">Edit Event</button>
             </div>
             <div>
+                <a asp-controller="Calendar" asp-action="ShareEvent" asp-route-id="@Model.Event.Id" class="btn btn-outline-dark w-100 mb-3">Share Event</a>
+            </div>
+            <div>
                 <a asp-controller="Calendar" asp-action="Index" class="btn btn-outline-dark w-100">Back To Calendar</a>
             </div>
         </div>

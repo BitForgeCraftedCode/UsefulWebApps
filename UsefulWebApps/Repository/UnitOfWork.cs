@@ -89,6 +89,7 @@ namespace UsefulWebApps.Repository
         public IQuotesRepository Quotes { get; private set; }
         public ILocationsRepository Locations { get; private set; }
         public ICalendarEventsRepository CalendarEvents { get; private set; }
+        public ICalendarEventSharesRepository CalendarEventShares { get; private set; }
         public IFriendshipsRepository Friendships { get; private set; }
         public IUserProfilesRepository UserProfiles { get; private set; }
         //other repos here
@@ -113,6 +114,7 @@ namespace UsefulWebApps.Repository
             Quotes = new QuotesRepository(_connection);
             Locations = new LocationsRepository(_connection);
             CalendarEvents = new CalendarEventsRepository(_connection);
+            CalendarEventShares = new CalendarEventSharesRepository(_connection);
             Friendships = new FriendshipsRepository(_connection);
             UserProfiles = new UserProfilesRepository(_connection);
         }
@@ -168,6 +170,7 @@ namespace UsefulWebApps.Repository
             Quotes.SetTransaction(txn);
             Locations.SetTransaction(txn);
             CalendarEvents.SetTransaction(txn);
+            CalendarEventShares.SetTransaction(txn);
             Friendships.SetTransaction(txn);
             UserProfiles.SetTransaction(txn);
         }
