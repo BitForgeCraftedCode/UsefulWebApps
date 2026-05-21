@@ -41,5 +41,22 @@ namespace UsefulWebApps.Repository
             int rows = await _connection.ExecuteAsync(sql, new { eventId });
             return rows > 0;
         }
+        public async Task<List<string>> GetSharedFriendNamesForEvent(long eventId, string ownerUserId)
+        {
+            /* gets the names of all users the event is shared with, but only if the event belongs to ownerUserId
+             * 
+             * Find everyone this calendar event was shared with, verify the event belongs to the specified owner, then return the shared users' display names sorted alphabetically.
+             */
+            string sql = @"SELECT COALESCE(up.DisplayName, 'Unknown') AS DisplayName
+                           FROM calendar_event_shares ces
+                           INNER JOIN calendar_events ce ON ce.Id = ces.CalendarEventId
+                           LEFT JOIN user_profiles up ON up.UserId = ces.SharedWithUserId
+                           WHERE ces.CalendarEventId = @eventId
+                           AND ce.UserId = @ownerUserId
+                           ORDER BY DisplayName";
+
+            List<string> names = (await _connection.QueryAsync<string>(sql, new { eventId, ownerUserId })).ToList();
+            return names;
+        }
     }
 }

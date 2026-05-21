@@ -183,6 +183,7 @@ namespace UsefulWebApps.Controllers
                 {
                     Event = calendarEvent,
                     IsRecurring = string.IsNullOrEmpty(calendarEvent.RRule) ? false : true,
+                    SharedWithFriends = await _unitOfWork.CalendarEventShares.GetSharedFriendNamesForEvent(calendarEvent.Id, calendarEvent.UserId)
                 };
             }
             else
@@ -195,7 +196,8 @@ namespace UsefulWebApps.Controllers
                     Frequency = GetFrequencyFromPattern(pattern),
                     Interval = pattern.Interval,
                     DaysOfWeek = pattern.Frequency == FrequencyType.Weekly ? GetDayOfWeekFromPattern(pattern) : string.Empty,
-                    RecurrenceEndDate = pattern.Until?.Value
+                    RecurrenceEndDate = pattern.Until?.Value,
+                    SharedWithFriends = await _unitOfWork.CalendarEventShares.GetSharedFriendNamesForEvent(calendarEvent.Id, calendarEvent.UserId)
 
                 };
             }

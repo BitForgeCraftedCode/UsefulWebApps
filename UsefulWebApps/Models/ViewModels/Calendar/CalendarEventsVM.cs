@@ -18,5 +18,6 @@ namespace UsefulWebApps.Models.ViewModels.Calendar
 
         public DateTime? RecurrenceEndDate { get; set; }
 
+        public List<string> SharedWithFriends { get; set; } = new();
     }
 }

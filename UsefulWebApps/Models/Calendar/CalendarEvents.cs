@@ -12,7 +12,7 @@ namespace UsefulWebApps.Models.Calendar
         public long Id { get; set; }
 
         [Column("UserId")]
-        public string? UserId { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
 
         [Column("Title")]
         [StringLength(255, MinimumLength = 3, ErrorMessage = "Please Enter At Least 3 Characters.")]

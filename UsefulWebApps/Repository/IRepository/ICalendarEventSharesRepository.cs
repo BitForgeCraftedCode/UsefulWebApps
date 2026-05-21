@@ -8,5 +8,6 @@ namespace UsefulWebApps.Repository.IRepository
         Task<bool> ShareCalendarEvent(long eventId, string sharedWithUserId);
         Task<List<CalendarEvents>> GetCalendarEventsSharedWithUserForDateRange(DateTime startDate, DateTime endDate, string userId);
         Task<bool> UnshareCalendarEvent(long eventId);
+        Task<List<string>> GetSharedFriendNamesForEvent(long eventId, string ownerUserId);
     }
 }
