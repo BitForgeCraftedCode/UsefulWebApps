@@ -1,71 +1,42 @@
-CREATE TABLE calendar_events (
-    Id             BIGINT UNSIGNED AUTO_INCREMENT,
-    UserId         VARCHAR(255) NULL,  -- NULL = public event
-    Title          VARCHAR(255) NOT NULL,
-    Description    TEXT NULL,
+CREATE TABLE `calendar_events` (
+  `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `UserId` varchar(255) NOT NULL,
+  `Title` varchar(255) NOT NULL,
+  `Description` text,
 
-    StartDate      DATETIME NOT NULL,
-    EndDate        DATETIME NOT NULL,
-    IsAllDay       BOOLEAN NOT NULL DEFAULT FALSE,
+  `StartDate` datetime NOT NULL,
+  `EndDate` datetime NOT NULL,
+  `IsAllDay` tinyint(1) NOT NULL DEFAULT '0',
 
-    RRule          TEXT NULL,  -- recurrence rule
-    RDate          TEXT NULL,  -- optional included dates
-    ExDate         TEXT NULL,  -- optional excluded dates
+  `RRule` text, -- recurrence rule
+  `RDate` text, -- optional included dates
+  `ExDate` text, -- optional excluded dates
 
-    CreatedAt      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UpdatedAt      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `CreatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `UpdatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    INDEX idx_user (UserId),
-    INDEX idx_start (StartDate),
-    INDEX idx_user_start (UserId, StartDate),
-    PRIMARY KEY (`Id`)
+  `IsPrivate` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`Id`),
+  KEY `idx_user` (`UserId`),
+  KEY `idx_start` (`StartDate`),
+  KEY `idx_user_start` (`UserId`,`StartDate`)
 );
 
-/*for improved feature set run this in production*/
-UPDATE `calendar_events`
-SET `UserId` = '251d80ae-93a3-401c-9be9-1ef83e30d541'
-WHERE `UserId` IS NULL;
-
-ALTER TABLE `calendar_events`
-    MODIFY COLUMN `UserId` varchar(255) NOT NULL,
-    ADD COLUMN `IsPrivate` tinyint(1) NOT NULL DEFAULT '0';
-
-/*will need a shares table as well*/
 CREATE TABLE `calendar_event_shares` (
   `Id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `CalendarEventId` bigint unsigned NOT NULL,
   `SharedWithUserId` varchar(255) NOT NULL,
-
   PRIMARY KEY (`Id`),
-
-  UNIQUE KEY `UQ_calendar_event_share`
-    (`CalendarEventId`, `SharedWithUserId`),
-
-  KEY `IX_calendar_event_shares_user`
-    (`SharedWithUserId`),
-
-  KEY `IX_calendar_event_shares_eventid`
-    (`CalendarEventId`),
-
-  CONSTRAINT `FK_calendar_event_shares_event`
-    FOREIGN KEY (`CalendarEventId`)
-    REFERENCES `calendar_events` (`Id`)
-    ON DELETE CASCADE,
-
-  CONSTRAINT `FK_calendar_event_shares_user`
-    FOREIGN KEY (`SharedWithUserId`)
-    REFERENCES `aspnetusers` (`Id`)
-    ON DELETE CASCADE
-
-) ENGINE=InnoDB
-  DEFAULT CHARSET=utf8mb4
-  COLLATE=utf8mb4_0900_ai_ci;
-
-
+  UNIQUE KEY `UQ_calendar_event_share` (`CalendarEventId`,`SharedWithUserId`),
+  KEY `IX_calendar_event_shares_user` (`SharedWithUserId`),
+  KEY `IX_calendar_event_shares_eventid` (`CalendarEventId`),
+  CONSTRAINT `FK_calendar_event_shares_event` FOREIGN KEY (`CalendarEventId`) REFERENCES `calendar_events` (`Id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_calendar_event_shares_user` FOREIGN KEY (`SharedWithUserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
+);
 
 /*Federal Holidays RRule's inserted via web server command line*/
 
-/*New Year's Day*/
+/*New Year's Day new structure above doesnt allow NULL for UserId*/
 INSERT INTO calendar_events
 (UserId, Title, StartDate, EndDate, IsAllDay, RRule)
 VALUES
