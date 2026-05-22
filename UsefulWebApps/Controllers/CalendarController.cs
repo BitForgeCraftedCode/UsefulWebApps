@@ -15,6 +15,15 @@ using UsefulWebApps.Repository.IRepository;
 
 namespace UsefulWebApps.Controllers
 {
+    /*
+     * The Goal of it from a UI perspective is this. 
+     * Allow users to make events. 
+     * Public events are seen by everyone --- only editable by owner or admin. 
+     * Private events are only seen by the user who made them unless that user shared the private event with friends -- private events only editable by owner or admin. 
+     * Once a private event is shared you cannot make it public until you unshare it. 
+     * Shared private events can only be edited by the owner or admin. 
+     * 
+     */
     [Authorize(Roles = "StandardUser, Admin")]
     [AutoValidateAntiforgeryToken]
     public class CalendarController : Controller
@@ -115,7 +124,7 @@ namespace UsefulWebApps.Controllers
             if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
                 TempData["warning"] = "You can only share events with friends.";
-                return RedirectToAction("Index");
+                return RedirectToAction("EditEvent", new { id = vm.EventId });
             }
             //verify the event belongs to the current user
             CalendarEvents calendarEvent = await _unitOfWork.CalendarEvents.GetById(vm.EventId);
@@ -123,6 +132,11 @@ namespace UsefulWebApps.Controllers
             {
                 TempData["warning"] = "You can only share your own events.";
                 return RedirectToAction("Index");
+            }
+            if (!calendarEvent.IsPrivate)
+            {
+                TempData["warning"] = "You can only share private events.";
+                return RedirectToAction("EditEvent", new { id = vm.EventId });
             }
             bool success = await _unitOfWork.CalendarEventShares.ShareCalendarEvent(vm.EventId, vm.SelectedFriendUserId);
             TempData[success ? "success" : "error"] = success
@@ -133,7 +147,7 @@ namespace UsefulWebApps.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteEvent(long? id, string? userID)
+        public async Task<IActionResult> DeleteEvent(long? id)
         {
             string? userId = User.GetUserId();
             string? role = User.GetUserRole();
@@ -144,7 +158,12 @@ namespace UsefulWebApps.Controllers
             {
                 return NotFound();
             }
-            if (userId != userID && role != "Admin")
+            CalendarEvents calendarEvent = await _unitOfWork.CalendarEvents.GetById(id);
+            if (calendarEvent.Id == 0)
+            {
+                return NotFound();
+            }
+            if (userId != calendarEvent.UserId && role != "Admin")
             {
                 TempData["warning"] = "You can only delete events that belong to you";
                 return RedirectToAction("Index");
@@ -207,6 +226,11 @@ namespace UsefulWebApps.Controllers
         [HttpPost]
         public async Task<IActionResult> EditEvent(CalendarEventsVM vm)
         {
+            string? userId = User.GetUserId();
+            string? role = User.GetUserRole();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            if (string.IsNullOrEmpty(role)) return NotFound();
+
             vm.Event.Description = sanitizer.Sanitize(vm.Event.Description);
             if (!ModelState.IsValid)
             {
@@ -227,7 +251,11 @@ namespace UsefulWebApps.Controllers
                 TempData["error"] = "Edit event error. Try again.";
                 return RedirectToAction("Index");
             }
-
+            if (userId != existingEvent.UserId && role != "Admin")
+            {
+                TempData["warning"] = "You can only edit events that belong to you";
+                return RedirectToAction("Index");
+            }
             if (existingEvent.IsPrivate != vm.Event.IsPrivate && await _unitOfWork.CalendarEventShares.HasShares(vm.Event.Id))
             {
                 TempData["warning"] = "You cannot change privacy while this event is shared. Unshare it first.";
@@ -238,7 +266,7 @@ namespace UsefulWebApps.Controllers
             CalendarEvents calEvent = new CalendarEvents
             {
                 Id = vm.Event.Id,
-                UserId = vm.Event.UserId,
+                UserId = existingEvent.UserId,
                 Title = vm.Event.Title,
                 Description = vm.Event.Description,
                 StartDate = vm.Event.StartDate,
