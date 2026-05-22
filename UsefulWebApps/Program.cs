@@ -26,6 +26,7 @@ builder.Services.AddDbContext<EFCoreDbContext>(options => {
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IFriendAccessService, FriendAccessService>();
 builder.Services.AddScoped<ICalendarRecurrenceService, CalendarRecurrenceService>();
+builder.Services.AddScoped<ICalendarDisplayService, CalendarDisplayService>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
