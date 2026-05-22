@@ -7,6 +7,7 @@ using UsefulWebApps.Repository;
 using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 using JavaScriptEngineSwitcher.V8;
 using Microsoft.AspNetCore.HttpOverrides;
+using UsefulWebApps.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,7 @@ builder.Services.AddDbContext<EFCoreDbContext>(options => {
 
 //see UnitOfWork Class DisposeAsync method is implemented. ASP.NET Core DI AddScoped will call DisposeAsync when request ends
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IFriendAccessService, FriendAccessService>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {

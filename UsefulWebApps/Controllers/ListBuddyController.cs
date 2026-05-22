@@ -22,12 +22,13 @@ namespace UsefulWebApps.Controllers
 
         private readonly HtmlSanitizer sanitizer;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFriendAccessService _friendAccessService;
 
-        public ListBuddyController(UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork)
+        public ListBuddyController(UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork, IFriendAccessService friendAccessService)
         {
             _userManager = userManager;
-
             _unitOfWork = unitOfWork;
+            _friendAccessService = friendAccessService;
 
             sanitizer = new HtmlSanitizer();
             sanitizer.AllowedAttributes.UnionWith(new[] { "class", "data-list" });
@@ -35,23 +36,6 @@ namespace UsefulWebApps.Controllers
         public IActionResult Index()
         {
             return View();
-        }
-
-        private async Task<IEnumerable<SelectListItem>> GetFriendsSelectListAsync(string userId)
-        {
-            // Get friends to populate dropdown
-            (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetFriendsWithProfiles(userId);
-            return result.profiles.Select(p => new SelectListItem
-            {
-                //?? null-coalescing operator
-                Text = p.DisplayName ?? p.UserId,
-                Value = p.UserId
-            });
-        }
-        private async Task<bool> AreFriendsAsync(string userId, string otherUserId)
-        {
-            Friendships? friendship = await _unitOfWork.Friendships.GetExisting(userId, otherUserId);
-            return friendship != null && friendship.Status == FriendshipStatus.Accepted;
         }
 
         #region Notes
@@ -188,7 +172,7 @@ namespace UsefulWebApps.Controllers
                 return RedirectToAction("MyNotes");
             }
 
-            IEnumerable<SelectListItem> friendsList = await GetFriendsSelectListAsync(userId);
+            IEnumerable<SelectListItem> friendsList = await _friendAccessService.GetFriendsSelectListAsync(userId);
 
             ShareNoteVM vm = new()
             {
@@ -205,7 +189,7 @@ namespace UsefulWebApps.Controllers
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
+            if (!await _friendAccessService.AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
                 TempData["warning"] = "You can only share notes with friends.";
                 return RedirectToAction("MyNotes");
@@ -287,7 +271,7 @@ namespace UsefulWebApps.Controllers
                 return RedirectToAction("MyToDoLists");
             }
 
-            IEnumerable<SelectListItem> friendsList = await GetFriendsSelectListAsync(userId);
+            IEnumerable<SelectListItem> friendsList = await _friendAccessService.GetFriendsSelectListAsync(userId);
 
             ShareToDoListVM vm = new()
             {
@@ -304,7 +288,7 @@ namespace UsefulWebApps.Controllers
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
+            if (!await _friendAccessService.AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
                 TempData["warning"] = "You can only share lists with friends.";
                 return RedirectToAction("MyToDoLists");
@@ -921,7 +905,7 @@ namespace UsefulWebApps.Controllers
                 return RedirectToAction("MyGroceryLists");
             }
 
-            IEnumerable<SelectListItem> friendsList = await GetFriendsSelectListAsync(userId);
+            IEnumerable<SelectListItem> friendsList = await _friendAccessService.GetFriendsSelectListAsync(userId);
 
             ShareGroceryListVM vm = new()
             {
@@ -944,7 +928,7 @@ namespace UsefulWebApps.Controllers
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
+            if (!await _friendAccessService.AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
                 TempData["warning"] = "You can only share lists with friends.";
                 return RedirectToAction("MyGroceryLists");

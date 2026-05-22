@@ -30,28 +30,14 @@ namespace UsefulWebApps.Controllers
     {
         private HtmlSanitizer sanitizer = new HtmlSanitizer();
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFriendAccessService _friendAccessService;
 
-        public CalendarController(IUnitOfWork unitOfWork)
+        public CalendarController(IUnitOfWork unitOfWork, IFriendAccessService friendAccessService)
         {
             _unitOfWork = unitOfWork;
+            _friendAccessService = friendAccessService;
         }
-        private async Task<IEnumerable<SelectListItem>> GetFriendsSelectListAsync(string userId)
-        {
-            // Get friends to populate dropdown
-            (List<UserProfiles> profiles, List<Friendships> friendships) result = await _unitOfWork.Friendships.GetFriendsWithProfiles(userId);
-            return result.profiles.Select(p => new SelectListItem
-            {
-                //?? null-coalescing operator
-                Text = p.DisplayName ?? p.UserId,
-                Value = p.UserId
-            });
-        }
-
-        private async Task<bool> AreFriendsAsync(string userId, string otherUserId)
-        {
-            Friendships? friendship = await _unitOfWork.Friendships.GetExisting(userId, otherUserId);
-            return friendship != null && friendship.Status == FriendshipStatus.Accepted;
-        }
+        
         public async Task<IActionResult> Index(int? year, int? month)
         {
             DateTime firstOfMonth = new DateTime(
@@ -106,7 +92,7 @@ namespace UsefulWebApps.Controllers
                 TempData["warning"] = "You can only share your own events.";
                 return RedirectToAction("Index");
             }
-            IEnumerable<SelectListItem> friendsList = await GetFriendsSelectListAsync(userId);
+            IEnumerable<SelectListItem> friendsList = await _friendAccessService.GetFriendsSelectListAsync(userId);
             ShareEventVM vm = new()
             {
                 EventId = calendarEvent.Id,
@@ -121,7 +107,7 @@ namespace UsefulWebApps.Controllers
             string? userId = User.GetUserId();
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
-            if (!await AreFriendsAsync(userId, vm.SelectedFriendUserId))
+            if (!await _friendAccessService.AreFriendsAsync(userId, vm.SelectedFriendUserId))
             {
                 TempData["warning"] = "You can only share events with friends.";
                 return RedirectToAction("EditEvent", new { id = vm.EventId });
