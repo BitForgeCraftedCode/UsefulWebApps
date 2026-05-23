@@ -28,5 +28,6 @@
         ICalendarEventSharesRepository CalendarEventShares { get; }
         IFriendshipsRepository Friendships { get; }
         IUserProfilesRepository UserProfiles { get; }
+        INotificationsRepository Notifications { get; }
     }
 }

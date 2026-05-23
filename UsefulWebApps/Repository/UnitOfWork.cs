@@ -92,6 +92,7 @@ namespace UsefulWebApps.Repository
         public ICalendarEventSharesRepository CalendarEventShares { get; private set; }
         public IFriendshipsRepository Friendships { get; private set; }
         public IUserProfilesRepository UserProfiles { get; private set; }
+        public INotificationsRepository Notifications { get; private set; }
         //other repos here
 
         public UnitOfWork(MySqlConnection connection)
@@ -117,6 +118,7 @@ namespace UsefulWebApps.Repository
             CalendarEventShares = new CalendarEventSharesRepository(_connection);
             Friendships = new FriendshipsRepository(_connection);
             UserProfiles = new UserProfilesRepository(_connection);
+            Notifications = new NotificationsRepository(_connection);
         }
 
         public async Task OpenConnectionAsync()
@@ -173,6 +175,7 @@ namespace UsefulWebApps.Repository
             CalendarEventShares.SetTransaction(txn);
             Friendships.SetTransaction(txn);
             UserProfiles.SetTransaction(txn);
+            Notifications.SetTransaction(txn);
         }
 
         // Async disposal -- DisposeAsync is called automatically by ASP.NET Core DI AddScoped
