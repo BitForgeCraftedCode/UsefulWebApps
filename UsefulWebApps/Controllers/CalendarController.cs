@@ -1,6 +1,5 @@
 ﻿using Ganss.Xss;
 using Ical.Net;
-using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,8 @@ using UsefulWebApps.Helpers.Calendar;
 using UsefulWebApps.Models.Calendar;
 using UsefulWebApps.Models.ViewModels.Calendar;
 using UsefulWebApps.Repository.IRepository;
+using Microsoft.AspNetCore.SignalR;
+using UsefulWebApps.Hubs;
 
 namespace UsefulWebApps.Controllers
 {
@@ -31,13 +32,15 @@ namespace UsefulWebApps.Controllers
         private readonly IFriendAccessService _friendAccessService;
         private readonly ICalendarRecurrenceService _calendarRecurrenceService;
         private readonly ICalendarDisplayService _calendarDisplayService;
+        private readonly IHubContext<AppHub> _hubContext;
 
-        public CalendarController(IUnitOfWork unitOfWork, IFriendAccessService friendAccessService, ICalendarRecurrenceService calendarRecurrenceService, ICalendarDisplayService calendarDisplayService)
+        public CalendarController(IUnitOfWork unitOfWork, IFriendAccessService friendAccessService, ICalendarRecurrenceService calendarRecurrenceService, ICalendarDisplayService calendarDisplayService, IHubContext<AppHub> hubContext)
         {
             _unitOfWork = unitOfWork;
             _friendAccessService = friendAccessService;
             _calendarRecurrenceService = calendarRecurrenceService;
             _calendarDisplayService = calendarDisplayService;
+            _hubContext = hubContext;
         }
         
         public async Task<IActionResult> Index(int? year, int? month)
@@ -130,6 +133,12 @@ namespace UsefulWebApps.Controllers
                 return RedirectToAction("EditEvent", new { id = vm.EventId });
             }
             bool success = await _unitOfWork.CalendarEventShares.ShareCalendarEvent(vm.EventId, vm.SelectedFriendUserId);
+            if (success)
+            {
+                await _hubContext.Clients.User(vm.SelectedFriendUserId)
+                    .SendAsync("ReceiveNotification",
+                        $"{User.Identity?.Name} shared calendar event '{calendarEvent.Title}' with you.");
+            }
             TempData[success ? "success" : "error"] = success
                 ? "Event shared successfully."
                 : "Could not share event. It may already be shared with this friend.";
