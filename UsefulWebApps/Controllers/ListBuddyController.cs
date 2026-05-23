@@ -1,16 +1,15 @@
 ﻿using Ganss.Xss;
-using Google.Protobuf.Collections;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using UsefulWebApps.DTO.ListBuddy;
 using UsefulWebApps.Helpers;
-using UsefulWebApps.Models.Friends;
 using UsefulWebApps.Models.ListBuddy;
 using UsefulWebApps.Models.ViewModels.ListBuddy;
 using UsefulWebApps.Repository.IRepository;
-
+using Microsoft.AspNetCore.SignalR;
+using UsefulWebApps.Hubs;
 
 namespace UsefulWebApps.Controllers
 {
@@ -23,8 +22,8 @@ namespace UsefulWebApps.Controllers
         private readonly HtmlSanitizer sanitizer;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFriendAccessService _friendAccessService;
-
-        public ListBuddyController(UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork, IFriendAccessService friendAccessService)
+        private readonly IHubContext<AppHub> _hubContext;
+        public ListBuddyController(UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork, IFriendAccessService friendAccessService, IHubContext<AppHub> hubContext)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
@@ -32,6 +31,7 @@ namespace UsefulWebApps.Controllers
 
             sanitizer = new HtmlSanitizer();
             sanitizer.AllowedAttributes.UnionWith(new[] { "class", "data-list" });
+            _hubContext = hubContext;
         }
         public IActionResult Index()
         {
@@ -204,6 +204,12 @@ namespace UsefulWebApps.Controllers
             }
 
             bool success = await _unitOfWork.NoteShares.ShareNote(vm.NoteId, vm.SelectedFriendUserId);
+            if (success)
+            {
+                await _hubContext.Clients.User(vm.SelectedFriendUserId)
+                    .SendAsync("ReceiveNotification",
+                        $"{User.Identity?.Name} shared note '{note.NoteTitle}' with you.");
+            }
             TempData[success ? "success" : "error"] = success
                 ? "Note shared successfully."
                 : "Could not share note. It may already be shared with this friend.";
@@ -301,6 +307,12 @@ namespace UsefulWebApps.Controllers
                 return RedirectToAction("MyToDoLists");
             }
             bool success = await _unitOfWork.ToDoListShares.ShareToDoList(vm.ListId, vm.SelectedFriendUserId);
+            if (success)
+            {
+                await _hubContext.Clients.User(vm.SelectedFriendUserId)
+                    .SendAsync("ReceiveNotification",
+                        $"{User.Identity?.Name} shared to do list '{toDoList.ListTitle}' with you.");
+            }
             TempData[success ? "success" : "error"] = success
                 ? "List shared successfully."
                 : "Could not share list. It may already be shared with this friend.";
@@ -942,6 +954,12 @@ namespace UsefulWebApps.Controllers
             }
             //share it
             bool success = await _unitOfWork.GroceryListShares.ShareGroceryList(vm.ListId, vm.SelectedFriendUserId);
+            if (success)
+            {
+                await _hubContext.Clients.User(vm.SelectedFriendUserId)
+                    .SendAsync("ReceiveNotification",
+                        $"{User.Identity?.Name} shared grocery list '{groceryList.ListTitle}' with you.");
+            }
             TempData[success ? "success" : "error"] = success
                 ? "List shared successfully."
                 : "Could not share list. It may already be shared with this friend.";

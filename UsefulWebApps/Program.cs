@@ -9,6 +9,7 @@ using JavaScriptEngineSwitcher.V8;
 using Microsoft.AspNetCore.HttpOverrides;
 using UsefulWebApps.Helpers;
 using UsefulWebApps.Helpers.Calendar;
+using UsefulWebApps.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IFriendAccessService, FriendAccessService>();
 builder.Services.AddScoped<ICalendarRecurrenceService, CalendarRecurrenceService>();
 builder.Services.AddScoped<ICalendarDisplayService, CalendarDisplayService>();
+builder.Services.AddSignalR();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
@@ -93,5 +95,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<AppHub>("/appHub");
 
 app.Run();

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/css/custom.css" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/toastrjs/toastr.min.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <link rel="stylesheet" href="~/lib/toastrjs/toastr.min.css" />
     <link rel="icon" href="~/images/app/wizardHat3.png" type="image/x-icon" />
     @await RenderSectionAsync("Styles", required: false)
@@ -87,6 +88,14 @@
                                 <span class="nav-link link-light">Welcome @User?.Identity?.Name</span>
                             }
                         </li>
+                        <li class="nav-item me-3 ms-3" style="max-width: 40px;">
+                           <img src="/images/app/announcement-color-icon.png" class="img-fluid" />
+                        </li>
+                        <li class="nav-item d-flex align-items-center">
+                            <div id="notification-count" class="badge rounded-pill bg-danger">
+                                0
+                            </div>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -107,6 +116,7 @@
     <!--<script src="~/lib/jquery/dist/jquery.min.js"></script>-->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js"></script>
+    <script src="~/js/signalRClientConfig.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
