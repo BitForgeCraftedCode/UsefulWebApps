@@ -1,21 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.Formats.Gif;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Formats.Png;
-using SixLabors.ImageSharp.Formats.Webp;
-using SixLabors.ImageSharp.Processing;
-using System.Security.Claims;
 using UsefulWebApps.Helpers;
-using UsefulWebApps.IdentityModels;
 using UsefulWebApps.Models.Friends;
-using UsefulWebApps.Models.MyRecipes;
 using UsefulWebApps.Models.ViewModels.Friends;
-using UsefulWebApps.Models.ViewModels.MyRecipes;
 using UsefulWebApps.Repository.IRepository;
+using Microsoft.AspNetCore.SignalR;
+using UsefulWebApps.Hubs;
 
 namespace UsefulWebApps.Controllers
 {
@@ -26,12 +17,13 @@ namespace UsefulWebApps.Controllers
         private IWebHostEnvironment _environment;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IUnitOfWork _unitOfWork;
-
-        public FriendsController(UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork, IWebHostEnvironment environment)
+        private readonly IHubContext<AppHub> _hubContext;
+        public FriendsController(UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork, IWebHostEnvironment environment, IHubContext<AppHub> hubContext)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
             _environment = environment;
+            _hubContext = hubContext;
         }
         public async Task<IActionResult> Index()
         {
@@ -96,6 +88,12 @@ namespace UsefulWebApps.Controllers
                 if (existing.Status == FriendshipStatus.Declined)
                 {
                     bool reRequest = await _unitOfWork.Friendships.UpdateStatus(existing.Id, FriendshipStatus.Pending);
+                    if (reRequest)
+                    {
+                        await _hubContext.Clients.User(existing.AddresseeUserId)
+                           .SendAsync("ReceiveNotification",
+                               $"{User.Identity?.Name} sent you a friend request.");
+                    }
                     TempData[reRequest ? "success" : "error"] = reRequest
                         ? "Friend request sent!"
                         : "Could not send friend request. Please try again.";
@@ -110,7 +108,12 @@ namespace UsefulWebApps.Controllers
             };
 
             bool success = await _unitOfWork.Friendships.Add(friendship);
-
+            if (success)
+            {
+                await _hubContext.Clients.User(friendship.AddresseeUserId)
+                    .SendAsync("ReceiveNotification",
+                        $"{User.Identity?.Name} sent you a friend request.");
+            }
             TempData[success ? "success" : "error"] = success
                 ? "Friend request sent!"
                 : "Could not send friend request. Please try again.";
@@ -138,6 +141,19 @@ namespace UsefulWebApps.Controllers
         public async Task<IActionResult> AcceptFriendRequest(long friendshipId)
         {
             bool success = await _unitOfWork.Friendships.UpdateStatus(friendshipId, FriendshipStatus.Accepted);
+            if (success)
+            {
+                Friendships friendship = await _unitOfWork.Friendships.GetById(friendshipId);
+                IdentityUser? addressee = await _userManager.FindByIdAsync(friendship.AddresseeUserId);
+                string? userName = string.Empty;
+                if (addressee != null)
+                {
+                    userName = addressee.UserName;
+                }
+                await _hubContext.Clients.User(friendship.RequesterUserId)
+                    .SendAsync("ReceiveNotification",
+                        $"The friend request you sent to {userName} was accepted.");
+            }
             TempData[success ? "success" : "error"] = success ? "Friend request accepted!" : "Something went wrong.";
             return RedirectToAction("Requests");
         }
