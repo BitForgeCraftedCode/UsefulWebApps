@@ -10,6 +10,7 @@ using UsefulWebApps.Models.ViewModels.ListBuddy;
 using UsefulWebApps.Repository.IRepository;
 using Microsoft.AspNetCore.SignalR;
 using UsefulWebApps.Hubs;
+using UsefulWebApps.Models.Notifications;
 
 namespace UsefulWebApps.Controllers
 {
@@ -206,9 +207,20 @@ namespace UsefulWebApps.Controllers
             bool success = await _unitOfWork.NoteShares.ShareNote(vm.NoteId, vm.SelectedFriendUserId);
             if (success)
             {
-                await _hubContext.Clients.User(vm.SelectedFriendUserId)
-                    .SendAsync("ReceiveNotification",
-                        $"{User.Identity?.Name} shared note '{note.NoteTitle}' with you.");
+                string message = $"{User.Identity?.Name} shared note '{note.NoteTitle}' with you.";
+                await _hubContext.Clients.User(vm.SelectedFriendUserId).SendAsync("ReceiveNotification", message);
+
+                //update notifications table
+                Notifications notification = new()
+                {
+                    UserId = vm.SelectedFriendUserId,
+                    SenderUserId = userId,
+                    Message = message,
+                    NotificationType = "NoteShared",
+                    RelatedEntityId = note.Id
+                };
+                await _unitOfWork.Notifications.Add(notification);
+
             }
             TempData[success ? "success" : "error"] = success
                 ? "Note shared successfully."

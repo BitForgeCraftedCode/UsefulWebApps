@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UsefulWebApps.Models.Notifications
 {
+    [Table("notifications")]
     public class Notifications
     {
         [Key]
