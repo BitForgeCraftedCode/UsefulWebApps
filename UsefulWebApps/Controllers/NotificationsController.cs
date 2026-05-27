@@ -26,5 +26,21 @@ namespace UsefulWebApps.Controllers
                 .ToList();
             return View(notifications);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAllNotifications()
+        {
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            bool success = await _unitOfWork.Notifications.DeleteAllWhere("UserId", userId);
+            if (success)
+            {
+                TempData["success"] = "Notifications deleted successfully.";
+                return RedirectToAction("Index");
+            }
+            TempData["error"] = "Delete notifications error. Try again.";
+            return RedirectToAction("Index");
+        }
     }
 }

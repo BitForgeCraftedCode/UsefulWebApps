@@ -47,10 +47,33 @@
                         </div>
                     }
                 </div>
-                <div class="max-width-200 mx-auto">
-                    <button class="btn btn-primary mb-3 mt-3 w-100">Clear Notifications</button>
-                </div>
+                <form method="post" asp-action="DeleteAllNotifications" id="delete-notifications">
+                    <div class="max-width-200 mx-auto">
+                        <button class="btn btn-primary mb-3 mt-3 w-100">Clear Notifications</button>
+                    </div>
+                </form>
             }
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <script type="text/javascript">
+        $("#delete-notifications").validate({
+            submitHandler: function (form) {
+                //ask to confirm delete
+                toastConfirm().then(deleteConfirm => {
+                    if (deleteConfirm == true) {
+                        form.submit();
+                    }
+                    else {
+                        toastr.success("Notifications have NOT been deleted");
+                    }
+                });
+            }
+        });
+    </script>
+}
