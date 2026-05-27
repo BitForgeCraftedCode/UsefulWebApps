@@ -1,0 +1,56 @@
+﻿@model List<UsefulWebApps.Models.Notifications.Notifications>
+
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <h1 class="mb-4">My Notifications</h1>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info" role="alert">
+                    You have no notifications right now.
+                </div>
+            }
+            else
+            {
+                <div class="list-group shadow-sm">
+                    @foreach (var notification in Model)
+                    {
+                        <div class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                <h5 class="mb-0">@notification.Message</h5>
+                                <small class="text-muted">@notification.CreatedAt.ToLocalTime().ToString("MMM d, yyyy h:mm tt")</small>
+                            </div>
+                            @if (notification.NotificationType == "NoteShared")
+                            {
+                                <a asp-controller="ListBuddy" asp-action="Note" asp-route-id="@notification.RelatedEntityId">
+                                    Note
+                                </a>
+                            }
+                            else if (notification.NotificationType == "ToDoListShared")
+                            {
+                                <a asp-controller="ListBuddy" asp-action="ToDoList" asp-route-listId="@notification.RelatedEntityId">
+                                    To Do List
+                                </a>
+                            }
+                            else if (notification.NotificationType == "GroceryListShared")
+                            {
+                                <a asp-controller="ListBuddy" asp-action="GroceryList" asp-route-listId="@notification.RelatedEntityId">
+                                    Grocery List
+                                </a>
+                            }
+                            else if (notification.NotificationType == "CalendarEventShared")
+                            {
+                                <a asp-controller="Calendar" asp-action="Index">Calendar</a>
+                            }
+
+                        </div>
+                    }
+                </div>
+                <div class="max-width-200 mx-auto">
+                    <button class="btn btn-primary mb-3 mt-3 w-100">Clear Notifications</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
