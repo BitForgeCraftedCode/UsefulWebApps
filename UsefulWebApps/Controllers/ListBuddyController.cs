@@ -1,16 +1,17 @@
 ﻿using Ganss.Xss;
+using Google.Protobuf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using UsefulWebApps.DTO.ListBuddy;
 using UsefulWebApps.Helpers;
+using UsefulWebApps.Hubs;
 using UsefulWebApps.Models.ListBuddy;
+using UsefulWebApps.Models.Notifications;
 using UsefulWebApps.Models.ViewModels.ListBuddy;
 using UsefulWebApps.Repository.IRepository;
-using Microsoft.AspNetCore.SignalR;
-using UsefulWebApps.Hubs;
-using UsefulWebApps.Models.Notifications;
 
 namespace UsefulWebApps.Controllers
 {
@@ -321,9 +322,19 @@ namespace UsefulWebApps.Controllers
             bool success = await _unitOfWork.ToDoListShares.ShareToDoList(vm.ListId, vm.SelectedFriendUserId);
             if (success)
             {
-                await _hubContext.Clients.User(vm.SelectedFriendUserId)
-                    .SendAsync("ReceiveNotification",
-                        $"{User.Identity?.Name} shared to do list '{toDoList.ListTitle}' with you.");
+                string message = $"{User.Identity?.Name} shared to do list '{toDoList.ListTitle}' with you.";
+                await _hubContext.Clients.User(vm.SelectedFriendUserId).SendAsync("ReceiveNotification", message);
+
+                //update notifications table
+                Notifications notification = new()
+                {
+                    UserId = vm.SelectedFriendUserId,
+                    SenderUserId = userId,
+                    Message = message,
+                    NotificationType = "ToDoListShared",
+                    RelatedEntityId = toDoList.Id
+                };
+                await _unitOfWork.Notifications.Add(notification);
             }
             TempData[success ? "success" : "error"] = success
                 ? "List shared successfully."
@@ -968,9 +979,19 @@ namespace UsefulWebApps.Controllers
             bool success = await _unitOfWork.GroceryListShares.ShareGroceryList(vm.ListId, vm.SelectedFriendUserId);
             if (success)
             {
-                await _hubContext.Clients.User(vm.SelectedFriendUserId)
-                    .SendAsync("ReceiveNotification",
-                        $"{User.Identity?.Name} shared grocery list '{groceryList.ListTitle}' with you.");
+                string message = $"{User.Identity?.Name} shared grocery list '{groceryList.ListTitle}' with you.";
+                await _hubContext.Clients.User(vm.SelectedFriendUserId).SendAsync("ReceiveNotification", message);
+
+                //update notifications table
+                Notifications notification = new()
+                {
+                    UserId = vm.SelectedFriendUserId,
+                    SenderUserId = userId,
+                    Message = message,
+                    NotificationType = "GroceryListShared",
+                    RelatedEntityId = groceryList.Id
+                };
+                await _unitOfWork.Notifications.Add(notification);
             }
             TempData[success ? "success" : "error"] = success
                 ? "List shared successfully."

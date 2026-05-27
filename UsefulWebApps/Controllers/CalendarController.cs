@@ -4,13 +4,14 @@ using Ical.Net.DataTypes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
 using UsefulWebApps.Helpers;
 using UsefulWebApps.Helpers.Calendar;
+using UsefulWebApps.Hubs;
 using UsefulWebApps.Models.Calendar;
+using UsefulWebApps.Models.Notifications;
 using UsefulWebApps.Models.ViewModels.Calendar;
 using UsefulWebApps.Repository.IRepository;
-using Microsoft.AspNetCore.SignalR;
-using UsefulWebApps.Hubs;
 
 namespace UsefulWebApps.Controllers
 {
@@ -135,9 +136,19 @@ namespace UsefulWebApps.Controllers
             bool success = await _unitOfWork.CalendarEventShares.ShareCalendarEvent(vm.EventId, vm.SelectedFriendUserId);
             if (success)
             {
-                await _hubContext.Clients.User(vm.SelectedFriendUserId)
-                    .SendAsync("ReceiveNotification",
-                        $"{User.Identity?.Name} shared calendar event '{calendarEvent.Title}' with you.");
+                string message = $"{User.Identity?.Name} shared calendar event '{calendarEvent.Title}' with you.";
+                await _hubContext.Clients.User(vm.SelectedFriendUserId).SendAsync("ReceiveNotification", message);
+
+                //update notifications table
+                Notifications notification = new()
+                {
+                    UserId = vm.SelectedFriendUserId,
+                    SenderUserId = userId,
+                    Message = message,
+                    NotificationType = "CalendarEventShared",
+                    RelatedEntityId = calendarEvent.Id,
+                };
+                await _unitOfWork.Notifications.Add(notification);
             }
             TempData[success ? "success" : "error"] = success
                 ? "Event shared successfully."

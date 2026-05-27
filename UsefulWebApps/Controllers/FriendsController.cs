@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using UsefulWebApps.Helpers;
+using UsefulWebApps.Hubs;
 using UsefulWebApps.Models.Friends;
+using UsefulWebApps.Models.Notifications;
 using UsefulWebApps.Models.ViewModels.Friends;
 using UsefulWebApps.Repository.IRepository;
-using Microsoft.AspNetCore.SignalR;
-using UsefulWebApps.Hubs;
 
 namespace UsefulWebApps.Controllers
 {
@@ -90,9 +91,18 @@ namespace UsefulWebApps.Controllers
                     bool reRequest = await _unitOfWork.Friendships.UpdateStatus(existing.Id, FriendshipStatus.Pending);
                     if (reRequest)
                     {
-                        await _hubContext.Clients.User(existing.AddresseeUserId)
-                           .SendAsync("ReceiveNotification",
-                               $"{User.Identity?.Name} sent you a friend request.");
+                        string message = $"{User.Identity?.Name} sent you a friend request.";
+                        await _hubContext.Clients.User(existing.AddresseeUserId).SendAsync("ReceiveNotification", message);
+
+                        //update notifications table
+                        Notifications notification = new()
+                        {
+                            UserId = existing.AddresseeUserId,
+                            SenderUserId = requesterId,
+                            Message = message,
+                            NotificationType = "FriendRequestSent",
+                        };
+                        await _unitOfWork.Notifications.Add(notification);
                     }
                     TempData[reRequest ? "success" : "error"] = reRequest
                         ? "Friend request sent!"
@@ -110,9 +120,18 @@ namespace UsefulWebApps.Controllers
             bool success = await _unitOfWork.Friendships.Add(friendship);
             if (success)
             {
-                await _hubContext.Clients.User(friendship.AddresseeUserId)
-                    .SendAsync("ReceiveNotification",
-                        $"{User.Identity?.Name} sent you a friend request.");
+                string message = $"{User.Identity?.Name} sent you a friend request.";
+                await _hubContext.Clients.User(friendship.AddresseeUserId).SendAsync("ReceiveNotification", message);
+
+                //update notifications table
+                Notifications notification = new()
+                {
+                    UserId = friendship.AddresseeUserId,
+                    SenderUserId = friendship.RequesterUserId,
+                    Message = message,
+                    NotificationType = "FriendRequestSent",
+                };
+                await _unitOfWork.Notifications.Add(notification);
             }
             TempData[success ? "success" : "error"] = success
                 ? "Friend request sent!"
@@ -150,9 +169,18 @@ namespace UsefulWebApps.Controllers
                 {
                     userName = addressee.UserName;
                 }
-                await _hubContext.Clients.User(friendship.RequesterUserId)
-                    .SendAsync("ReceiveNotification",
-                        $"The friend request you sent to {userName} was accepted.");
+                string message = $"The friend request you sent to {userName} was accepted.";
+                await _hubContext.Clients.User(friendship.RequesterUserId).SendAsync("ReceiveNotification", message);
+
+                //update notifications table
+                Notifications notification = new()
+                {
+                    UserId = friendship.RequesterUserId,
+                    SenderUserId = friendship.AddresseeUserId,
+                    Message = message,
+                    NotificationType = "FriendRequestAccepted",
+                };
+                await _unitOfWork.Notifications.Add(notification);
             }
             TempData[success ? "success" : "error"] = success ? "Friend request accepted!" : "Something went wrong.";
             return RedirectToAction("Requests");
