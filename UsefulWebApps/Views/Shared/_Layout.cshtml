@@ -87,17 +87,7 @@
                             {
                                 <span class="nav-link link-light">Welcome @User?.Identity?.Name</span>
                             }
-                        </li>
-                        <li class="nav-item me-3 ms-3" style="max-width: 40px;">
-                            <a class="nav-link p-0" asp-controller="Notifications" asp-action="Index" title="Notifications">
-                                <img src="/images/app/announcement-color-icon.png" class="img-fluid" />
-                            </a>
-                        </li>
-                        <li class="nav-item d-flex align-items-center">
-                            <div id="notification-count" class="badge rounded-pill bg-danger">
-                                0
-                            </div>
-                        </li>
+                        </li>                       
                     </ul>
                 </div>
             </div>
@@ -106,6 +96,7 @@
     <div>
         <main role="main">
             <partial name="_Notification" />
+            @await Component.InvokeAsync("NotificationBell")
             @RenderBody()
         </main>
     </div>

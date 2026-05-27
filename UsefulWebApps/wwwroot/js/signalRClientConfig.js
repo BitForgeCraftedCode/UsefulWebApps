@@ -30,5 +30,4 @@ function incrementNotificationBadge() {
         current = 0;
 
     badge.innerText = current + 1;
-    badge.style.display = "inline-block";
 }

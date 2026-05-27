@@ -1,0 +1,14 @@
+﻿@model int
+
+<div class="d-flex align-items-center flex-row-reverse pt-2 pe-2">
+    <div>
+        <div id="notification-count" class="badge rounded-pill bg-danger col">
+            @Model
+        </div>
+    </div>
+    <div class="pe-2" style="max-width: 60px;">
+        <a asp-controller="Notifications" asp-action="Index" title="Notifications">
+            <img src="/images/app/announcement-color-icon.png" class="img-fluid" />
+        </a>
+    </div>
+</div>
