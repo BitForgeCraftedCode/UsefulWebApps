@@ -217,7 +217,7 @@ namespace UsefulWebApps.Controllers
                     UserId = vm.SelectedFriendUserId,
                     SenderUserId = userId,
                     Message = message,
-                    NotificationType = "NoteShared",
+                    NotificationType = NotificationType.NoteShared.ToString(),
                     RelatedEntityId = note.Id
                 };
                 await _unitOfWork.Notifications.Add(notification);
@@ -331,7 +331,7 @@ namespace UsefulWebApps.Controllers
                     UserId = vm.SelectedFriendUserId,
                     SenderUserId = userId,
                     Message = message,
-                    NotificationType = "ToDoListShared",
+                    NotificationType = NotificationType.ToDoListShared.ToString(),
                     RelatedEntityId = toDoList.Id
                 };
                 await _unitOfWork.Notifications.Add(notification);
@@ -988,7 +988,7 @@ namespace UsefulWebApps.Controllers
                     UserId = vm.SelectedFriendUserId,
                     SenderUserId = userId,
                     Message = message,
-                    NotificationType = "GroceryListShared",
+                    NotificationType = NotificationType.GroceryListShared.ToString(),
                     RelatedEntityId = groceryList.Id
                 };
                 await _unitOfWork.Notifications.Add(notification);

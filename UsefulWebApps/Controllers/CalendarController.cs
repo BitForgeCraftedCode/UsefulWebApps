@@ -145,7 +145,7 @@ namespace UsefulWebApps.Controllers
                     UserId = vm.SelectedFriendUserId,
                     SenderUserId = userId,
                     Message = message,
-                    NotificationType = "CalendarEventShared",
+                    NotificationType = NotificationType.CalendarEventShared.ToString(),
                     RelatedEntityId = calendarEvent.Id,
                 };
                 await _unitOfWork.Notifications.Add(notification);

@@ -100,7 +100,7 @@ namespace UsefulWebApps.Controllers
                             UserId = existing.AddresseeUserId,
                             SenderUserId = requesterId,
                             Message = message,
-                            NotificationType = "FriendRequestSent",
+                            NotificationType = NotificationType.FriendRequestSent.ToString(),
                         };
                         await _unitOfWork.Notifications.Add(notification);
                     }
@@ -129,7 +129,7 @@ namespace UsefulWebApps.Controllers
                     UserId = friendship.AddresseeUserId,
                     SenderUserId = friendship.RequesterUserId,
                     Message = message,
-                    NotificationType = "FriendRequestSent",
+                    NotificationType = NotificationType.FriendRequestSent.ToString(),
                 };
                 await _unitOfWork.Notifications.Add(notification);
             }
@@ -178,7 +178,7 @@ namespace UsefulWebApps.Controllers
                     UserId = friendship.RequesterUserId,
                     SenderUserId = friendship.AddresseeUserId,
                     Message = message,
-                    NotificationType = "FriendRequestAccepted",
+                    NotificationType = NotificationType.FriendRequestAccepted.ToString(),
                 };
                 await _unitOfWork.Notifications.Add(notification);
             }
