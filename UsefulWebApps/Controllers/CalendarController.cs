@@ -154,7 +154,7 @@ namespace UsefulWebApps.Controllers
                 ? "Event shared successfully."
                 : "Could not share event. It may already be shared with this friend.";
 
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { year = calendarEvent.StartDate.Year, month = calendarEvent.StartDate.Month });
         }
 
         [HttpPost]
@@ -183,7 +183,7 @@ namespace UsefulWebApps.Controllers
             if (success)
             {
                 TempData["success"] = "Event deleted successfully.";
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { year = calendarEvent.StartDate.Year, month = calendarEvent.StartDate.Month });
             }
             TempData["error"] = "Delete event error. Try again.";
             return RedirectToAction("Index");
@@ -301,6 +301,7 @@ namespace UsefulWebApps.Controllers
             if (success)
             {
                 TempData["success"] = "Event edited successfully.";
+                return RedirectToAction("Index", new { year = vm.Event.StartDate.Year, month = vm.Event.StartDate.Month });
             }
             else
             {
@@ -369,6 +370,7 @@ namespace UsefulWebApps.Controllers
             if (success)
             {
                 TempData["success"] = "Event created successfully.";
+                return RedirectToAction("Index", new { year = vm.Event.StartDate.Year, month = vm.Event.StartDate.Month });
             }
             else
             {
