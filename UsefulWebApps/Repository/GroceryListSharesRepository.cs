@@ -33,6 +33,16 @@ namespace UsefulWebApps.Repository
             List<string> sharedUserIds = (await _connection.QueryAsync<string>(sql, new { listId })).ToList();
             return sharedUserIds;
         }
+        public async Task<bool> IsGroceryListSharedWithUser(long listId, string userId)
+        {
+            string sql = @"SELECT COUNT(*)
+                           FROM grocery_list_shares
+                           WHERE ListId = @listId
+                           AND SharedWithUserId = @userId";
+
+            int count = await _connection.ExecuteScalarAsync<int>(sql, new { listId, userId });
+            return count > 0;
+        }
         public async Task<List<GroceryLists>> GetGroceryListsSharedWithUser(string userId)
         {
             string sql = @"SELECT gl.* FROM grocery_lists gl

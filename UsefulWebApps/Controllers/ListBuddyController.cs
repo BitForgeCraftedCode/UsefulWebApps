@@ -582,7 +582,7 @@ namespace UsefulWebApps.Controllers
 
         #region Grocery List
 
-        private static GroceryListVM FormatGroceryListForDisplay(GroceryLists grocerylist, List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories, long listId)
+        private static GroceryListVM FormatGroceryListForDisplay(GroceryLists grocerylist, List<GroceryListItems> groceryListItems, IEnumerable<GroceryCategories> groceryCategoriesEnum, List<UserGroceryCategories> userGroceryCategories, long listId, bool isSharedWithCurrentUser = false)
         {
             //for UI display we need a list of grocery items for each category
             //A list of lists where each individual list will contain the all items in a specific category
@@ -619,7 +619,8 @@ namespace UsefulWebApps.Controllers
                 },
                 GroceryCategoriesList = groceryListCategories,
                 FilteredGroceryListItems = filteredGroceryListItems,
-                UserSortedGroceryCategories = userGroceryCategories
+                UserSortedGroceryCategories = userGroceryCategories,
+                IsSharedWithCurrentUser = isSharedWithCurrentUser,
             };
             return groceryListVM;
         }
@@ -686,7 +687,8 @@ namespace UsefulWebApps.Controllers
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             GroceryListViewState viewState = await _unitOfWork.GroceryLists.GetAllItemsAndCategoriesInList(listId);
-            GroceryListVM groceryListVM = FormatGroceryListForDisplay(viewState.GroceryList, viewState.ListItems, viewState.GroceryCategoriesEnum, viewState.UserGroceryCategories, (long)listId);
+            bool isSharedWithCurrentUser = await _unitOfWork.GroceryListShares.IsGroceryListSharedWithUser((long)listId, userId);
+            GroceryListVM groceryListVM = FormatGroceryListForDisplay(viewState.GroceryList, viewState.ListItems, viewState.GroceryCategoriesEnum, viewState.UserGroceryCategories, (long)listId, isSharedWithCurrentUser);
             return View(groceryListVM);
         }
 
@@ -1029,40 +1031,59 @@ namespace UsefulWebApps.Controllers
             if (string.IsNullOrEmpty(userId)) return NotFound();
 
             GroceryLists groceryList = await _unitOfWork.GroceryLists.GetById(listId);
-            if (groceryList.UserId != userId)
+            if (groceryList == null) return NotFound();
+
+            bool isOwner = groceryList.UserId == userId;
+            bool isSharedWithCurrentUser = await _unitOfWork.GroceryListShares.IsGroceryListSharedWithUser(listId, userId);
+
+            if (!isOwner && !isSharedWithCurrentUser)
             {
-                TempData["warning"] = "You can only notify friends about your own lists.";
+                TempData["warning"] = "You can only send done editing notifications for grocery lists you own or lists shared with you.";
                 return RedirectToAction("MyGroceryLists");
             }
 
+            string message = $"{User.Identity?.Name} is done editing grocery list '{groceryList.ListTitle}'.";
             List<string> sharedUserIds = await _unitOfWork.GroceryListShares.GetSharedUserIdsForList(listId);
-            if (!sharedUserIds.Any())
+            /*
+             * If owner of list send send notifications to everyone in sharedUserIds
+             * else send notifications to the owner and other shared friends
+             * 
+             * append to add owner userId to list and Where removes the current user's userId from the list
+             */
+            List<string> recipientUserIds = isOwner ? sharedUserIds : sharedUserIds.Append(groceryList.UserId).Where(uid => uid != userId).Distinct().ToList();
+
+            if (!recipientUserIds.Any())
             {
-                TempData["warning"] = "This grocery list is not shared with any friends yet.";
+                TempData["warning"] = isOwner
+                    ? "This grocery list is not shared with any friends yet."
+                    : "There is no one else to notify for this grocery list.";
                 return RedirectToAction("GroceryList", new { listId });
             }
 
-            string message = $"{User.Identity?.Name} is done editing grocery list '{groceryList.ListTitle}'.";
-
-            foreach (string sharedUserId in sharedUserIds)
+            foreach (string recipientUserId in recipientUserIds)
             {
-                await _hubContext.Clients.User(sharedUserId).SendAsync("ReceiveNotification", message);
-
-                Notifications notification = new()
-                {
-                    UserId = sharedUserId,
-                    SenderUserId = userId,
-                    Message = message,
-                    NotificationType = NotificationType.GroceryListDoneEditing.ToString(),
-                    RelatedEntityId = groceryList.Id
-                };
-                await _unitOfWork.Notifications.Add(notification);
+                await SendGroceryListDoneEditingNotification(recipientUserId, userId, message, groceryList.Id);
             }
 
-            TempData["success"] = "Friends shared on this grocery list have been notified.";
+            TempData["success"] = isOwner
+                ? "Friends shared on this grocery list have been notified."
+                : "The owner and other friends shared on this grocery list have been notified.";
             return RedirectToAction("GroceryList", new { listId });
         }
+        private async Task SendGroceryListDoneEditingNotification(string recipientUserId, string senderUserId, string message, long groceryListId)
+        {
+            await _hubContext.Clients.User(recipientUserId).SendAsync("ReceiveNotification", message);
 
+            Notifications notification = new()
+            {
+                UserId = recipientUserId,
+                SenderUserId = senderUserId,
+                Message = message,
+                NotificationType = NotificationType.GroceryListDoneEditing.ToString(),
+                RelatedEntityId = groceryListId
+            };
+            await _unitOfWork.Notifications.Add(notification);
+        }
         #endregion
     }
 }

@@ -11,5 +11,6 @@ namespace UsefulWebApps.Models.ViewModels.ListBuddy
         public IEnumerable<SelectListItem> GroceryCategoriesList { get; set; }
         public List<List<GroceryListItems>> FilteredGroceryListItems { get; set; }
         public List<UserGroceryCategories> UserSortedGroceryCategories { get; set; }
+        public bool IsSharedWithCurrentUser { get; set; }
     }
 }

@@ -76,6 +76,14 @@
             </form>
         </div>
     }
+    else if (Model.IsSharedWithCurrentUser)
+    {
+        <div class="max-width-250 mx-auto">
+            <form method="post" asp-controller="ListBuddy" asp-action="NotifyGroceryListEditingDone" asp-route-listId="@Model.GroceryListItem.ListId">
+                <button type="submit" class="btn btn-outline-dark mb-3 w-100">Done Editing Notify Friends</button>
+            </form>
+        </div>
+    }
     <p>
         You can save a grocery list as a template to your account.<br />
         Note: Using a saved list will delete your current list items and saving a new list template will delete the old one.
