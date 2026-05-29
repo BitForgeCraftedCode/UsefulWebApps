@@ -1018,7 +1018,50 @@ namespace UsefulWebApps.Controllers
                 : "Could not unshare list.";
 
             return RedirectToAction("MyGroceryLists");
-        } 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> NotifyGroceryListEditingDone(long listId)
+        {
+            if (listId == 0) return NotFound();
+
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            GroceryLists groceryList = await _unitOfWork.GroceryLists.GetById(listId);
+            if (groceryList.UserId != userId)
+            {
+                TempData["warning"] = "You can only notify friends about your own lists.";
+                return RedirectToAction("MyGroceryLists");
+            }
+
+            List<string> sharedUserIds = await _unitOfWork.GroceryListShares.GetSharedUserIdsForList(listId);
+            if (!sharedUserIds.Any())
+            {
+                TempData["warning"] = "This grocery list is not shared with any friends yet.";
+                return RedirectToAction("GroceryList", new { listId });
+            }
+
+            string message = $"{User.Identity?.Name} is done editing grocery list '{groceryList.ListTitle}'.";
+
+            foreach (string sharedUserId in sharedUserIds)
+            {
+                await _hubContext.Clients.User(sharedUserId).SendAsync("ReceiveNotification", message);
+
+                Notifications notification = new()
+                {
+                    UserId = sharedUserId,
+                    SenderUserId = userId,
+                    Message = message,
+                    NotificationType = NotificationType.GroceryListDoneEditing.ToString(),
+                    RelatedEntityId = groceryList.Id
+                };
+                await _unitOfWork.Notifications.Add(notification);
+            }
+
+            TempData["success"] = "Friends shared on this grocery list have been notified.";
+            return RedirectToAction("GroceryList", new { listId });
+        }
 
         #endregion
     }

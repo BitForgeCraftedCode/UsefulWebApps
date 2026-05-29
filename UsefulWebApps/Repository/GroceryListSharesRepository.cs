@@ -24,6 +24,15 @@ namespace UsefulWebApps.Repository
             int rows = await _connection.ExecuteAsync(sql, new { listId });
             return rows > 0;
         }
+        public async Task<List<string>> GetSharedUserIdsForList(long listId)
+        {
+            string sql = @"SELECT SharedWithUserId
+                           FROM grocery_list_shares
+                           WHERE ListId = @listId";
+
+            List<string> sharedUserIds = (await _connection.QueryAsync<string>(sql, new { listId })).ToList();
+            return sharedUserIds;
+        }
         public async Task<List<GroceryLists>> GetGroceryListsSharedWithUser(string userId)
         {
             string sql = @"SELECT gl.* FROM grocery_lists gl

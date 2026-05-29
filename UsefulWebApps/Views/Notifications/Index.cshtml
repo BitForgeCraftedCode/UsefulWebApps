@@ -33,7 +33,7 @@
                                     To Do List
                                 </a>
                             }
-                            else if (notification.NotificationType == "GroceryListShared")
+                            else if (notification.NotificationType == "GroceryListShared" || notification.NotificationType == "GroceryListDoneEditing")
                             {
                                 <a asp-controller="ListBuddy" asp-action="GroceryList" asp-route-listId="@notification.RelatedEntityId">
                                     Grocery List

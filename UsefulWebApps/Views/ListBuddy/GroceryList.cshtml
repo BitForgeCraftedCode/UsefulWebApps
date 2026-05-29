@@ -71,6 +71,9 @@
     {
         <div class="max-width-250 mx-auto">
             <a asp-controller="ListBuddy" asp-action="ShareGroceryList" asp-route-id="@Model.GroceryListItem.ListId" class="btn btn-primary mb-3 w-100">Share List</a>
+            <form method="post" asp-controller="ListBuddy" asp-action="NotifyGroceryListEditingDone" asp-route-listId="@Model.GroceryListItem.ListId">
+                <button type="submit" class="btn btn-outline-dark mb-3 w-100">Done Editing Notify Friends</button>
+            </form>
         </div>
     }
     <p>

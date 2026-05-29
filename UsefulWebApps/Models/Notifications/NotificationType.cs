@@ -7,6 +7,7 @@
         NoteShared,
         ToDoListShared,
         GroceryListShared,
+        GroceryListDoneEditing,
         CalendarEventShared
     }
 }
