@@ -43,6 +43,3 @@ CREATE TABLE `to_do_list_shares` (
   CONSTRAINT `FK_todolist_shares_user` FOREIGN KEY (`SharedWithUserId`) REFERENCES `aspnetusers` (`Id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- need to delete old to_do_list table in production server after setting up the new tables and publishing new app code
-DROP TABLE to_do_list;
-
