@@ -20,5 +20,9 @@ namespace UsefulWebApps.Models.MyHomePage
         [ValidateNever]
         [StringLength(100, MinimumLength = 0)]
         public string Author { get; set; } = string.Empty;
+
+        [Column("UserId")]
+        [Required]
+        public string UserId { get; set; } = string.Empty;
     }
 }

@@ -41,7 +41,7 @@ namespace UsefulWebApps.Controllers
             List<QuickLinks> userQuickLinks = await _unitOfWork.QuickLinks.GetQuickLinksForUser(userId);
 
             //get a random quote
-            Quotes randomQuote = await _unitOfWork.Quotes.GetRandomRow();
+            Quotes? randomQuote = await _unitOfWork.Quotes.GetRandomQuoteForUser(userId);
             
             MyHomePageVM myHomePageVM = new() 
             { 
@@ -166,7 +166,14 @@ namespace UsefulWebApps.Controllers
 
         public IActionResult CreateQuote()
         {
-            return View();
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+            Quotes quote = new()
+            {
+                UserId = userId,
+            };
+
+            return View(quote);
         }
 
         [HttpPost]

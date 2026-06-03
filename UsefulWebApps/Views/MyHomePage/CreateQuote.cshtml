@@ -7,7 +7,7 @@
 <div class="max-width-550 mx-auto container pb-3">
     <h1 class="display-3 mt-3 text-center">Create Quote</h1>
     <form method="post" id="createQuoteForm">
-       
+        <input type="hidden" asp-for="UserId" />
         <h3 class="mt-3 text-center">Author</h3>
         <div class="form-floating mb-3">
             <input asp-for="Author" type="text" class="form-control ignore" placeholder="Quote Author" minlength="0" maxlength="100" />

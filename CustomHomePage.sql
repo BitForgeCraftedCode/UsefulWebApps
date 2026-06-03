@@ -418,3 +418,18 @@ INSERT INTO quotes (Quote) VALUES ("THOSE WHO ARE IGNORANT AND ASLEEP ARE THOSE 
 INSERT INTO quotes (Quote) VALUES ("Seek progress, not perfection. As someone who has extremely high standards for myself, I have to repeat this daily.");
 INSERT INTO quotes (Quote) VALUES ("You have a limited amount of energy and time in any given day - and you get to choose where you place that energy. Think of it like chips at a roulette table. When I feel angry thoughts about a news article, hear an opinion I disagree with, come across an asshole driving on the freeway... all of these things take energy, my chips, which are an extremely limited resource. Place your chips wisely. I stop myself many times a day from using mine now, and I'm much happier.");
 INSERT INTO quotes (Quote) VALUES ("A jack of all trades is a master of none, but oftentimes better than a master of one.");
+
+/*add this to production*/
+ALTER TABLE quotes
+ADD COLUMN UserId VARCHAR(255) NULL;
+
+UPDATE quotes
+SET UserId = '251d80ae-93a3-401c-9be9-1ef83e30d541';
+
+ALTER TABLE quotes
+MODIFY COLUMN UserId VARCHAR(255) NOT NULL,
+ADD KEY FK_quotes_user (UserId),
+ADD CONSTRAINT FK_quotes_user
+    FOREIGN KEY (UserId)
+    REFERENCES aspnetusers (Id)
+    ON DELETE CASCADE;
