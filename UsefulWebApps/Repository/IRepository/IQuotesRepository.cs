@@ -7,5 +7,7 @@ namespace UsefulWebApps.Repository.IRepository
         //any Quote specific database methods here
 
         Task<Quotes?> GetRandomQuoteForUser(string userId);
+        Task<List<Quotes>> GetQuotesForUser(string userId);
+        Task<bool> DeleteQuoteForUser(long? quoteId, string userId);
     }
 }

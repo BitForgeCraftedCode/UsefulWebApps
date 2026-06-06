@@ -136,14 +136,17 @@
                         @Model.RandomQuote.Author
                     </div>
                 }
-                <div class="max-width-350 mx-auto pt-3">
+                <div class="max-width-500 mx-auto pt-3">
                     <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-12 pb-3">
+                        <div class="col-lg-4 col-md-4 col-sm-12 pb-3">
                             <a asp-controller="MyHomePage" asp-action="CreateQuote" class="btn btn-outline-dark w-100">Add a Quote</a>
                         </div>
                         @if (Model.RandomQuote != null)
                         {
-                            <div class="col-lg-6 col-md-6 col-sm-12">
+                            <div class="col-lg-4 col-md-4 col-sm-12 pb-3">
+                                <a asp-controller="MyHomePage" asp-action="MyQuotes" class="btn btn-outline-dark w-100">My Quotes</a>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12 pb-3">
                                 <a asp-controller="MyHomePage" asp-action="EditQuote" asp-route-id="@Model.RandomQuote.QuoteId" class="btn btn-outline-dark w-100">Edit Quote</a>
                             </div>
                         }

@@ -1,7 +1,6 @@
 ﻿using Ganss.Xss;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using UsefulWebApps.Helpers;
 using UsefulWebApps.Models.MyHomePage;
 using UsefulWebApps.Models.ViewModels.MyHomePage;
@@ -162,6 +161,41 @@ namespace UsefulWebApps.Controllers
             }
             TempData["error"] = "Update slideshow error. Please try again.";
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> MyQuotes()
+        {
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            QuotesVM quotesVM = new()
+            {
+                MyQuotes = await _unitOfWork.Quotes.GetQuotesForUser(userId)
+            };
+
+            return View(quotesVM);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteQuote(long? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+
+            string? userId = User.GetUserId();
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            bool success = await _unitOfWork.Quotes.DeleteQuoteForUser(id, userId);
+            if (success)
+            {
+                TempData["success"] = "Quote deleted successfully.";
+                return RedirectToAction("MyQuotes");
+            }
+
+            TempData["error"] = "Delete quote error. Try again.";
+            return RedirectToAction("MyQuotes");
         }
 
         public IActionResult CreateQuote()
