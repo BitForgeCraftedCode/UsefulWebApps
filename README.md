@@ -86,6 +86,20 @@ sudo mysqldump usefulwebapps > usefulwebapps_YYYY_MM_DD.sql
 sudo mysql usefulwebapps < usefulwebapps_YYYY_MM_DD.sql
 ```
 
+## Get the schema only on Ubuntu
+
+1. Navigate to folder with backups
+2. **Backup Schema Only**
+```
+sudo mysqldump --no-data --databases usefulwebapps > usefulwebapps_schemaonly_YYYY_MM_DD.sql
+```
+3. **Restore Schema Only**
+```
+sudo mysql < usefulwebapps_schemaonly_YYYY_MM_DD.sql
+```
+
+The --databases flag includes the CREATE DATABASE and USE statements in the SQL dump, allowing the database to be recreated without creating it first.
+
 	
 ## Transfer Database or Images from Ubuntu to Windows
 
