@@ -3,6 +3,30 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+UsefulWebApps/wwwroot/images/artwork/*
+!UsefulWebApps/wwwroot/images/artwork/.gitkeep
+
+UsefulWebApps/wwwroot/images/customhomepage/animals/*
+!UsefulWebApps/wwwroot/images/customhomepage/animals/.gitkeep
+
+UsefulWebApps/wwwroot/images/customhomepage/cityskylines/*
+!UsefulWebApps/wwwroot/images/customhomepage/cityskylines/.gitkeep
+
+UsefulWebApps/wwwroot/images/customhomepage/nature/*
+!UsefulWebApps/wwwroot/images/customhomepage/nature/.gitkeep
+
+UsefulWebApps/wwwroot/images/customhomepage/ocean/*
+!UsefulWebApps/wwwroot/images/customhomepage/ocean/.gitkeep
+
+UsefulWebApps/wwwroot/images/customhomepage/space/*
+!UsefulWebApps/wwwroot/images/customhomepage/space/.gitkeep
+
+UsefulWebApps/wwwroot/images/recipes/*
+!UsefulWebApps/wwwroot/images/recipes/.gitkeep
+
+UsefulWebApps/wwwroot/images/users/*
+!UsefulWebApps/wwwroot/images/users/.gitkeep
+
 PW_SeedAccounts.txt
 
 appsettings.Production.json
